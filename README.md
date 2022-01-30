@@ -1,12 +1,14 @@
-# Team *enter team name here* Small Group project
+# Team Nonconformist Computer Science Students Major Group project
 
 ## Team members
 The members of the team are:
-- *Enter member 1*
-- *Enter member 2*
-- *Enter member 3*
-- *Enter member 4*
-*Add any further information about the team here, such as absent team members.*
+- Garik Chilingaryan
+- Daphnee Brunschwig
+- Guneek Deol
+- Mugur-Cristian Iacob
+- Lubna Taraki
+- Xiaojun Liang
+- Kamil Duszak
 
 ## Project structure
 The project is called `system`.  It currently consists of a single app `clubs`.
