@@ -1,0 +1,28 @@
+[
+    {
+        "model": "clubs.club",
+        "pk": 2,
+        "fields": {
+            "name": "Clubber",
+            "description": "Another friendly neighbourhood book club."
+        }
+    },
+
+    {
+        "model": "clubs.club",
+        "pk": 3,
+        "fields": {
+            "name": "Foo",
+            "description": "Yet another friendly neighbourhood book club."
+        }
+    },
+
+    {
+        "model": "clubs.club",
+        "pk": 4,
+        "fields": {
+            "name": "Bar",
+            "description": "Yes, another friendly neighbourhood book club."
+        }
+    }
+]
