@@ -1,0 +1,10 @@
+[
+    {
+        "model": "clubs.club",
+        "pk": 1,
+        "fields": {
+            "name": "Booker",
+            "description": "Your friendly neighbourhood book club."
+        }
+    }
+]

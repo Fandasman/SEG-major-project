@@ -29,3 +29,18 @@ class User(AbstractUser):
 
     def mini_gravatar(self):
         return self.gravatar(size = 60)
+
+# Create the book Club model
+class Club(models.Model):
+    name = models.CharField(
+        max_length = 50,
+        unique = True,
+        validators=[
+            RegexValidator(
+                regex = r'^.{3,}$',
+                message = 'The name of the club must contain at least three characters!'
+                )
+        ]
+    )
+
+    description = models.CharField(max_length = 500, blank = True)

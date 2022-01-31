@@ -124,11 +124,11 @@ class UserModelTestCase(TestCase):
         self.user.bio = second_user.bio
         self._assert_user_is_valid()
 
-    def test_bio_may_have_520_chars(self):
+    def test_bio_may_have_500_chars(self):
         self.user.bio='x' * 500
         self._assert_user_is_valid()
 
-    def test_bio_cannot_have_over_520_chars(self):
+    def test_bio_cannot_have_over_500_chars(self):
         self.user.bio='x' * 501
         self._assert_user_is_invalid()
 
