@@ -15,7 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from clubs import views
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('log_in/', views.LogInView.as_view() , name = 'log_in'),
+
 ]
