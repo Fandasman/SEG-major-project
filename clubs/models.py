@@ -1,5 +1,6 @@
 from django.db import models
-from django.core.validators import RegexValidator
+from .helpers import get_genres
+from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
 
@@ -29,6 +30,19 @@ class User(AbstractUser):
 
     def mini_gravatar(self):
         return self.gravatar(size = 60)
+
+# Create the Book model
+class Book(models.Model):
+    name = models.CharField(max_length = 100)
+    author = models.CharField(max_length = 100)
+    description = models.CharField(max_length = 500)
+    rating = models.IntegerField(
+        default = 0,
+        validators = [MaxValueValidator(10), MinValueValidator(0)]
+    )
+    isbn = models.CharField(max_length = 17)
+    genre = models.CharField(max_length = 20, choices = get_genres())
+    isFranchise = models.BooleanField(default = False)
 
 # Create the book Club model
 class Club(models.Model):
