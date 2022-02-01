@@ -36,6 +36,8 @@ class Book(models.Model):
     name = models.CharField(max_length = 100)
     author = models.CharField(max_length = 100)
     description = models.CharField(max_length = 500)
+    publisher = models.CharField(max_length = 100, default = '')
+    # Date of publishing here
     rating = models.IntegerField(
         default = 0,
         validators = [MaxValueValidator(10), MinValueValidator(0)]
