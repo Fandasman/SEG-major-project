@@ -1,0 +1,26 @@
+<!-- This code was taken from the clucker project -->
+{% load widget_tweaks %}
+{% for field in form %}
+ <div class="mb-3" style="color:black;">
+   {{ field.label_tag }}
+   {% if form.is_bound %}
+      {% if field.errors %}
+        {% render_field field class="form-control is-invalid" %}
+      {% else %}
+        {% render_field field class="form-control is-valid" %}
+      {% endif %}
+    {% else %}
+         {% if field.MultipleChoiceField %}
+           {% render_field field class="form-select" %}
+           {% else %}
+             {% render_field field class="form-control" %}
+             {% endif %}
+           {% endif %}
+    <div class="valid-feedback">
+      Looks good!
+    </div>
+    <div class="invalid-feedback">
+      {{ field.errors }}
+    </div>
+  </div>
+{% endfor %}
