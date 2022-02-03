@@ -11,7 +11,7 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     list_display = [
-        'title', 'author', 'description', 'publisher', 'published', 'pages', 'rating', 'isbn', 'genre', 'isFranchise',
+        'isbn', 'title', 'author', 'publisher', 'published', 'imgURLSmall', 'imgURLMedium', 'imgURLLarge'
     ]
 
 @admin.register(Club)

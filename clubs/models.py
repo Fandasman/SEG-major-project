@@ -34,25 +34,17 @@ class User(AbstractUser):
 
 # Create the Book model
 class Book(models.Model):
-    title = models.CharField(max_length = 100)
-    author = models.CharField(max_length = 100)
-    description = models.CharField(max_length = 500)
+    isbn = models.CharField(max_length = 17, unique = True, blank = False)
+    title = models.CharField(max_length = 100, unique = True, blank = False)
+    author = models.CharField(max_length = 100, blank = False)
     publisher = models.CharField(max_length = 100, default = '')
     published = models.IntegerField(
         default = datetime.datetime.now().year,
         validators = [MaxValueValidator(datetime.datetime.now().year), MinValueValidator(0)]
     )
-    pages = models.IntegerField(
-        default = 1,
-        validators = [MinValueValidator(1)]
-    )
-    rating = models.IntegerField(
-        default = 0,
-        validators = [MaxValueValidator(10), MinValueValidator(0)]
-    )
-    isbn = models.CharField(max_length = 17)
-    genre = models.CharField(max_length = 20, choices = get_genres())
-    isFranchise = models.BooleanField(default = False)
+    imgURLSmall = models.URLField(blank = True)
+    imgURLMedium = models.URLField(blank = True)
+    imgURLLarge = models.URLField(blank = True)
 
 # Create the book Club model
 class Club(models.Model):
