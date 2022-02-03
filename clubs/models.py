@@ -37,7 +37,7 @@ class Book(models.Model):
     isbn = models.CharField(max_length = 17, unique = True, blank = False)
     title = models.CharField(max_length = 100, unique = True, blank = False)
     author = models.CharField(max_length = 100, blank = False)
-    publisher = models.CharField(max_length = 100, default = '')
+    publisher = models.CharField(max_length = 100, blank = False)
     published = models.IntegerField(
         default = datetime.datetime.now().year,
         validators = [MaxValueValidator(datetime.datetime.now().year), MinValueValidator(0)]
