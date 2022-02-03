@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from .helpers import get_genres
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
@@ -33,11 +34,18 @@ class User(AbstractUser):
 
 # Create the Book model
 class Book(models.Model):
-    name = models.CharField(max_length = 100)
+    title = models.CharField(max_length = 100)
     author = models.CharField(max_length = 100)
     description = models.CharField(max_length = 500)
     publisher = models.CharField(max_length = 100, default = '')
-    # Date of publishing here
+    published = models.IntegerField(
+        default = datetime.datetime.now().year,
+        validators = [MaxValueValidator(datetime.datetime.now().year), MinValueValidator(0)]
+    )
+    pages = models.IntegerField(
+        default = 1,
+        validators = [MinValueValidator(1)]
+    )
     rating = models.IntegerField(
         default = 0,
         validators = [MaxValueValidator(10), MinValueValidator(0)]
