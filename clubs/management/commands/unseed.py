@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
         Command.delete_clubs(self)
 
-        print("Unseeding successful!")
+        print("Unseeding complete!")
     
 
     # Delete functions

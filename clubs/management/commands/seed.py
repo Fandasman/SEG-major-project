@@ -22,7 +22,7 @@ class Command(BaseCommand):
 
         Command.get_books(self, **options)
 
-        print("Seeding successful!")
+        print("Seeding complete!")
 
     
     # Generate 100 fake users.
@@ -63,19 +63,23 @@ class Command(BaseCommand):
     def get_books(self, **options):
         print("Reading books from BX_Books.csv...")
         
-        with open("clubs/data/BX_Books.csv", 'r', encoding = 'latin-1') as csv_file:
-            csvreader = csv.reader(csv_file, delimiter = ";")
-            header = next(csvreader)
+        try:
+            with open("BX_Books.csv", 'r', encoding = 'latin-1') as csv_file:
+                csvreader = csv.reader(csv_file, delimiter = ";")
+                header = next(csvreader)
 
-            for row in csvreader:
-                Book.objects.create(
-                    isbn = row[0],
-                    author = row[1],
-                    publisher = row[2],
-                    published = row[3],
-                    imgURLSmall = row[4],
-                    imgURLMedium = row[5],
-                    imgURLLarge = row[6]
-                )
+                for row in csvreader:
+                    Book.objects.create(
+                        isbn = row[0],
+                        author = row[1],
+                        publisher = row[2],
+                        published = row[3],
+                        imgURLSmall = row[4],
+                        imgURLMedium = row[5],
+                        imgURLLarge = row[6]
+                    )
+        except OSError as e:
+            print("File not found. Make sure it's in the right directory!")
+            print(e)
 
         print("Done!")
