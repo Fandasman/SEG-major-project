@@ -18,10 +18,8 @@ from django.urls import path
 from clubs import views
 
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('log_in/', views.LogInView.as_view() , name = 'log_in'),
-    path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
-]
 
+]
