@@ -3,7 +3,7 @@
         "model": "clubs.book",
         "pk": 2,
         "fields": {
-            "isbn": 7983161484100,
+            "isbn": "7983161484100",
             "title": "Ring of the Lords",
             "author": "R.R.J. Kientol",
             "publisher": "ChickenPrint",
@@ -18,7 +18,7 @@
         "model": "clubs.book",
         "pk": 3,
         "fields": {
-            "isbn": 4353161484100,
+            "isbn": "4353161484100",
             "title": "The Transformation",
             "author": "Bob Kafka",
             "publisher": "ChickenPrint",
@@ -33,7 +33,7 @@
         "model": "clubs.book",
         "pk": 4,
         "fields": {
-            "isbn": 2853161484100,
+            "isbn": "2853161484100",
             "title": "Of Cats and Hoomans",
             "author": "John Beckstein",
             "publisher": "MeowPress",

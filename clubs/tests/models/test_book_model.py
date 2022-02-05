@@ -24,15 +24,23 @@ class BookModelTestCase(TestCase):
         self.book.isbn=second_book.isbn
         self._assert_book_is_invalid()
 
+    def test_isbn_can_have_less_than_13_characters(self):
+        self.book.isbn='x' * 13
+        self._assert_book_is_valid()
+
+    def test_isbn_cannot_have_more_than_13_characters(self):
+        self.book.isbn='x' * 14
+        self._assert_book_is_invalid()
+
 # Title tests
     def test_title_is_not_blank(self):
         self.book.title=''
         self._assert_book_is_invalid()
 
-    def test_title_must_be_unique(self):
+    def test_title_does_not_have_to_be_unique(self):
         second_book=Book.objects.get(title="The Transformation")
         self.book.title=second_book.title
-        self._assert_book_is_invalid()
+        self._assert_book_is_valid()
 
     def test_title_can_have_less_than_100_characters(self):
         self.book.title='x' * 100

@@ -3,7 +3,7 @@
         "model": "clubs.book",
         "pk": 1,
         "fields": {
-            "isbn": 9783161484100,
+            "isbn": "9783161484100",
             "title": "Bob in Wonderland",
             "author": "Carroll Lewis",
             "publisher": "ChickenPrint",

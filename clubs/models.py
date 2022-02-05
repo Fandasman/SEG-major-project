@@ -33,7 +33,7 @@ class User(AbstractUser):
 
 # Create the Book model
 class Book(models.Model):
-    isbn = models.CharField(max_length = 10, unique = True, blank = False)
+    isbn = models.CharField(max_length = 13, unique = True, blank = False)
     title = models.CharField(max_length = 100, blank = False)
     author = models.CharField(max_length = 100, blank = False)
     publisher = models.CharField(max_length = 100, blank = False)
