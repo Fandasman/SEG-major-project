@@ -1,11 +1,13 @@
 from django.core.management.base import BaseCommand, CommandError
-from clubs.models import User, Club
+from clubs.models import User, Book, Club
 
 class Command(BaseCommand):
     """The database unseeder."""
 
     def handle(self, *args, **options):
         print("Starting unseed...")
+
+        Command.delete_books(self)
 
         Command.delete_users(self)
 
@@ -28,5 +30,14 @@ class Command(BaseCommand):
         clubs = Club.objects.all()
         for club in clubs:
             club.delete()
+
+        print("Done!")
+
+    def delete_books(self):
+        print("Deleting books...")
+
+        books = Book.objects.all()
+        for book in books:
+            book.delete()
 
         print("Done!")

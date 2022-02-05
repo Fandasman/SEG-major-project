@@ -1,5 +1,6 @@
+import csv
 from django.core.management.base import BaseCommand, CommandError
-from clubs.models import User, Club
+from clubs.models import User, Book, Club
 from django.contrib.auth.hashers import make_password
 from faker import Faker
 
@@ -18,6 +19,8 @@ class Command(BaseCommand):
         Command.generate_users(self)
 
         Command.generate_clubs(self)
+
+        Command.get_books(self, **options)
 
         print("Seeding successful!")
 
@@ -54,4 +57,25 @@ class Command(BaseCommand):
                 name = fakeName,
                 description = fakeDescription
             )
+        print("Done!")
+
+    # Read books from BX_Books.csv
+    def get_books(self, **options):
+        print("Reading books from BX_Books.csv...")
+        
+        with open("clubs/data/BX_Books.csv", 'r', encoding = 'latin-1') as csv_file:
+            csvreader = csv.reader(csv_file, delimiter = ";")
+            header = next(csvreader)
+
+            for row in csvreader:
+                Book.objects.create(
+                    isbn = row[0],
+                    author = row[1],
+                    publisher = row[2],
+                    published = row[3],
+                    imgURLSmall = row[4],
+                    imgURLMedium = row[5],
+                    imgURLLarge = row[6]
+                )
+
         print("Done!")

@@ -24,14 +24,6 @@ class BookModelTestCase(TestCase):
         self.book.isbn=second_book.isbn
         self._assert_book_is_invalid()
 
-    def test_isbn_can_have_less_than_17_characters(self):
-        self.book.isbn='x' * 17
-        self._assert_book_is_valid()
-
-    def test_isbn_cannot_have_more_than_17_characters(self):
-        self.book.isbn='x' * 18
-        self._assert_book_is_invalid()
-
 # Title tests
     def test_title_is_not_blank(self):
         self.book.title=''

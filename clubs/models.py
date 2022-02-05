@@ -1,6 +1,5 @@
 import datetime
 from django.db import models
-from .helpers import get_genres
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
@@ -34,8 +33,8 @@ class User(AbstractUser):
 
 # Create the Book model
 class Book(models.Model):
-    isbn = models.CharField(max_length = 17, unique = True, blank = False)
-    title = models.CharField(max_length = 100, unique = True, blank = False)
+    isbn = models.CharField(max_length = 10, unique = True, blank = False)
+    title = models.CharField(max_length = 100, blank = False)
     author = models.CharField(max_length = 100, blank = False)
     publisher = models.CharField(max_length = 100, blank = False)
     published = models.IntegerField(

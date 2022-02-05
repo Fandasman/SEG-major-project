@@ -3,14 +3,14 @@
         "model": "clubs.book",
         "pk": 2,
         "fields": {
-            "isbn": "798-3-16-148410-0",
+            "isbn": 7983161484100,
             "title": "Ring of the Lords",
             "author": "R.R.J. Kientol",
             "publisher": "ChickenPrint",
             "published": 1967,
-            "imgURLSmall": "http://images.catzon.com/images/P/0195153448.01.THUMBZZZ.jpg",
-            "imgURLMedium": "http://images.catzon.com/images/P/0195153458.01.THUMBZZZ.jpg",
-            "imgURLLarge": "http://images.catzon.com/images/P/0195153468.01.THUMBZZZ.jpg"
+            "imgURLSmall": "http://images.amazon.com/images/P/0195153448.01.THUMBZZZ.jpg",
+            "imgURLMedium": "http://images.amazon.com/images/P/0195153458.01.THUMBZZZ.jpg",
+            "imgURLLarge": "http://images.amazon.com/images/P/0195153468.01.THUMBZZZ.jpg"
         }
     },
 
@@ -18,14 +18,14 @@
         "model": "clubs.book",
         "pk": 3,
         "fields": {
-            "isbn": "435-3-16-148410-0",
+            "isbn": 4353161484100,
             "title": "The Transformation",
             "author": "Bob Kafka",
             "publisher": "ChickenPrint",
             "published": 1948,
-            "imgURLSmall": "http://images.catzon.com/images/P/0195153448.01.THUMBZZZ.jpg",
-            "imgURLMedium": "http://images.catzon.com/images/P/0195153458.01.THUMBZZZ.jpg",
-            "imgURLLarge": "http://images.catzon.com/images/P/0195153468.01.THUMBZZZ.jpg"
+            "imgURLSmall": "http://images.amazon.com/images/P/0195153448.01.THUMBZZZ.jpg",
+            "imgURLMedium": "http://images.amazon.com/images/P/0195153458.01.THUMBZZZ.jpg",
+            "imgURLLarge": "http://images.amazon.com/images/P/0195153468.01.THUMBZZZ.jpg"
         }
     },
 
@@ -33,14 +33,14 @@
         "model": "clubs.book",
         "pk": 4,
         "fields": {
-            "isbn": "285-3-16-148410-0",
+            "isbn": 2853161484100,
             "title": "Of Cats and Hoomans",
             "author": "John Beckstein",
             "publisher": "MeowPress",
             "published": 2004,
-            "imgURLSmall": "http://images.catzon.com/images/P/0195153448.01.THUMBZZZ.jpg",
-            "imgURLMedium": "http://images.catzon.com/images/P/0195153458.01.THUMBZZZ.jpg",
-            "imgURLLarge": "http://images.catzon.com/images/P/0195153468.01.THUMBZZZ.jpg"
+            "imgURLSmall": "http://images.amazon.com/images/P/0195153448.01.THUMBZZZ.jpg",
+            "imgURLMedium": "http://images.amazon.com/images/P/0195153458.01.THUMBZZZ.jpg",
+            "imgURLLarge": "http://images.amazon.com/images/P/0195153468.01.THUMBZZZ.jpg"
         }
     }
 ]
