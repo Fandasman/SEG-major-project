@@ -1,0 +1,16 @@
+[
+    {
+        "model": "clubs.book",
+        "pk": 1,
+        "fields": {
+            "isbn": "9783161484100",
+            "title": "Bob in Wonderland",
+            "author": "Carroll Lewis",
+            "publisher": "ChickenPrint",
+            "published": 1987,
+            "imgURLSmall": "http://images.amazon.com/images/P/0195153448.01.THUMBZZZ.jpg",
+            "imgURLMedium": "http://images.amazon.com/images/P/0195153458.01.THUMBZZZ.jpg",
+            "imgURLLarge": "http://images.amazon.com/images/P/0195153468.01.THUMBZZZ.jpg"
+        }
+    }
+]

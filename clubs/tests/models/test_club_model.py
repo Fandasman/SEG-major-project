@@ -26,7 +26,7 @@ class ClubModelTestCase(TestCase):
         self._assert_club_is_invalid()
 
     def test_name_contains_whitespace(self):
-        self.club.name = "Booker"
+        self.club.name = "Booker "
         self._assert_club_is_valid()
 
     def test_name_contains_number(self):
@@ -64,7 +64,7 @@ class ClubModelTestCase(TestCase):
         try:
             self.club.full_clean()
         except (ValidationError):
-            self.fail('Test user should be valid')
+            self.fail('Test should be valid')
 
     def _assert_club_is_invalid(self):
         with self.assertRaises(ValidationError):
