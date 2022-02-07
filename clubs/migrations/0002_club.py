@@ -18,5 +18,10 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=50, unique=True, validators=[django.core.validators.RegexValidator(message='The name of the club must contain at least three characters!', regex='^.{3,}$')])),
                 ('description', models.CharField(blank=True, max_length=500)),
             ],
+            options={
+                'verbose_name': 'club',
+                'verbose_name_plural': 'clubs',
+                'abstract': False,
+            },
         ),
     ]

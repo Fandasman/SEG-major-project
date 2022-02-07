@@ -1,32 +1,17 @@
 {% extends 'base.html' %}
 {% block body %}
-
-<div id="cover-image">
-  <div calss="container vh-100">
-    <div class="row vh-100">
-      <div class="col-12 my-auto">
-        <div class="card cover-card offset-sm-2 offset-md-4 offset-lg-7" style= "background-color: rgba(245, 245, 245, 0.6);
-          max-width: 30rem;
-          padding-top: 30px;
-          padding-left: 50px;
-          padding-right: 50px;
-          padding-bottom: 30px;
-          border-radius: 15%;">
-          <h1 class="cover-heading">Book Club</h1>
-          <p class="cover-text"> The place for the people to sign up for the club</p>
-          <p>
-            <a href='{% url 'sign_up'%}' class="btn btn-lg btn-secondary">
-              Sign up
-            </a>
-          </p>
-          <p>
-            <a href='{% url 'home'%}' class="btn btn-lg btn-secondary">
-              Log in
-            </a>
-          </p>
+<div class="bg-image"
+     style="background-image: url('/static/books.jpg');
+            height: 100vh">
+        <div class="col d-flex justify-content-center align-item-center">
+          <div class="card rounded cover-cards offset-sm-2 offset-md-4 offset-lg-7 p-3 mb-2 bg-dark text-white">
+            <h1>Welcome to The Book Club!</h1>
+            <form action="{% url 'feed' %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ next }}">
+              <input type="submit" value="Enter" class="btn btn-primary">
+            </form>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
 {% endblock %}
