@@ -20,6 +20,7 @@ from clubs import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('log_in/', views.LogInView.as_view() , name = 'log_in'),
+    path('log_in/', views.log_in , name = 'log_in'),
+    path('clubs/', views.log_in , name = 'clubs'),
 
 ]
