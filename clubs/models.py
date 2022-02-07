@@ -24,6 +24,9 @@ class User(AbstractUser):
     email = models.EmailField(unique = True, blank = False)
     bio = models.CharField(max_length = 500, blank = True)
 
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
+        
     def gravatar(self, size = 120):
         g_object = Gravatar(self.email)
         url = g_object.get_image(size = size, default = 'mp')
