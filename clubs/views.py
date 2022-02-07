@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic.edit import FormView
 from .forms import SignUpForm
+from .forms import CreateClubForm
 from django.conf import settings
 
 # class LoginProhibitedMixin:
@@ -53,3 +54,16 @@ class SignUpView(FormView):
     def get_success_url(self):
         pass
         #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
+def CreateClubView(request):
+    if request.method == "POST":
+        form = CreateClubForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+    else:
+        form = CreateClubForm()
+    return render(request, 'create_club.html', {'form': form})
+
+    # form_class = CreateClubForm
+    # template_name = "create_club.html"

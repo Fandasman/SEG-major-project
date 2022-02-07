@@ -20,5 +20,6 @@ from clubs import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
+    path('create_club/', views.CreateClubView, name ='create_club'),
     path('', views.home, name = 'home'),
 ]
