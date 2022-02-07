@@ -7,12 +7,9 @@ from django.views import View
 from .forms import SignUpForm
 from .forms import LogInForm
 from .models import Book, Club, User
-<<<<<<< HEAD
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
-=======
 from .forms import EditProfileForm
->>>>>>> 05ac22bb9a116f88f745dee764155f4e4e031d8d
 
 
 # Create your views here.
@@ -154,7 +151,7 @@ class SignUpView(FormView):
         pass
         #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
               
-@login_required
+# @login_required
 def edit_profile(request):
     current_user = request.user
     if request.method == 'POST':

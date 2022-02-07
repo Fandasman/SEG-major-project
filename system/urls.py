@@ -28,11 +28,8 @@ urlpatterns = [
     path('user/<int:user_id>', views.show_user, name='show_user'),
     path('users/', views.search_users, name='search_users'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
-<<<<<<< HEAD
     path('login/', views.LogInView.as_view(), name='login'),
-=======
     path('edit_profile/', views.edit_profile, name='edit_profile'),
 
 
->>>>>>> 05ac22bb9a116f88f745dee764155f4e4e031d8d
 ]
