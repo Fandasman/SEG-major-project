@@ -1,0 +1,29 @@
+{% extends 'base_content.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Clubs</h1>
+      <form class="container-fluid" action="{% url 'search_clubs' %}">
+        <table class="table">
+          <nav class="navbar navbar-light bg-light">
+            <div class="input-group">
+              <input class="form-control" list="clubsOptions" placeholder="Type to search clubs" name="club_searchbar">
+              <datalist id="clubsOptions">
+                {% for club in clubs %}
+                  <option value="{{ club.name }}">
+                {% endfor %}
+              </datalist>
+            </div>
+          </nav>
+          {% for club in clubs %}
+            <tr>
+              <td><a href="{% url 'show_club' club.id %}">{{ club.name }}</a></td>
+            </tr>
+          {% endfor %}
+        </table>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

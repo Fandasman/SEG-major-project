@@ -4,7 +4,7 @@
 </head>
 <body>
   <h1>Log_in</h1>
-  <form action ="{%url 'log_in' %}" method="post">
+  <form action ="{%url 'login' %}" method="post">
     {%csrf_token%}
     {{form.as_p}}
     <input type ="submit" value = "log_in">
