@@ -5,14 +5,9 @@ from django.shortcuts import redirect, render
 from django.views.generic.edit import FormView
 from django.views import View
 from .forms import SignUpForm
-from .forms import LogInForm
+from .forms import CreateClubForm
+from django.conf import settings
 from .models import Book, Club, User
-<<<<<<< HEAD
-from django.contrib import messages
-from django.contrib.auth import authenticate, login
-=======
-from .forms import EditProfileForm
->>>>>>> 05ac22bb9a116f88f745dee764155f4e4e031d8d
 
 
 # Create your views here.
@@ -112,27 +107,6 @@ def search_users(request):
     #              return self.redirect_when_logged_in_url
 
 
-class LogInView(View):
-    """Log-in handling view"""
-    def get(self,request):
-        self.next = request.GET.get('next') or 'officer'
-        return self.render()
-
-    def post(self,request):
-        form = LogInForm(request.POST)
-        self.next = request.POST.get('next') 
-        user = form.get_user()
-        if user is not None:
-                """Redirect to club selection page, with option to create new club"""
-                login(request, user)
-                return redirect('feed')
-
-        messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
-        return self.render()    
-
-    def render(self):
-        form = LogInForm()
-        return render(self.request, 'login.html', {'form': form, 'next' : self.next})
 
     """This function standardize the requirements for
         user registration, if the user successfully
@@ -153,17 +127,18 @@ class SignUpView(FormView):
     def get_success_url(self):
         pass
         #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-              
-@login_required
-def edit_profile(request):
-    current_user = request.user
-    if request.method == 'POST':
-        form = EditProfileForm(instance=current_user, data=request.POST)
-        if form.is_valid():
-            messages.add_message(request, messages.SUCCESS, "Profile updated!")
-            form.save()
-            return redirect('feed')
-    else:
-        form = EditProfileForm(instance=current_user)
-    return render(request, 'edit_profile.html', {'form': form, 'user': current_user})
 
+
+"""This function standardize the requirements for
+    creating clubs, if club is successfully created,
+    it will be store in the database and client will
+    be redirected to the feed page"""
+def CreateClubView(request):
+    if request.method == "POST":
+        form = CreateClubForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/feed/')
+    else:
+        form = CreateClubForm()
+    return render(request, 'create_club.html', {'form': form})
