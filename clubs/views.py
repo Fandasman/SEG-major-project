@@ -59,6 +59,13 @@ def show_user(request, user_id):
         )
 
 # @login_required
+def profile(request):
+    current_user = request.user
+    return render(request, 'profile.html',
+            {'user': current_user}
+        )
+
+# @login_required
 def search_books(request):
     search_book = request.GET.get('book_searchbar')
     if search_book:
@@ -182,7 +189,6 @@ class EditProfileView(View):
             messages.add_message(request, messages.SUCCESS, "Profile updated!")
             form.save()
             return redirect('feed')
-        messages.add_message(request, messages.ERROR, "Invalid data entered")
         return render(request, 'edit_profile.html', {'form': form, 'user': current_user})
 
 
