@@ -55,6 +55,11 @@ class SignUpView(FormView):
         pass
         #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
+
+"""This function standardize the requirements for
+    creating clubs, if club is successfully created,
+    it will be store in the database and client will
+    be redirected to the home page"""
 def CreateClubView(request):
     if request.method == "POST":
         form = CreateClubForm(request.POST)
@@ -64,6 +69,3 @@ def CreateClubView(request):
     else:
         form = CreateClubForm()
     return render(request, 'create_club.html', {'form': form})
-
-    # form_class = CreateClubForm
-    # template_name = "create_club.html"

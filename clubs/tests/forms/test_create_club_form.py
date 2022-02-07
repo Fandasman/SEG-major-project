@@ -2,7 +2,7 @@
 from django.test import TestCase
 from clubs.forms import CreateClubForm
 from clubs.models import Club
-from django.urls import reverse
+
 
 class CreateClubFormTestCase(TestCase):
 

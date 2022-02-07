@@ -1,10 +1,8 @@
 """Test of the create club view"""
 from django.test import TestCase
 from django.urls import reverse
-
-from clubs.forms import CreateClubForm
 from clubs.models import Club
-#from clubs.forms import CreateClubForm
+
 
 class CreateClubViewTestCase(TestCase):
 
