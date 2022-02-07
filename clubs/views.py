@@ -4,6 +4,8 @@ from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.views.generic.edit import FormView
 from .forms import SignUpForm
+from .forms import CreateClubForm
+from django.conf import settings
 from .models import Book, Club, User
 
 
@@ -124,3 +126,18 @@ class SignUpView(FormView):
     def get_success_url(self):
         pass
         #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
+
+"""This function standardize the requirements for
+    creating clubs, if club is successfully created,
+    it will be store in the database and client will
+    be redirected to the feed page"""
+def CreateClubView(request):
+    if request.method == "POST":
+        form = CreateClubForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/feed/')
+    else:
+        form = CreateClubForm()
+    return render(request, 'create_club.html', {'form': form})

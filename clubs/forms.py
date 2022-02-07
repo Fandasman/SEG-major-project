@@ -2,6 +2,7 @@ from django import forms
 from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from .models import User
+from .models import Club
 
 
 class SignUpForm(forms.ModelForm):
@@ -40,3 +41,9 @@ class SignUpForm(forms.ModelForm):
             password=self.cleaned_data.get('new_password'),
         )
         return user
+
+class CreateClubForm(forms.ModelForm):
+    class Meta:
+        model = Club
+        fields = ['name', 'description']
+        widgets = { 'description': forms.Textarea()}
