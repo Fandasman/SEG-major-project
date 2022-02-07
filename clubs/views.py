@@ -1,10 +1,11 @@
-from django.shortcuts import redirect, render
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
-from .models import Book, Club, User
+from django.shortcuts import redirect, render
 from django.views.generic.edit import FormView
 from .forms import SignUpForm
-from django.conf import settings
+from .models import Book, Club, User
+
 
 # Create your views here.
 
@@ -108,18 +109,18 @@ def search_users(request):
         user registration, if the user successfully
         registers, it will be created in the system,
         and will be redirected to the profile page """
-    class SignUpView(FormView):
-        """View that signs up user."""
+class SignUpView(FormView):
+    """View that signs up user."""
 
-        form_class = SignUpForm
-        template_name = "sign_up.html"
-        #redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
+    form_class = SignUpForm()
+    template_name = "sign_up.html"
+    #redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
 
-        def form_valid(self, form):
-            self.object = form.save()
-            login(self.request, self.object)
-            return super().form_valid(form)
+    def form_valid(self, form):
+        self.object = form.save()
+        login(self.request, self.object)
+        return super().form_valid(form)
 
-        def get_success_url(self):
-            pass
-            #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+    def get_success_url(self):
+        pass
+        #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
