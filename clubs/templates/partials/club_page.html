@@ -23,7 +23,7 @@
 </div>
 <div class="row content">
   <div class="col-12">
-    <h3>About {{ club.get_owner_username }} :</h3>
+    <h3>About {{ club.get_leader_username }} :</h3>
   </div>
 </div>
 &emsp;
@@ -32,10 +32,10 @@
     <img src="{{ user.mini_gravatar }}" alt="Gravatar of {{ club.owner }}" class="rounded-circle profile-image" >
   </div>
   <div class="col">
-    <h5 class="profile-title">{{ club.get_owner_name }}</h5>
+    <h5 class="profile-title">{{ club.get_leader_name }}</h5>
   </div>
 </div>
 &emsp;
 <div class="row content">
-  <p class="profile-bio">{{ club.get_owner_bio }}</p>
+  <p class="profile-bio">{{ club.get_leader_bio }}</p>
 </div>
