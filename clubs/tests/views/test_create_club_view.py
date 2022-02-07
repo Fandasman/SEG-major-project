@@ -32,5 +32,5 @@ class CreateClubViewTestCase(TestCase):
         response = self.client.post(self.url, self.form_input, follow=True)
         after_count = Club.objects.count()
         self.assertEqual(after_count, before_count+1)
-        response_url = reverse('home')
+        response_url = reverse('feed')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
