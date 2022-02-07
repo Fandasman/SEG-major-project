@@ -5,6 +5,7 @@ from django.shortcuts import redirect, render
 from django.views.generic.edit import FormView
 from .forms import SignUpForm
 from .models import Book, Club, User
+from .forms import EditProfileForm
 
 
 # Create your views here.
@@ -76,7 +77,6 @@ def search_users(request):
         users= User.objects.all()
     return render(request, 'search_users.html', {'users': users})
 
-
     # class LoginProhibitedMixin:
     #
     #      """Mixin that redirects when a user is logged in."""
@@ -124,3 +124,17 @@ class SignUpView(FormView):
     def get_success_url(self):
         pass
         #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+              
+@login_required
+def edit_profile(request):
+    current_user = request.user
+    if request.method == 'POST':
+        form = EditProfileForm(instance=current_user, data=request.POST)
+        if form.is_valid():
+            messages.add_message(request, messages.SUCCESS, "Profile updated!")
+            form.save()
+            return redirect('feed')
+    else:
+        form = EditProfileForm(instance=current_user)
+    return render(request, 'edit_profile.html', {'form': form, 'user': current_user})
+

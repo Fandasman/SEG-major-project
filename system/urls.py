@@ -28,5 +28,7 @@ urlpatterns = [
     path('user/<int:user_id>', views.show_user, name='show_user'),
     path('users/', views.search_users, name='search_users'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
+    path('edit_profile/', views.edit_profile, name='edit_profile'),
+
 
 ]
