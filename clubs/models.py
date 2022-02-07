@@ -1,5 +1,6 @@
+import datetime
 from django.db import models
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
 
@@ -32,6 +33,20 @@ class User(AbstractUser):
 
     def mini_gravatar(self):
         return self.gravatar(size = 60)
+
+# Create the Book model
+class Book(models.Model):
+    isbn = models.CharField(max_length = 13, unique = True, blank = False)
+    title = models.CharField(max_length = 100, blank = False)
+    author = models.CharField(max_length = 100, blank = False)
+    publisher = models.CharField(max_length = 100, blank = False)
+    published = models.IntegerField(
+        default = datetime.datetime.now().year,
+        validators = [MaxValueValidator(datetime.datetime.now().year), MinValueValidator(0)]
+    )
+    imgURLSmall = models.URLField(blank = True)
+    imgURLMedium = models.URLField(blank = True)
+    imgURLLarge = models.URLField(blank = True)
 
 # Create the book Club model
 class Club(models.Model):

@@ -1,0 +1,41 @@
+<div class="row row-cols-2">
+  <div class="col">
+    <div class="header-text">
+      <h1 class="page-title">{{ club.name }}</h1>
+      <p class="club-owner">{{ club.leader }}</p>
+    </div>
+  </div>
+  <div class="col">
+    <p class="page-statistics">
+      <span>
+        <b>{{ club.members_count }}</b> Members
+      </span>
+    </p>
+  </div>
+</div>
+<div class="row row-cols-2">
+  <div class="col-9">
+    <p class="club-bio">{{ club.description }}</p>
+  </div>
+  <div class="col-3">
+    <p class="club-location">{{ club.location }}</p>
+  </div>
+</div>
+<div class="row content">
+  <div class="col-12">
+    <h3>About {{ club.get_leader_username }} :</h3>
+  </div>
+</div>
+&emsp;
+<div class="row row-cols-2">
+  <div class="col-2">
+    <img src="{{ user.mini_gravatar }}" alt="Gravatar of {{ club.owner }}" class="rounded-circle profile-image" >
+  </div>
+  <div class="col">
+    <h5 class="profile-title">{{ club.get_leader_name }}</h5>
+  </div>
+</div>
+&emsp;
+<div class="row content">
+  <p class="profile-bio">{{ club.get_leader_bio }}</p>
+</div>
