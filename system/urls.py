@@ -27,5 +27,7 @@ urlpatterns = [
     path('feed/', views.feed, name='feed'),
     path('user/<int:user_id>', views.show_user, name='show_user'),
     path('users/', views.search_users, name='search_users'),
+    path('edit_profile/', views.edit_profile, name='edit_profile'),
+
 
 ]

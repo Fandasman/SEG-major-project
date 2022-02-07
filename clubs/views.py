@@ -2,6 +2,7 @@ from django.shortcuts import redirect, render
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from .models import Book, Club, User
+from .forms import EditProfileForm
 
 # Create your views here.
 
@@ -71,3 +72,17 @@ def search_users(request):
     else:
         users= User.objects.all()
     return render(request, 'search_users.html', {'users': users})
+
+@login_required
+def edit_profile(request):
+    current_user = request.user
+    if request.method == 'POST':
+        form = EditProfileForm(instance=current_user, data=request.POST)
+        if form.is_valid():
+            messages.add_message(request, messages.SUCCESS, "Profile updated!")
+            form.save()
+            return redirect('feed')
+    else:
+        form = EditProfileForm(instance=current_user)
+    return render(request, 'edit_profile.html', {'form': form, 'user': current_user})
+
