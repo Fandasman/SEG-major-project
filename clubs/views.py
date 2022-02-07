@@ -6,6 +6,8 @@ from django.views.generic.edit import FormView
 from django.views import View
 from .forms import SignUpForm
 from .forms import LogInForm
+from .forms import CreateClubForm
+from django.conf import settings
 from .models import Book, Club, User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
@@ -166,3 +168,18 @@ def edit_profile(request):
         form = EditProfileForm(instance=current_user)
     return render(request, 'edit_profile.html', {'form': form, 'user': current_user})
 
+
+
+"""This function standardize the requirements for
+    creating clubs, if club is successfully created,
+    it will be store in the database and client will
+    be redirected to the feed page"""
+def CreateClubView(request):
+    if request.method == "POST":
+        form = CreateClubForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/feed/')
+    else:
+        form = CreateClubForm()
+    return render(request, 'create_club.html', {'form': form})
