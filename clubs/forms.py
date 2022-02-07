@@ -42,16 +42,6 @@ class SignUpForm(forms.ModelForm):
         )
         return user
 
-class EditProfileForm(forms.ModelForm):
-    """Form to update user profiles."""
-
-    class Meta:
-        """Form options."""
-
-        model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'bio']
-        widgets = { 'bio': forms.Textarea()}
-
 class LogInForm(forms.Form):
     username = forms.CharField(required=True, label = "username")
     # Tried to make email not case senstive.

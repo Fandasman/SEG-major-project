@@ -11,9 +11,11 @@ from django.conf import settings
 from .models import Book, Club, User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
-from .forms import EditProfileForm
 from django.core.exceptions import ImproperlyConfigured
 
+from .forms import CreateClubForm
+from django.conf import settings
+from .models import Book, Club, User
 
 
 # Create your views here.
@@ -112,7 +114,6 @@ def search_users(request):
 #              else:
 #                  return self.redirect_when_logged_in_url
 
-
 class LogInView(View):
     """Log-in handling view"""
     def get(self,request):
@@ -154,20 +155,6 @@ class SignUpView(FormView):
     def get_success_url(self):
         pass
         #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-              
-# @login_required
-def edit_profile(request):
-    current_user = request.user
-    if request.method == 'POST':
-        form = EditProfileForm(instance=current_user, data=request.POST)
-        if form.is_valid():
-            messages.add_message(request, messages.SUCCESS, "Profile updated!")
-            form.save()
-            return redirect('feed')
-    else:
-        form = EditProfileForm(instance=current_user)
-    return render(request, 'edit_profile.html', {'form': form, 'user': current_user})
-
 
 
 """This function standardize the requirements for
