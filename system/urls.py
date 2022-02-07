@@ -19,15 +19,6 @@ from clubs import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',views.home, name='home'),
-    path('book/<int:book_id>', views.show_book, name='show_book'),
-    path('books/', views.search_books, name='search_books'),
-    path('club/<int:club_id>', views.show_club, name='show_club'),
-    path('clubs/', views.search_clubs, name='search_clubs'),
-    path('feed/', views.feed, name='feed'),
-    path('user/<int:user_id>', views.show_user, name='show_user'),
-    path('users/', views.search_users, name='search_users'),
     path('edit_profile/', views.edit_profile, name='edit_profile'),
-
 
 ]
