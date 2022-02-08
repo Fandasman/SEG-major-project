@@ -71,12 +71,13 @@ class Command(BaseCommand):
                 for row in csvreader:
                     Book.objects.create(
                         isbn = row[0],
-                        author = row[1],
-                        publisher = row[2],
+                        title = row[1],
+                        author = row[2],
                         published = row[3],
-                        imgURLSmall = row[4],
-                        imgURLMedium = row[5],
-                        imgURLLarge = row[6]
+                        publisher = row[4],
+                        imgURLSmall = row[5],
+                        imgURLMedium = row[6],
+                        imgURLLarge = row[7]
                     )
         except OSError as e:
             print("File not found. Make sure it's in the right directory!")
