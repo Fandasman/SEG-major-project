@@ -1,0 +1,30 @@
+{%extends 'base_content.html'%}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>All Users</h1>
+      <table class="table table-borderless">
+        <tr>
+          <td>
+            <div class="card" style="width: 40rem;">
+              <div class="card-header text-center">
+                <h5 class="card-title">Members</h5>
+              </div>
+              <div class="card-body">
+                <p class="card-text">Access information about all members</p>
+                <p class="card-text">Members: {{ number_of_members }}</p>
+                <form action="{% url 'owner_member_list' %}" method="post">
+                  {% csrf_token %}
+                  {% include 'partials/bootstrap_form.html' with form=form %}
+                  <input type = "submit" value = "Members" class = "btn btn-primary" name="members">
+                </form>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group
 from libgravatar import Gravatar
 
 # Create your models here.
@@ -25,13 +25,27 @@ class User(AbstractUser):
 
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
-        
+
     def gravatar(self, size = 120):
         g_object = Gravatar(self.email)
         url = g_object.get_image(size = size, default = 'mp')
 
     def mini_gravatar(self):
         return self.gravatar(size = 60)
+
+# Create the Book model
+class Book(models.Model):
+    isbn = models.CharField(max_length = 13, unique = True, blank = False)
+    title = models.CharField(max_length = 100, blank = False)
+    author = models.CharField(max_length = 100, blank = False)
+    publisher = models.CharField(max_length = 100, blank = False)
+    # published = models.IntegerField(
+    #     default = datetime.datetime.now().year,
+    #     validators = [MaxValueValidator(datetime.datetime.now().year), MinValueValidator(0)]
+    # )
+    imgURLSmall = models.URLField(blank = True)
+    imgURLMedium = models.URLField(blank = True)
+    imgURLLarge = models.URLField(blank = True)
 
 # Create the book Club model
 class Club(models.Model):
@@ -47,3 +61,16 @@ class Club(models.Model):
     )
 
     description = models.CharField(max_length = 500, blank = True)
+
+
+    def getClubApplicantGroup(self):
+        return Group.objects.get(name = self.club_codename + " Applicant")
+
+    def getClubMemberGroup(self):
+        return Group.objects.get(name = self.club_codename + " Member")
+
+    def getClubOfficerGroup(self):
+        return Group.objects.get(name = self.club_codename + " Officer")
+
+    def getClubOwnerGroup(self):
+        return Group.objects.get(name = self.club_codename + " Owner")

@@ -1,0 +1,14 @@
+<div class="row content">
+  <div class="col-12">
+    <img src="{{ user.gravatar }}" alt="Gravatar of {{ user.first_name }}" class="rounded-circle profile-image">
+    <div class="profile-text">
+      <h1 class="profile-title">{{ user.first_name }} {{ user.last_name }}</h1>
+    </div>
+  </div>
+</div>
+<div class="row content">
+  <h2>Bio</h2>
+  <p class="profile-bio">{{ user.bio }}</p>
+  <div class="col-12">
+  </div>
+</div>
