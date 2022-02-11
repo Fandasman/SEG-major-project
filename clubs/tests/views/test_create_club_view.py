@@ -33,6 +33,7 @@ class CreateClubViewTestCase(TestCase):
 
     def test_unsuccessful_create_club(self):
         self.form_input['name'] = ''
+        self.form_input['location'] = ''
         self.form_input['description'] = 'a'* 501
         response = self.client.post(self.form_input)
         self.assertEqual(response.status_code, 404)
