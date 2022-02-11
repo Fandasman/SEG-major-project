@@ -46,6 +46,10 @@ class ClubModelTestCase(TestCase):
         self.club.leader = None
         self._assert_club_is_invalid()
 
+    def test_valid_leader(self):
+        self.club.leader = User.objects.get(id = 1)
+        self._assert_club_is_valid()
+
     def test_leader_does_not_have_to_be_unique(self):
         second_club=Club.objects.get(name="Clubber")
         self.club.leader=second_club.leader
