@@ -41,6 +41,16 @@ class ClubModelTestCase(TestCase):
         self.club.name='x' * 51
         self._assert_club_is_invalid()
 
+# Leader tests.
+    def test_leader_cannot_be_blank(self):
+        self.club.leader = None
+        self._assert_club_is_invalid()
+
+    def test_leader_does_not_have_to_be_unique(self):
+        second_club=Club.objects.get(name="Clubber")
+        self.club.leader=second_club.leader
+        self._assert_club_is_valid()
+
 # Description tests.
     def test_description_can_be_blank(self):
         self.club.description=''
