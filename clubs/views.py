@@ -15,7 +15,7 @@ from django.views.generic.edit import FormView
 from typing import List
 from .club_list import ClubList
 from .forms import SignUpForm, LogInForm, EditProfileForm, CreateClubForm
-from .models import Club, User
+from .models import Book, Club, User
 
 
 # Create your views here.
