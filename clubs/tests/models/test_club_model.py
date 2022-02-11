@@ -55,6 +55,11 @@ class ClubModelTestCase(TestCase):
         self.club.leader=second_club.leader
         self._assert_club_is_valid()
 
+# Members tests.
+    def test_members_can_be_blank(self):
+        self.club.members.set([])
+        self._assert_club_is_valid()
+
 # Location tests.
     def test_location_can_be_blank(self):
         self.club.location = ''

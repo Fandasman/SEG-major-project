@@ -25,8 +25,19 @@ class Command(BaseCommand):
         print("Seeding complete!")
 
     
-    # Generate 100 fake users.
+    # Generate fake users.
     def generate_users(self):
+        print("Generating club owner profile...")
+        User.objects.create(
+            username = 'charlie',
+            first_name = 'Charlie',
+            last_name = 'Czechman',
+            email = 'charlie@example.org',
+            password = Command.PASSWORD,
+            bio = 'Hi, I own all the clubs here. Care to join?'
+        )
+        print("Done!")
+
         print("Generating 100 fake users...")
         for i in range(0, 100):
             fakeUsername = self.faker.user_name() + str(i)
@@ -51,10 +62,13 @@ class Command(BaseCommand):
         print("Generating 10 fake book clubs...")
         for i in range(0, 10):
             fakeName = self.faker.company()
+            fakeLocation = self.faker.address()
             fakeDescription = self.faker.text(max_nb_chars = 500)
 
             Club.objects.create(
                 name = fakeName,
+                leader = User.objects.get(username = 'charlie'),
+                location = fakeLocation,
                 description = fakeDescription
             )
         print("Done!")
