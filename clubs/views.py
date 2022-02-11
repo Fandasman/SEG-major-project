@@ -6,6 +6,7 @@ from django.views.generic.edit import FormView
 from django.views import View
 from .forms import SignUpForm, LogInForm, EditProfileForm, CreateClubForm
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from .models import Book, Club, User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
@@ -166,11 +167,16 @@ class SignUpView(FormView):
     creating clubs, if club is successfully created,
     it will be store in the database and client will
     be redirected to the feed page"""
+@login_required
 def CreateClubView(request):
     if request.method == "POST":
         form = CreateClubForm(request.POST)
+        current_user = request.user
         if form.is_valid():
-            form.save()
+            name = form.cleaned_data.get('name')
+            location = form.cleaned_data.get('location')
+            description = form.cleaned_data.get('description')
+            Club.objects.create(leader=current_user, name=name, location=location, description=description)
             return redirect('/feed/')
     else:
         form = CreateClubForm()
@@ -193,6 +199,6 @@ class EditProfileView(View):
 
 
     def render(self):
-	    current_user = self.request.user
-	    form = EditProfileForm(instance=current_user)
-	    return render(self.request,'edit_profile.html', {'form': form})
+        current_user = self.request.user
+        form = EditProfileForm(instance=current_user)
+        return render(self.request,'edit_profile.html', {'form': form})
