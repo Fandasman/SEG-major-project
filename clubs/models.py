@@ -60,5 +60,10 @@ class Club(models.Model):
                 )
         ]
     )
-
+    leader = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'leader')
+    members = models.ManyToManyField(User, related_name = 'member', blank = True)
+    location = models.CharField(max_length = 100, blank = True)
     description = models.CharField(max_length = 500, blank = True)
+
+    def get_members(self):
+        return "\n".join([m.members for m in self.members.all()])

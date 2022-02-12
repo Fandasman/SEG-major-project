@@ -62,7 +62,7 @@ class LogInForm(forms.Form):
 class CreateClubForm(forms.ModelForm):
     class Meta:
         model = Club
-        fields = ['name', 'description']
+        fields = ['name', 'location', 'description']
         widgets = { 'description': forms.Textarea()}
 
 class EditProfileForm(forms.ModelForm):
