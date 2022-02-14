@@ -202,3 +202,15 @@ class EditProfileView(View):
         current_user = self.request.user
         form = EditProfileForm(instance=current_user)
         return render(self.request,'edit_profile.html', {'form': form})
+
+class WishlistView(View):
+    def get(self, request, user_id):
+        return self.render(user_id)
+
+    def render(self, user_id):
+        try:
+            user = User.objects.get(id = user_id)
+            return render(self.request, 'wishlist.html', {'user': user})
+
+        except ObjectDoesNotExist:
+            return redirect('feed')

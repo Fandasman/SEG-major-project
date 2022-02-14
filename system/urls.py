@@ -32,5 +32,5 @@ urlpatterns = [
     path('login/', views.LogInView.as_view(), name='login'),
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
     path('create_club/', views.CreateClubView, name ='create_club'),
-
+    path('user/<int:user_id>/wishlist', views.WishlistView.as_view(), name = 'wishlist'),
 ]
