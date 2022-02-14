@@ -1,15 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>club</title>
-</head>
-<body>
-    <h1>create club</h1>
-    <form action="{% url 'create_club' %}" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Create">
-    </form>
-</body>
-</html>
+{% extends 'base_content.html' %}
+{% block title %}
+| Create club
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-lg-6 col-xl-8">
+            <form action="{% url 'create_club' %}" method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" class="btn btn-primary" value="Create">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
