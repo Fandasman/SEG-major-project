@@ -4,10 +4,9 @@ from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.views.generic.edit import FormView
 from django.views import View
-from .forms import SignUpForm
-from .forms import LogInForm
-from .forms import CreateClubForm
+from .forms import SignUpForm, LogInForm, EditProfileForm, CreateClubForm
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from .models import Book, Club, User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
@@ -61,6 +60,13 @@ def show_user(request, user_id):
         )
 
 # @login_required
+def profile(request):
+    current_user = request.user
+    return render(request, 'profile.html',
+            {'user': current_user}
+        )
+
+# @login_required
 def search_books(request):
     search_book = request.GET.get('book_searchbar')
     if search_book:
@@ -87,32 +93,32 @@ def search_users(request):
         users= User.objects.all()
     return render(request, 'search_users.html', {'users': users})
 
-class LoginProhibitedMixin:
-    
-         """Mixin that redirects when a user is logged in."""
-    
-         redirect_when_logged_in_url = None
-    
-         def dispatch(self, *args, **kwargs):
-            """Redirect when logged in, or dispatch as normal otherwise."""
-            if self.request.user.is_authenticated:
-                return self.handle_already_logged_in(*args, **kwargs)
-            return super().dispatch(*args, **kwargs)
-    
-         def handle_already_logged_in(self, *args, **kwargs):
-             url = self.get_redirect_when_logged_in_url()
-             return redirect('feed')
-    
-         def get_redirect_when_logged_in_url(self):
-             """Returns the url to redirect to when not logged in."""
-             if self.redirect_when_logged_in_url is None:
-                raise ImproperlyConfigured(
-                 "LoginProhibitedMixin requires either a value for "
-                 "'redirect_when_logged_in_url', or an implementation for "
-                 "'get_redirect_when_logged_in_url()'."
-                 )
-             else:
-                 return self.redirect_when_logged_in_url
+# class LoginProhibitedMixin:
+
+#          """Mixin that redirects when a user is logged in."""
+
+#          redirect_when_logged_in_url = None
+
+#          def dispatch(self, *args, **kwargs):
+#             """Redirect when logged in, or dispatch as normal otherwise."""
+#             if self.request.user.is_authenticated:
+#                 return self.handle_already_logged_in(*args, **kwargs)
+#             return super().dispatch(*args, **kwargs)
+
+#          def handle_already_logged_in(self, *args, **kwargs):
+#              url = self.get_redirect_when_logged_in_url()
+#              return redirect('feed')
+
+#          def get_redirect_when_logged_in_url(self):
+#              """Returns the url to redirect to when not logged in."""
+#              if self.redirect_when_logged_in_url is None:
+#                 raise ImproperlyConfigured(
+#                  "LoginProhibitedMixin requires either a value for "
+#                  "'redirect_when_logged_in_url', or an implementation for "
+#                  "'get_redirect_when_logged_in_url()'."
+#                  )
+#              else:
+#                  return self.redirect_when_logged_in_url
 
 class LogInView(View):
     """Log-in handling view"""
@@ -122,7 +128,7 @@ class LogInView(View):
 
     def post(self,request):
         form = LogInForm(request.POST)
-        self.next = request.POST.get('next') 
+        self.next = request.POST.get('next')
         user = form.get_user()
         if user is not None:
                 """Redirect to club selection page, with option to create new club"""
@@ -130,7 +136,7 @@ class LogInView(View):
                 return redirect('feed')
 
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
-        return self.render()    
+        return self.render()
 
     def render(self):
         form = LogInForm()
@@ -161,12 +167,38 @@ class SignUpView(FormView):
     creating clubs, if club is successfully created,
     it will be store in the database and client will
     be redirected to the feed page"""
+@login_required
 def CreateClubView(request):
     if request.method == "POST":
         form = CreateClubForm(request.POST)
+        current_user = request.user
         if form.is_valid():
-            form.save()
+            name = form.cleaned_data.get('name')
+            location = form.cleaned_data.get('location')
+            description = form.cleaned_data.get('description')
+            Club.objects.create(leader=current_user, name=name, location=location, description=description)
             return redirect('/feed/')
     else:
         form = CreateClubForm()
     return render(request, 'create_club.html', {'form': form})
+
+
+class EditProfileView(View):
+    def get(self,request):
+        return self.render()
+
+    def post(self,request):
+        current_user = request.user
+        form = EditProfileForm(instance=current_user, data=request.POST)
+        if form.is_valid():
+            current_user.username = form.cleaned_data.get('username')
+            messages.add_message(request, messages.SUCCESS, "Profile updated!")
+            form.save()
+            return redirect('feed')
+        return render(request, 'edit_profile.html', {'form': form, 'user': current_user})
+
+
+    def render(self):
+        current_user = self.request.user
+        form = EditProfileForm(instance=current_user)
+        return render(self.request,'edit_profile.html', {'form': form})

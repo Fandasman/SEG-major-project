@@ -36,7 +36,7 @@ class User(AbstractUser):
 
 # Create the Book model
 class Book(models.Model):
-    isbn = models.CharField(max_length = 13, unique = True, blank = False)
+    isbn = models.CharField(max_length = 13, unique = True, blank = False, primary_key=True)
     title = models.CharField(max_length = 100, blank = False)
     author = models.CharField(max_length = 100, blank = False)
     publisher = models.CharField(max_length = 100, blank = False)
@@ -60,5 +60,13 @@ class Club(models.Model):
                 )
         ]
     )
-
+    leader = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'leader')
+    members = models.ManyToManyField(User, related_name = 'member', blank = True)
+    location = models.CharField(max_length = 100, blank = True)
     description = models.CharField(max_length = 500, blank = True)
+    current_book = models.ForeignKey(Book, on_delete = models.DO_NOTHING)
+    book_progession = models.IntegerField(default = 0, 
+    validators = [MaxValueValidator(9999), MinValueValidator(0)])
+
+    def get_members(self):
+        return "\n".join([m.members for m in self.members.all()])

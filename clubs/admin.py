@@ -17,5 +17,5 @@ class BookAdmin(admin.ModelAdmin):
 @admin.register(Club)
 class ClubAdmin(admin.ModelAdmin):
     list_display = [
-        'name', 'description'
+        'name', 'leader', 'get_members', 'location', 'description'
     ]

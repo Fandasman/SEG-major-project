@@ -58,8 +58,19 @@ class LogInForm(forms.Form):
             password = self.cleaned_data.get('password')
             user = authenticate(username = username, password = password)
         return user
+
 class CreateClubForm(forms.ModelForm):
     class Meta:
         model = Club
-        fields = ['name', 'description']
+        fields = ['name', 'location', 'description']
         widgets = { 'description': forms.Textarea()}
+
+class EditProfileForm(forms.ModelForm):
+    """Form to update user profiles."""
+
+    class Meta:
+        """Form options."""
+
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email', 'bio']
+        widgets = { 'bio': forms.Textarea()}
