@@ -17,10 +17,13 @@
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" href="#" id="user-account-dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
         <span class="bi-person-circle"></span>
-        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <li><a class="dropdown-item" href="{% url 'profile'  %}">Profile</a></li>
-        </ul>
       </a>
+      <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
+        <li><a class = "dropdown-item" href="{% url 'wishlist' user.id %}">Wishlist</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a  class="dropdown-item" href="{% url 'log_out' %}">Log out</a></li>
+      </ul>
     </li>
   </ul>
 </div>

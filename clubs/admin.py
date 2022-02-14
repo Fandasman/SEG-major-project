@@ -5,7 +5,7 @@ from .models import User, Book, Club
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = [
-        'username', 'first_name', 'last_name', 'email', 'is_active',
+        'username', 'first_name', 'last_name', 'email', 'get_wishlist', 'is_active',
     ]
 
 @admin.register(Book)
@@ -17,5 +17,5 @@ class BookAdmin(admin.ModelAdmin):
 @admin.register(Club)
 class ClubAdmin(admin.ModelAdmin):
     list_display = [
-        'name', 'leader', 'get_members', 'location', 'description'
+        'name', 'leader', 'location', 'description', 'get_members',
     ]
