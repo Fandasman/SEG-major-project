@@ -132,6 +132,11 @@ class UserModelTestCase(TestCase):
         self.user.bio='x' * 501
         self._assert_user_is_invalid()
 
+# Wishlist test cases
+    def test_wishlist_can_be_empty(self):
+        self.user.wishlist.set([])
+        self._assert_user_is_valid()
+
 # Test case assertions
     def _assert_user_is_valid(self):
         try:

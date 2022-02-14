@@ -7,7 +7,17 @@
     <div class="row">
         <div class="col-xs-12 col-lg-6 col-xl-8">
             <h1>Wishlist</h1>
-            <p>This is where the user's wishlist will be displayed...</p>
+            <ul class="vertical-list">
+                {% for book in user.wishlist.all %}
+                
+                <li>{{book.name}}</li>
+
+                    {% empty %}
+
+                <p>{{user.username}}'s wishlist is empty.</p>
+
+                {% endfor %}
+            </ul>
         </div>
     </div>
 </div>
