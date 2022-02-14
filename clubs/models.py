@@ -4,8 +4,6 @@ from django.core.validators import RegexValidator, MaxValueValidator, MinValueVa
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
 
-# Create your models here.
-
 # Create the User model
 class User(AbstractUser):
     username = models.CharField(

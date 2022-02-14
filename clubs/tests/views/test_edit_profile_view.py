@@ -37,11 +37,6 @@ class TestEditProfileView(TestCase):
         self.assertTrue(isinstance(form, EditProfileForm))
         self.assertEqual(form.instance, self.user)
 
-#    def test_get_edit_profile_redirects_when_not_logged_in(self):
-#       redirect_url = reverse_with_next('login', self.url)
-#       response = self.client.get(self.url)
-#       self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
-
     def test_unsuccesful_profile_update(self):
         self.client.login(username=self.user.username, password='Password123')
         self.form_input['email'] = 'bademailexample.org'

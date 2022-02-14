@@ -4,6 +4,8 @@ from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.views.generic.edit import FormView
 from django.views import View
+from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import SignUpForm, LogInForm, EditProfileForm, CreateClubForm
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -209,7 +211,7 @@ class EditProfileView(View):
         return render(self.request,'edit_profile.html', {'form': form})
 
 """Includes the view for a user's wishlist."""
-class WishlistView(View):
+class WishlistView(LoginRequiredMixin, ListView):
     def get(self, request, user_id):
         return self.render(user_id)
 
