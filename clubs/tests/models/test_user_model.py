@@ -137,6 +137,12 @@ class UserModelTestCase(TestCase):
         self.user.wishlist.set([])
         self._assert_user_is_valid()
 
+    def test_valid_wishlist(self):
+        pass
+
+    def test_wishlist_does_not_have_to_be_unique(self):
+        pass
+
 # Test case assertions
     def _assert_user_is_valid(self):
         try:
