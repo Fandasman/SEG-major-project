@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from .models import Book, Club, User
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ImproperlyConfigured
 
 from .forms import CreateClubForm
@@ -202,3 +202,17 @@ class EditProfileView(View):
         current_user = self.request.user
         form = EditProfileForm(instance=current_user)
         return render(self.request,'edit_profile.html', {'form': form})
+
+class LogOutView(View):
+    template_name = 'home.html'
+
+    def get(self,request):
+        logout(request)
+        return redirect('home')
+
+    def post(self,request):
+        logout(request)
+        return redirect('home')
+
+    def render(self):
+        return render(self.request, template_name)

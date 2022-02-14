@@ -3,7 +3,7 @@ from django.urls import reverse
 from clubs.models import User, Book
 from clubs.tests.helpers import reverse_with_next, LogInTester
 
-class ShowUserTest(TestCase,LogInTester):
+class ShowBookTest(TestCase,LogInTester):
     fixtures = [
         'clubs/tests/fixtures/default_user.json',
         'clubs/tests/fixtures/default_book.json'
