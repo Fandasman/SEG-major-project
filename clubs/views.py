@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from .models import Book, Club, User
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ImproperlyConfigured
 
 from .forms import CreateClubForm
@@ -142,6 +142,11 @@ class LogInView(View):
         form = LogInForm()
         return render(self.request, 'login.html', {'form': form, 'next' : self.next})
 
+"""View used for logging out."""
+def log_out(request):
+    logout(request)
+    return redirect('home')
+
     """This function standardize the requirements for
         user registration, if the user successfully
         registers, it will be created in the system,
@@ -203,6 +208,7 @@ class EditProfileView(View):
         form = EditProfileForm(instance=current_user)
         return render(self.request,'edit_profile.html', {'form': form})
 
+"""Includes the view for a user's wishlist."""
 class WishlistView(View):
     def get(self, request, user_id):
         return self.render(user_id)
