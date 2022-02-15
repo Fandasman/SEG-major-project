@@ -4,7 +4,6 @@
         "pk": 2,
         "fields": {
             "name": "Clubber",
-            "leader": 1,
             "location": "London",
             "description": "Another friendly neighbourhood book club."
         }
@@ -15,7 +14,6 @@
         "pk": 3,
         "fields": {
             "name": "Foo",
-            "leader": 1,
             "location": "London",
             "description": "Yet another friendly neighbourhood book club."
         }
@@ -26,7 +24,6 @@
         "pk": 4,
         "fields": {
             "name": "Bar",
-            "leader": 1,
             "location": "London",
             "description": "Yes, another friendly neighbourhood book club."
         }

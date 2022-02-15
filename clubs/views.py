@@ -235,7 +235,8 @@ def CreateClubView(request):
             name = form.cleaned_data.get('name')
             location = form.cleaned_data.get('location')
             description = form.cleaned_data.get('description')
-            Club.objects.create(leader=current_user, name=name, location=location, description=description)
+            club = Club.objects.create(name=name, location=location, description=description)
+            Role.objects.create(user = current_user, club = club, role = 'O')
             return redirect('/feed/')
     else:
         form = CreateClubForm()
