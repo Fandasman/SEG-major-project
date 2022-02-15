@@ -14,6 +14,8 @@
         <li><a class="dropdown-item" href="{% url 'club_list' %}">All Clubs</a></li>
         <li><a class="dropdown-item" href="{% url 'owner_club_list' %}">As Owner</a></li>
         <li><a class="dropdown-item" href="{% url 'member_club_list' %}">As Member</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="{% url 'create_club' %}">Create club</a></li>
       </ul>
     </li>
     <li class="nav-item">
@@ -27,7 +29,7 @@
       </a>
       <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
         <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
-        <li><a class = "dropdown-item" href="{% url 'wishlist' user.id %}">Wishlist</a></li>
+        <li><a class = "dropdown-item" href="{% url 'wishlist' current_user.id %}">Wishlist</a></li>
         <li><hr class="dropdown-divider"></li>
         <li><a  class="dropdown-item" href="{% url 'log_out' %}">Log out</a></li>
       </ul>

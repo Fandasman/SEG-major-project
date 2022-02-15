@@ -93,11 +93,11 @@ class MemberListView(ListView):
     template_name= 'member_list.html'
     context_object_name= 'users'
 
-    def get_context_data(self, *args, **kwargs):
-        context= super().get_context_data(*args, **kwargs)
-        user= User.objects.all()
-        context['members']= Role.objects.all().filter(role= "M")
-        return context
+    # def get_context_data(self, *args, **kwargs):
+    #     context= super().get_context_data(*args, **kwargs)
+    #     user= User.objects.all()
+    #     context['members']= Role.objects.all().filter(role= "M")
+    #     return context
 
 # class ClubListView(LoginRequiredMixin, ListView):
 class ClubListView(ListView):
@@ -235,7 +235,8 @@ def CreateClubView(request):
             name = form.cleaned_data.get('name')
             location = form.cleaned_data.get('location')
             description = form.cleaned_data.get('description')
-            Club.objects.create(leader=current_user, name=name, location=location, description=description)
+            club = Club.objects.create(name=name, location=location, description=description)
+            Role.objects.create(user = current_user, club = club, role = 'O')
             return redirect('/feed/')
     else:
         form = CreateClubForm()
