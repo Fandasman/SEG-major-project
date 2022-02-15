@@ -1,6 +1,6 @@
 import csv
 from django.core.management.base import BaseCommand, CommandError
-from clubs.models import User, Book, Club
+from clubs.models import User, Book, Club, Role
 from django.contrib.auth.hashers import make_password
 from faker import Faker
 
@@ -57,7 +57,7 @@ class Command(BaseCommand):
         print("Done!")
 
     
-    # Generate 10 fake clubs.
+    # Generate 10 fake clubs and set charlie as their owner.
     def generate_clubs(self):
         print("Generating 10 fake book clubs...")
         for i in range(0, 10):
@@ -65,13 +65,21 @@ class Command(BaseCommand):
             fakeLocation = self.faker.address()
             fakeDescription = self.faker.text(max_nb_chars = 500)
 
-            Club.objects.create(
+            club = Club.objects.create(
                 name = fakeName,
-                leader = User.objects.get(username = 'charlie'),
                 location = fakeLocation,
                 description = fakeDescription
             )
+
+            Role.objects.create(
+                user = User.objects.get(username = "charlie"),
+                club = club,
+                role = 'O'
+            )
+
         print("Done!")
+
+    
 
     # Read books from BX_Books.csv
     def get_books(self, **options):
