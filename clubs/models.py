@@ -63,14 +63,21 @@ class Club(models.Model):
     description = models.CharField(max_length = 500, blank = True)
 
 
-    def getClubApplicantGroup(self):
-        return Group.objects.get(name = self.club_codename + " Applicant")
+# Create the user's Roles model
+ROLES= (
+    ('A', 'Applicant'),
+    ('M', 'Member'),
+    ('O', 'Owner'),
+)
 
-    def getClubMemberGroup(self):
-        return Group.objects.get(name = self.club_codename + " Member")
+class Role(models.Model):
+    user= models.ForeignKey(User, on_delete=models.CASCADE)
+    club= models.ForeignKey(Club, on_delete=models.CASCADE)
+    role= models.CharField(
+        max_length=1,
+        choices=ROLES,
+        default='A'
+    )
 
-    def getClubOfficerGroup(self):
-        return Group.objects.get(name = self.club_codename + " Officer")
-
-    def getClubOwnerGroup(self):
-        return Group.objects.get(name = self.club_codename + " Owner")
+    def __str__(self):
+        return self.user.full_name + " is " + self.role

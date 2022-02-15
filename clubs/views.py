@@ -1,9 +1,7 @@
 from django import template
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.paginator import Paginator
 from django.db.models import Q, Count
 from django.db.models.query import QuerySet
 from django.http.response import HttpResponse
@@ -12,24 +10,41 @@ from django.views import View
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from typing import List
-from .club_list import ClubList
 from .forms import SignUpForm, LogInForm, EditProfileForm, CreateClubForm
-from .models import Book, Club, User
+from .models import Book, Club, Role, User
 
 
 # Create your views here.
-#
+
 def feed(request):
     current_user = request.user
     return render(request, 'feed.html', {'user': current_user})
 
+class LoginProhibitedMixin:
+
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect('feed')
+        return super().dispatch(*args, **kwargs)
+
+# class FeedView(LoginProhibitedMixin, View):
+#     template_name = 'feed.html'
+#
+#     def get(self,request):
+#         return self.render()
+#
+#     def post(self,request):
+#         return self.render()
+#
+#     def render(self):
+#         return render(self.request, 'feed.html')
+
 # class FeedView(LoginRequiredMixin, ListView):
 #     """Class-based generic view for displaying a view."""
 #
-#     model = User
+#     model = Post
 #     template_name = "feed.html"
-#     context_object_name = 'users'
+#     context_object_name = 'posts'
 #
 #     def get_queryset(self):
 #         """Return the user's feed."""
@@ -45,41 +60,6 @@ def feed(request):
 #         context['form'] = ClubForm()
 #         return context
 
-
-# new implementation !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-def getClubAndListOfClubsWithObjectParameter(obj):
-    list_of_clubs = ClubList()
-    name_of_club = obj.request.session.get('name')
-    club = list_of_clubs.find_club(name_of_club)
-    return club, list_of_clubs
-
-def getClubAndListOfClubs(request):
-    list_of_clubs = ClubList()
-    name_of_club = request.session.get('name')
-    club = list_of_clubs.find_club(name_of_club)
-    return club, list_of_clubs
-
-def club_selection(request):
-    list_of_clubs = ClubList()
-    clubs = list_of_clubs.club_list
-    owners = []
-    member_count_list = []
-    for club in clubs:
-        #owners.append(club.get_club_owner())
-        member_count_list.append(User.objects.filter(groups__name__in = [club.getClubOwnerGroup(), club.getClubMemberGroup()]).count())
-    clubs_and_owners = zip(clubs, owners, member_count_list)
-    return render(request, 'club_selection.html', {'clubs_and_owners' : clubs_and_owners, 'clubs':clubs})
-
-
-class LoginProhibitedMixin:
-
-    def dispatch(self, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            return redirect('club_selection')
-        return super().dispatch(*args, **kwargs)
-
 class HomeView(LoginProhibitedMixin,View):
     template_name = 'home.html'
 
@@ -92,95 +72,64 @@ class HomeView(LoginProhibitedMixin,View):
     def render(self):
         return render(self.request, 'home.html')
 
-
-class MemberOnlyMixin:
-
-    def dispatch(self, *args, **kwargs):
-        current_user = self.request.user
-        club, list_of_clubs = getClubAndListOfClubsWithObjectParameter(self)
-        if not (current_user.groups.filter(name = club.getClubMemberGroup()).exists() or current_user.groups.filter(name = club.getClubOwnerGroup()).exists()):
-            return redirect('profile')
-        return super().dispatch(*args, **kwargs)
-
-class OwnerOnlyMixin:
-
-    def dispatch(self, *args, **kwargs):
-        current_user = self.request.user
-        club, list_of_clubs = getClubAndListOfClubsWithObjectParameter(self)
-        if not (current_user.groups.filter(name = club.getClubOwnerGroup()).exists()):
-            return redirect('profile')
-        return super().dispatch(*args, **kwargs)
-
-class MemberListView(LoginRequiredMixin,MemberOnlyMixin,ListView):
-    model = User
-    template_name = 'member_list.html'
-    context_object_name = 'users'
-
-    def get_queryset(self):
-          qs = super().get_queryset()
-          club, list_of_clubs = getClubAndListOfClubsWithObjectParameter(self)
-          return qs.filter(groups__name__in=[club.getClubApplicantGroup(), club.getClubOwnerGroup(), club.getClubMemberGroup()])
-
-    def get(self,request,*args, **kwargs):
-        return self.render()
-
-    def post(self,request,*args, **kwargs):
-        return self.redirect('club_selection')
-
-    def render(self):
-        qs = super().get_queryset()
-        club, list_of_clubs = getClubAndListOfClubsWithObjectParameter(self)
-        clubs = list_of_clubs.club_list
-        users = qs.filter(groups__name__in=[club.getClubMemberGroup()])
-        return render(self.request, 'member_list.html', {'users':users, 'clubs':clubs})
-
-class OwnerMemberListView(OwnerOnlyMixin,MemberListView):
-    template_name = 'owner_member_list.html'
-    context_object_name = 'users'
-    #paginate_by = settings.USERS_PER_PAGE
+# class MemberListView(LoginRequiredMixin, ListView):
+class MemberListView(ListView):
+    model= User
+    template_name= 'member_list.html'
+    context_object_name= 'users'
 
     def get_context_data(self, *args, **kwargs):
-        """Generate content to be displayed in the template."""
-        context = super().get_context_data(*args, **kwargs)
-        club, list_of_clubs = getClubAndListOfClubsWithObjectParameter(self)
-        context['number_of_applicants'] = User.objects.filter(groups__name = club.getClubApplicantGroup()).count()
-        context['number_of_members'] = User.objects.filter(groups__name__in = [club.getClubOwnerGroup(),club.getClubMemberGroup()]).count()
+        context= super().get_context_data(*args, **kwargs)
+        user= User.objects.all()
+        context['members']= Role.objects.all().filter(role= "M")
         return context
 
-    def get(self,request,*args, **kwargs):
-        return self.render()
+# class ClubListView(LoginRequiredMixin, ListView):
+class ClubListView(ListView):
+    model= Club
+    template_name= 'club_list.html'
+    context_object_name= 'clubs'
 
+    def get_context_data(self, *args, **kwargs):
+        context= super().get_context_data(*args, **kwargs)
+        club= Club.objects.all()
+        context['roles']= Role.objects.all().filter(role= "O")
+        return context
 
-    def post(self,request,*args, **kwargs):
-        return self.render()
+# class OwnerClubListView(LoginRequiredMixin, ListView):
+class OwnerClubListView(ListView):
+    model= Club
+    template_name= 'owner_club_list.html'
+    context_object_name= 'user'
 
-    def get_queryset(self):
-        qs = super().get_queryset()
-        return qs
+    def get_context_data(self, *args, **kwargs):
+        context= super().get_context_data(*args, **kwargs)
+        current_user= self.request.user
+        context['roles']= Role.objects.all().filter(user= current_user, role= "O")
+        return context
 
-    def render(self):
-        qs = super().get_queryset()
-        club, list_of_clubs = getClubAndListOfClubsWithObjectParameter(self)
-        clubs = list_of_clubs.club_list
-        users = qs.filter(groups__name__in=[club.getClubMemberGroup()])
-        return render(self.request, 'owner_member_list.html', {'users':users, 'clubs':clubs})
+# class MemberClubListView(LoginRequiredMixin, ListView):
+class MemberClubListView(ListView):
+    model= Club
+    template_name= 'member_club_list.html'
+    context_object_name= 'user'
+
+    def get_context_data(self, *args, **kwargs):
+        context= super().get_context_data(*args, **kwargs)
+        current_user= self.request.user
+        context['roles']= Role.objects.all().filter(user= current_user, role= "M")
+        return context
+
 
 class ShowUserView(DetailView):
     model = User
     template_name = 'show_user.html'
     pk_url_kwarg = "user_id"
 
-class OwnerView(OwnerMemberListView):
-
-    template_name = 'owner.html'
-
-    def render(self):
-        club, list_of_clubs = getClubAndListOfClubsWithObjectParameter(self)
-        clubs = list_of_clubs.club_list
-        users = User.objects.all()
-        number_of_applicants = User.objects.filter(groups__name = club.getClubApplicantGroup()).count()
-        number_of_members = User.objects.filter(groups__name__in = [ club.getClubOwnerGroup(), club.getClubMemberGroup()]).count()
-        return render(self.request, 'owner.html', {'users': users, 'number_of_applicants': number_of_applicants, 'number_of_members': number_of_members, 'clubs': clubs})
+class ShowClubView(DetailView):
+    model = Club
+    template_name = 'show_club.html'
+    pk_url_kwarg = "club_id"
 
 class LogInView(View):
     """Log-in handling view"""

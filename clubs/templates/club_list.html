@@ -3,22 +3,18 @@
 <div class="container">
   <div class="row">
     <div class="col-12">
-      <h1>Members</h1>
+      <h1>Clubs</h1>
       <table class="table table-striped table-hover">
         <thead>
           <tr>
-            <th scope="col">Username</th>
             <th scope="col">Name</th>
           </tr>
         </thead>
-        {% for user in users %}
+        {% for club in clubs %}
           <tr>
+            <td>{{ club.name }}</td>
             <td>
-              <img src="{{ user.mini_gravatar }}" alt="Gravatar of {{ user.first_name }}" class="rounded-circle" >
-            </td>
-            <td>{{ user.full_name }}</td>
-            <td>
-              <form action = "{% url 'show_user' user.id %}" method = "get">
+              <form action = "{% url 'show_club' club.id %}" method = "get">
                 {% csrf_token %}
                 <input type = "hidden" name = "next" value = "{{ next }}">
                 {% include 'partials/bootstrap_form.html' with form=form %}

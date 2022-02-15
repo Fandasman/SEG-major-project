@@ -1,0 +1,17 @@
+{%extends 'base_content.html'%}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Owned Club List</h1>
+      <form action="{% url 'owner_club_list' %}" method="post">
+        {% csrf_token %}
+        {% include 'partials/bootstrap_form.html' with form=form %}
+      {% for role in roles %}
+          {% include 'partials/club_page.html' with clubs=clubs roles=roles %}
+      {% endfor %}
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

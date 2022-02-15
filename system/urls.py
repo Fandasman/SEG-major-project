@@ -20,11 +20,16 @@ from clubs import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.HomeView.as_view(), name = 'home'),
+    path('create_club/', views.CreateClubView, name ='create_club'),
+    path('club_list', views.ClubListView.as_view(), name = 'club_list'),
+    path('club/<int:club_id>', views.ShowClubView.as_view(), name='show_club'),
+    path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
     path('feed/', views.feed, name='feed'),
-    path('club_selection/', views.club_selection, name = 'club_selection'),
-    path('member_list/', views.MemberListView.as_view(), name = 'member_list'),
-    path('owner/', views.OwnerView.as_view(), name = 'owner'),
-    path('owner_member_list', views.OwnerMemberListView.as_view(), name = 'owner_member_list'),
+    path('login/', views.LogInView.as_view(), name='login'),
+    path('member_club_list', views.MemberClubListView.as_view(), name = 'member_club_list'),
+    path('member_list', views.MemberListView.as_view(), name = 'member_list'),
+    path('owner_club_list', views.OwnerClubListView.as_view(), name = 'owner_club_list'),
+    path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('user/<int:user_id>', views.ShowUserView.as_view(), name='show_user'),
 
 ]
