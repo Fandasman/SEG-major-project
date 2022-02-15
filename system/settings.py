@@ -66,6 +66,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                # Custom context processors
+                'clubs.context_processors.get_current_user',
             ],
         },
     },
