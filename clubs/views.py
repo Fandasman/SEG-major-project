@@ -1,30 +1,10 @@
-<<<<<<< HEAD
-from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
-from django.shortcuts import redirect, render
-from django.views.generic.edit import FormView
-from django.views import View
-from django.views.generic import ListView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import SignUpForm, LogInForm, EditProfileForm, CreateClubForm
-from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from .models import Book, Club, User
-from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
-from django.core.exceptions import ImproperlyConfigured
-
-from .forms import CreateClubForm
-from django.conf import settings
-from .models import Book, Club, User
-=======
 from django import template
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q, Count
-from django.db.models.query import QuerySet
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
 from django.views import View
@@ -33,8 +13,6 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from .forms import SignUpForm, LogInForm, EditProfileForm, CreateClubForm
 from .models import Book, Club, Role, User
->>>>>>> search-lists
-
 
 # Create your views here.
 
@@ -43,8 +21,11 @@ def feed(request):
     return render(request, 'feed.html', {'user': current_user})
 
 class LoginProhibitedMixin:
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect('feed')
+        return super().dispatch(*args, **kwargs)
 
-<<<<<<< HEAD
 # @login_required
 def show_book(request, book_id):
     try:
@@ -54,28 +35,6 @@ def show_book(request, book_id):
     else:
         return render(request, 'show_book.html',
             {'book': book}
-        )
-
-# @login_required
-def show_club(request, club_id):
-    try:
-        club = Club.objects.get(id=club_id)
-    except ObjectDoesNotExist:
-        return redirect('search_clubs')
-    else:
-        return render(request, 'show_club.html',
-            {'club': club}
-        )
-
-# @login_required
-def show_user(request, user_id):
-    try:
-        user = User.objects.get(id=user_id)
-    except ObjectDoesNotExist:
-        return redirect('search_users')
-    else:
-        return render(request, 'show_user.html',
-            {'user': user}
         )
 
 # @login_required
@@ -94,37 +53,6 @@ def search_books(request):
         books = Book.objects.all()
     return render(request, 'search_books.html', {'books': books})
 
-# @login_required
-def search_clubs(request):
-    search_club = request.GET.get('club_searchbar')
-    if search_club:
-        clubs= Club.objects.filter(Q(name__icontains=search_club))
-    else:
-        clubs = Club.objects.all()
-    return render(request, 'search_clubs.html', {'clubs': clubs})
-
-# @login_required
-def search_users(request):
-    search_user = request.GET.get('user_searchbar')
-    if search_user:
-        users= User.objects.filter(Q(username__icontains=search_user))
-=======
-    def dispatch(self, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            return redirect('feed')
-        return super().dispatch(*args, **kwargs)
-
-# class FeedView(LoginProhibitedMixin, View):
-#     template_name = 'feed.html'
-#
-#     def get(self,request):
-#         return self.render()
-#
-#     def post(self,request):
-#         return self.render()
-#
-#     def render(self):
-#         return render(self.request, 'feed.html')
 
 # class FeedView(LoginRequiredMixin, ListView):
 #     """Class-based generic view for displaying a view."""
@@ -218,65 +146,7 @@ class ShowClubView(DetailView):
     template_name = 'show_club.html'
     pk_url_kwarg = "club_id"
 
-class LogInView(View):
-    """Log-in handling view"""
-    def get(self,request):
-        self.next = request.GET.get('next') or 'officer'
-        return self.render()
 
-    def post(self,request):
-        form = LogInForm(request.POST)
-        self.next = request.POST.get('next')
-        user = form.get_user()
-        if user is not None:
-                """Redirect to club selection page, with option to create new club"""
-                login(request, user)
-                return redirect('feed')
-
-        messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
-        return self.render()
-
-    def render(self):
-        form = LogInForm()
-        return render(self.request, 'login.html', {'form': form, 'next' : self.next})
-
-    """This function standardize the requirements for
-        user registration, if the user successfully
-        registers, it will be created in the system,
-        and will be redirected to the profile page """
-class SignUpView(FormView):
-    """View that signs up user."""
-
-    form_class = SignUpForm()
-    template_name = "sign_up.html"
-    #redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
-
-    def form_valid(self, form):
-        self.object = form.save()
-        login(self.request, self.object)
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        pass
-        #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-
-
-"""This function standardize the requirements for
-    creating clubs, if club is successfully created,
-    it will be store in the database and client will
-    be redirected to the feed page"""
-def CreateClubView(request):
-    if request.method == "POST":
-        form = CreateClubForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('/feed/')
->>>>>>> search-lists
-    else:
-        form = CreateClubForm()
-    return render(request, 'create_club.html', {'form': form})
-
-<<<<<<< HEAD
 # class LoginProhibitedMixin:
 
 #          """Mixin that redirects when a user is logged in."""
@@ -371,8 +241,6 @@ def CreateClubView(request):
         form = CreateClubForm()
     return render(request, 'create_club.html', {'form': form})
 
-=======
->>>>>>> search-lists
 
 class EditProfileView(View):
     def get(self,request):
@@ -387,8 +255,6 @@ class EditProfileView(View):
             form.save()
             return redirect('feed')
         return render(request, 'edit_profile.html', {'form': form, 'user': current_user})
-
-<<<<<<< HEAD
 
     def render(self):
         current_user = self.request.user
@@ -407,10 +273,3 @@ class WishlistView(LoginRequiredMixin, ListView):
 
         except ObjectDoesNotExist:
             return redirect('feed')
-=======
-
-    def render(self):
-	    current_user = self.request.user
-	    form = EditProfileForm(instance=current_user)
-	    return render(self.request,'edit_profile.html', {'form': form})
->>>>>>> search-lists

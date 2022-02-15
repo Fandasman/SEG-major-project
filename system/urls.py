@@ -25,17 +25,14 @@ urlpatterns = [
     path('club/<int:club_id>', views.ShowClubView.as_view(), name='show_club'),
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
     path('feed/', views.feed, name='feed'),
-<<<<<<< HEAD
     path('profile/', views.profile, name='profile'),
-    path('user/<int:user_id>', views.show_user, name='show_user'),
-    path('users/', views.search_users, name='search_users'),
+    #path('users/', views.search_users, name='search_users'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('login/', views.LogInView.as_view(), name='login'),
     path('logout/', views.log_out, name='log_out'),
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
     path('create_club/', views.CreateClubView, name ='create_club'),
     path('user/<int:user_id>/wishlist', views.WishlistView.as_view(), name = 'wishlist'),
-=======
     path('login/', views.LogInView.as_view(), name='login'),
     path('member_club_list', views.MemberClubListView.as_view(), name = 'member_club_list'),
     path('member_list', views.MemberListView.as_view(), name = 'member_list'),
@@ -43,5 +40,4 @@ urlpatterns = [
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('user/<int:user_id>', views.ShowUserView.as_view(), name='show_user'),
 
->>>>>>> search-lists
 ]

@@ -47,24 +47,9 @@ class User(AbstractUser):
     def mini_gravatar(self):
         return self.gravatar(size = 60)
 
-<<<<<<< HEAD
     def get_wishlist(self):
         return "\n".join([b.wishlist for b in self.wishlist.all()])
-=======
-# Create the Book model
-class Book(models.Model):
-    isbn = models.CharField(max_length = 13, unique = True, blank = False)
-    title = models.CharField(max_length = 100, blank = False)
-    author = models.CharField(max_length = 100, blank = False)
-    publisher = models.CharField(max_length = 100, blank = False)
-    # published = models.IntegerField(
-    #     default = datetime.datetime.now().year,
-    #     validators = [MaxValueValidator(datetime.datetime.now().year), MinValueValidator(0)]
-    # )
-    imgURLSmall = models.URLField(blank = True)
-    imgURLMedium = models.URLField(blank = True)
-    imgURLLarge = models.URLField(blank = True)
->>>>>>> search-lists
+
 
 # Create the book Club model
 class Club(models.Model):
@@ -83,10 +68,8 @@ class Club(models.Model):
     location = models.CharField(max_length = 100, blank = True)
     description = models.CharField(max_length = 500, blank = True)
 
-<<<<<<< HEAD
     def get_members(self):
         return "\n".join([m.members for m in self.members.all()])
-=======
 
 # Create the user's Roles model
 ROLES= (
@@ -106,4 +89,3 @@ class Role(models.Model):
 
     def __str__(self):
         return self.user.full_name + " is " + self.role
->>>>>>> search-lists

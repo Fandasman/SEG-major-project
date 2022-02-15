@@ -42,11 +42,8 @@ class SignUpForm(forms.ModelForm):
         return user
 
 class LogInForm(forms.Form):
-<<<<<<< HEAD
     username = forms.CharField(required=True, label = "Username")
-=======
-    username = forms.CharField(required=True, label = "username")
->>>>>>> search-lists
+
     # Tried to make email not case senstive.
     # def clean_email(self):
     #     data = self.cleaned_data['email']
@@ -65,12 +62,7 @@ class LogInForm(forms.Form):
 class CreateClubForm(forms.ModelForm):
     class Meta:
         model = Club
-<<<<<<< HEAD
         fields = ['name', 'location', 'description']
-=======
-        fields = ['name', 'description']
->>>>>>> search-lists
-        widgets = { 'description': forms.Textarea()}
 
 class EditProfileForm(forms.ModelForm):
     """Form to update user profiles."""
