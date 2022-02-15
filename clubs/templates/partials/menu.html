@@ -3,14 +3,21 @@
     <li class="nav-item">
       <a class="nav-link" href="{% url 'feed' %}">Feed</a>
     </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">Books</a>
+    </li>
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          Search
+          Clubs
       </a>
       <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-        <li><a class="dropdown-item" href="{% url 'search_clubs' %}">Clubs</a></li>
-        <li><a class="dropdown-item" href="{% url 'search_users' %}">Users</a></li>
+        <li><a class="dropdown-item" href="{% url 'club_list' %}">All Clubs</a></li>
+        <li><a class="dropdown-item" href="{% url 'owner_club_list' %}">As Owner</a></li>
+        <li><a class="dropdown-item" href="{% url 'member_club_list' %}">As Member</a></li>
       </ul>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'member_list' %}">Users</a>
     </li>
   </ul>
   <ul class="navbar-nav ms-auto mb-2 mb-lg-0">

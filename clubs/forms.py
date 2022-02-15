@@ -1,8 +1,7 @@
 from django import forms
 from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
-from .models import User
-from .models import Club
+from .models import Club, User
 
 
 class SignUpForm(forms.ModelForm):
@@ -43,7 +42,11 @@ class SignUpForm(forms.ModelForm):
         return user
 
 class LogInForm(forms.Form):
+<<<<<<< HEAD
     username = forms.CharField(required=True, label = "Username")
+=======
+    username = forms.CharField(required=True, label = "username")
+>>>>>>> search-lists
     # Tried to make email not case senstive.
     # def clean_email(self):
     #     data = self.cleaned_data['email']
@@ -62,7 +65,11 @@ class LogInForm(forms.Form):
 class CreateClubForm(forms.ModelForm):
     class Meta:
         model = Club
+<<<<<<< HEAD
         fields = ['name', 'location', 'description']
+=======
+        fields = ['name', 'description']
+>>>>>>> search-lists
         widgets = { 'description': forms.Textarea()}
 
 class EditProfileForm(forms.ModelForm):
