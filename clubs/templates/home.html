@@ -10,9 +10,9 @@
               {% csrf_token %}
               <input type="hidden" name="next" value="{{ next }}">
               {% if user.is_authenticated %}
-              <input type="submit" value="Enter" class="btn btn-primary">
+                <input type="submit" value="Enter" class="btn btn-primary">
               {% else %}
-              <a class="btn btn-primary" href="{% url 'login' %}">Log in</a>
+                <a class="btn btn-primary" href="{% url 'login' %}">Log in</a>
               {% endif %}
             </form>
           </div>

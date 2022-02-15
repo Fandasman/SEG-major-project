@@ -7,6 +7,10 @@
       <form action="{% url 'member_club_list' %}" method="post">
         {% csrf_token %}
         {% include 'partials/bootstrap_form.html' with form=form %}
+        {% if role.size == none %}
+          <h3> You do not have any memberships yet :( </h3>
+          <p> Apply to any club you like and come back! </p>
+        {% endif %}
       {% for role in roles %}
           {% include 'partials/club_page.html' with clubs=clubs roles=roles %}
       {% endfor %}
