@@ -42,7 +42,7 @@ class User(AbstractUser):
 
     def gravatar(self, size = 120):
         g_object = Gravatar(self.email)
-        url = g_object.get_image(size = size, default = 'mp')
+        return g_object.get_image(size = size, default = 'mp')
 
     def mini_gravatar(self):
         return self.gravatar(size = 60)
