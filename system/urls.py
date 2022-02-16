@@ -18,6 +18,7 @@ from django.urls import path
 from clubs import views
 
 urlpatterns = [
+    path('all_members/<int:club_id>', views.member_list, name = "member_list"),
     path('admin/', admin.site.urls),
     path('', views.HomeView.as_view(), name = 'home'),
     #path('create_club/', views.CreateClubView, name ='create_club'),
@@ -26,7 +27,7 @@ urlpatterns = [
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
     path('feed/', views.feed, name='feed'),
     path('profile/', views.profile, name='profile'),
-    #path('users/', views.search_users, name='search_users'),
+    # path('users/', views.search_users, name='search_users'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('login/', views.LogInView.as_view(), name='login'),
     path('logout/', views.log_out, name='log_out'),
@@ -39,4 +40,14 @@ urlpatterns = [
     path('owner_club_list', views.OwnerClubListView.as_view(), name = 'owner_club_list'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('user/<int:user_id>', views.ShowUserView.as_view(), name='show_user'),
+    path('promoted/<int:club_id>/<int:member_id>', views.promote_member_to_officer, name = "promotion"),
+    path('promote/<int:club_id>/<int:member_id>', views.promote_officer_to_ClubOwner, name = "promotionOfficer"),
+    path('demoted/<int:club_id>/<int:member_id>', views.demote_officer_to_member, name = "demotion"),
+    path('removemember/<int:club_id>/<int:member_id>', views.remove_member, name = "removemember"),
+    path('leave/<int:club_id>', views.leave_club, name = "leave_club"),
+    path('accept_applicant/<int:club_id>/<int:member_id>', views.accept_applicant_to_club_as_Owner, name = "accept_applicant_as_owner"),
+    path('accept_applicant_as_officer/<int:club_id>/<int:member_id>', views.accept_applicant_to_club_as_officer, name = "accept_applicant"),
+    path('rejectAsOwner/<int:club_id>/<int:member_id>', views.reject_applicant_to_club_as_Owner, name = "rejectasowner"),
+    path('rejectAsOfficer/<int:club_id>/<int:member_id>', views.reject_applicant_to_club_as_Officer, name = "rejectasofficer"),
+    path('apply/<int:club_id>', views.apply, name='apply'),
 ]
