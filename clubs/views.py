@@ -208,7 +208,7 @@ def log_out(request):
 class SignUpView(FormView):
     """View that signs up user."""
 
-    form_class = SignUpForm()
+    form_class = SignUpForm
     template_name = "sign_up.html"
     #redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
 
