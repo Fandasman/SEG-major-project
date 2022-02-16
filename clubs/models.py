@@ -64,8 +64,8 @@ class Club(models.Model):
                 )
         ]
     )
-    location = models.CharField(max_length = 100, blank = True)
-    description = models.CharField(max_length = 500, blank = True)
+    location = models.CharField(max_length = 100, blank = False)
+    description = models.CharField(max_length = 500, blank = False)
 
 # Create the user's Roles model
 ROLES= (
