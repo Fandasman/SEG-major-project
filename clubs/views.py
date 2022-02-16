@@ -11,7 +11,7 @@ from django.views import View
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import SignUpForm, LogInForm, EditProfileForm, CreateClubForm
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm
 from .models import Book, Club, Role, User
 
 # Create your views here.
@@ -227,20 +227,26 @@ class SignUpView(FormView):
     it will be store in the database and client will
     be redirected to the feed page"""
 @login_required
-def CreateClubView(request):
-    if request.method == "POST":
-        form = CreateClubForm(request.POST)
+def create_club(request):
+    current_user = request.user
+    if request.method == 'POST':
         current_user = request.user
-        if form.is_valid():
-            name = form.cleaned_data.get('name')
-            location = form.cleaned_data.get('location')
-            description = form.cleaned_data.get('description')
-            club = Club.objects.create(name=name, location=location, description=description)
-            Role.objects.create(user = current_user, club = club, role = 'O')
-            return redirect('/feed/')
+        current_owned_clubs = Role.objects.filter(user = current_user, role = 'O')
+        if len(current_owned_clubs) < 3:
+            form = ClubForm(request.POST)
+            if form.is_valid():
+                newClub = form.save()
+                role = Role.objects.create(user = current_user, club = newClub, role = 'O')
+                return redirect('club_list')
+        else:
+            messages.add_message(request, messages.ERROR, "You already own too many clubs!")
+            form = ClubForm()
+        return render(request, 'create_club.html' , {'form': form})
+
     else:
-        form = CreateClubForm()
-    return render(request, 'create_club.html', {'form': form})
+        form = ClubForm()
+        return render(request, 'create_club.html' , {'form': form})
+
 
 
 class EditProfileView(View):

@@ -47,5 +47,5 @@ class CreateClubViewTestCase(TestCase):
         role_after_count = Role.objects.count()
         self.assertEqual(after_count, before_count+1)
         self.assertEqual(role_after_count, role_before_count+1)
-        response_url = reverse('feed')
+        response_url = reverse('club_list')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
