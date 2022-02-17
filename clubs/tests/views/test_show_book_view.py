@@ -28,9 +28,9 @@ class ShowBookTest(TestCase,LogInTester):
 
 
     def test_show_book_with_invalid_id(self):
-        self.client.login(username=self.user.username, passsword='Password123')
-        url = reverse('show_book', kwargs={'book_id': self.target_book.id+99999999999})
-        response = self.client.get(url,follow=True)
+        self.client.login(username=self.user.username, password="Password123")
+        self.url = reverse('show_book', kwargs={'book_id': 99999999999999})
+        response = self.client.get(self.url,follow=True)
         redirect_url = reverse('search_books')
-        reponse = self.client.get(self.url)
+        response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)

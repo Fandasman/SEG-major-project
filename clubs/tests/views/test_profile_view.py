@@ -15,6 +15,7 @@ class ProfileTestCase(TestCase):
         self.assertEqual(self.url, '/profile/')
 
     def test_get_profile(self):
+        self.client.login(username=self.user.username, password="Password123")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'profile.html')
