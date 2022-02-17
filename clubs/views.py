@@ -8,6 +8,10 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
 from django.views import View
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView

@@ -10,7 +10,7 @@ class WishlistViewTestCase(TestCase):
     
     def setUp(self):
         self.user = User.objects.get(username = "johndoe")
-        self.url = reverse("wishlist", args=(self.user.id,))
+        self.url = reverse("wishlist", args=(self.user.pk,))
     
     def test_wishlist_url(self):
         self.assertEquals(self.url, "/user/1/wishlist")
