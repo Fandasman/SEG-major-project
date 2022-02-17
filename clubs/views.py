@@ -283,19 +283,19 @@ class WishlistView(LoginRequiredMixin, ListView):
 
 def wish(request, book_id):
     user = request.user
-    book = Book.objects.get(pk = book_id)
     try:
+        book = Book.objects.get(pk = book_id)
         if user.wishlist.filter(isbn=book.isbn).exists() == False:
             user.wishlist.add(book)
         return redirect('wishlist', user.id)
-    
+        
     except ObjectDoesNotExist:
         return redirect('feed')
 
 def unwish(request, book_id):
     user = request.user
-    book = Book.objects.get(pk = book_id)
     try:
+        book = Book.objects.get(pk = book_id)
         if user.wishlist.filter(isbn=book.isbn).exists():
             user.wishlist.remove(book)
         return redirect('wishlist', user.id)
