@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from unicodedata import name
+from os import name
 from django.contrib import admin
 from django.urls import path
 from clubs import views
@@ -37,8 +38,10 @@ urlpatterns = [
     path('member_list', views.MemberListView.as_view(), name = 'member_list'),
     path('owner_club_list', views.OwnerClubListView.as_view(), name = 'owner_club_list'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
+    path('book/<int:book_id>', views.show_book, name='show_book'),
     path('user/<int:user_id>', views.ShowUserView.as_view(), name='show_user'),
     path('book/<int:book_id>', views.show_book, name='show_book'),
+    path('search_books/', views.search_books, name='search_books'),
     path('book/<int:book_id>/wish', views.wish, name='wish'),
     path('book/<int:book_id>/unwish', views.unwish, name='unwish'),
 ]
