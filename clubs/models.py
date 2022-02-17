@@ -49,7 +49,7 @@ class User(AbstractUser):
         return self.gravatar(size = 60)
 
     def get_wishlist(self):
-        return "\n".join([b.wishlist for b in self.wishlist.all()])
+          return "\n".join([b.wishlist for b in self.wishlist.all()])
 
 
 # Create the book Club model
@@ -66,6 +66,11 @@ class Club(models.Model):
     )
     location = models.CharField(max_length = 100, blank = False)
     description = models.CharField(max_length = 500, blank = False)
+    club_book = models.ForeignKey(Book, related_name="club_book", blank = True, null = True, on_delete=models.CASCADE)
+
+    def _add_book(self, club):
+        club.club_book.add(self)
+
 
 # Create the user's Roles model
 ROLES= (

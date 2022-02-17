@@ -11,7 +11,7 @@ from django.views import View
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm
 from .models import Book, Club, Role, User
 
 # Create your views here.
@@ -54,6 +54,50 @@ def search_books(request):
     return render(request, 'search_books.html', {'books': books})
 
 
+def set_club_book(request):
+    current_user = request.user
+
+    if request.method == 'POST':
+        form = SetClubBookForm(request.POST)
+        if form.is_valid():
+            club = form.get_club()
+            book = form.get_book()
+            #current_owned_clubs = Role.objects.filter(user=current_user, role='O')
+            #if club in current_owned_clubs:
+            club._add_book(book)
+            return redirect('login')
+            #else:
+                #messages.add_message(request, messages.ERROR, "you don't own this club")
+               # form = SetClubBookForm()
+        else:
+            messages.add_message(request, messages.ERROR, "Invalid club name or book name")
+            form = SetClubBookForm()
+        return render(request, 'set_club_book.html', {'form' : form})
+    else:
+        form = SetClubBookForm()
+        return render(request, 'set_club_book.html', {'form': form})
+
+
+@login_required
+def create_club(request):
+    current_user = request.user
+    if request.method == 'POST':
+        current_user = request.user
+        current_owned_clubs = Role.objects.filter(user = current_user, role = 'O')
+        if len(current_owned_clubs) < 3:
+            form = ClubForm(request.POST)
+            if form.is_valid():
+                newClub = form.save()
+                role = Role.objects.create(user = current_user, club = newClub, role = 'O')
+                return redirect('club_list')
+        else:
+            messages.add_message(request, messages.ERROR, "You already own too many clubs!")
+            form = ClubForm()
+        return render(request, 'create_club.html' , {'form': form})
+
+    else:
+        form = ClubForm()
+        return render(request, 'create_club.html' , {'form': form})
 # class FeedView(LoginRequiredMixin, ListView):
 #     """Class-based generic view for displaying a view."""
 #
@@ -201,10 +245,10 @@ def log_out(request):
     logout(request)
     return redirect('home')
 
-    """This function standardize the requirements for
-        user registration, if the user successfully
-        registers, it will be created in the system,
-        and will be redirected to the profile page """
+"""This function standardize the requirements for
+    user registration, if the user successfully
+    registers, it will be created in the system,
+    and will be redirected to the profile page """
 class SignUpView(FormView):
     """View that signs up user."""
 
