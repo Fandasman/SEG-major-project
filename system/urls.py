@@ -39,4 +39,6 @@ urlpatterns = [
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('user/<int:user_id>', views.ShowUserView.as_view(), name='show_user'),
     path('book/<int:book_id>', views.show_book, name='show_book'),
+    path('book/<int:book_id>/wish', views.wish, name='wish'),
+    path('book/<int:book_id>/unwish', views.unwish, name='unwish'),
 ]
