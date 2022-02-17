@@ -12,7 +12,8 @@
               {% if user.is_authenticated %}
                 <input type="submit" value="Enter" class="btn btn-primary">
               {% else %}
-                <a class="btn btn-primary" href="{% url 'login' %}">Log in</a>
+                <a class="btn btn-primary" href="{% url 'sign_up' %}">Sign up</a>
+                <a class="btn btn-secondary" href="{% url 'login' %}">Log in</a>
               {% endif %}
             </form>
           </div>

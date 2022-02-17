@@ -52,7 +52,7 @@ def profile(request):
 def search_books(request):
     search_book = request.GET.get('book_searchbar')
     if search_book:
-        books= Book.objects.filter(Q(name__icontains=search_book))
+        books= Book.objects.filter(name__icontains=search_book)
     else:
         books = Book.objects.all()
     return render(request, 'search_books.html', {'books': books})
@@ -284,3 +284,25 @@ class WishlistView(LoginRequiredMixin, ListView):
 
         except ObjectDoesNotExist:
             return redirect('feed')
+
+def wish(request, book_id):
+    user = request.user
+    try:
+        book = Book.objects.get(pk = book_id)
+        if user.wishlist.filter(isbn=book.isbn).exists() == False:
+            user.wishlist.add(book)
+        return redirect('wishlist', user.id)
+
+    except ObjectDoesNotExist:
+        return redirect('feed')
+
+def unwish(request, book_id):
+    user = request.user
+    try:
+        book = Book.objects.get(pk = book_id)
+        if user.wishlist.filter(isbn=book.isbn).exists():
+            user.wishlist.remove(book)
+        return redirect('wishlist', user.id)
+    
+    except ObjectDoesNotExist:
+        return redirect('feed')
