@@ -31,7 +31,7 @@ def show_book(request, book_id):
     try:
         book = Book.objects.get(id=book_id)
     except ObjectDoesNotExist:
-        return redirect('search_books')
+        return redirect('feed')
     else:
         return render(request, 'show_book.html',
             {'book': book}
