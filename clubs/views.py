@@ -1,21 +1,22 @@
+from django import template
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
-from django.shortcuts import redirect, render
-from django.views.generic.edit import FormView
-from django.views import View
-from .forms import SignUpForm, LogInForm, EditProfileForm, CreateClubForm
-from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Book, Club, User
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.http.response import HttpResponse
+from django.shortcuts import redirect, render
+from django.views import View
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ImproperlyConfigured
-
-from .forms import CreateClubForm
-from django.conf import settings
-from .models import Book, Club, User
-
+from django.views.generic import ListView
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import FormView
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm
+from .models import Book, Club, Role, User
 
 # Create your views here.
 
@@ -23,8 +24,11 @@ def feed(request):
     current_user = request.user
     return render(request, 'feed.html', {'user': current_user})
 
-def home(request):
-    return render(request, 'home.html')
+class LoginProhibitedMixin:
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect('feed')
+        return super().dispatch(*args, **kwargs)
 
 # @login_required
 def show_book(request, book_id):
@@ -35,28 +39,6 @@ def show_book(request, book_id):
     else:
         return render(request, 'show_book.html',
             {'book': book}
-        )
-
-# @login_required
-def show_club(request, club_id):
-    try:
-        club = Club.objects.get(id=club_id)
-    except ObjectDoesNotExist:
-        return redirect('search_clubs')
-    else:
-        return render(request, 'show_club.html',
-            {'club': club}
-        )
-
-# @login_required
-def show_user(request, user_id):
-    try:
-        user = User.objects.get(id=user_id)
-    except ObjectDoesNotExist:
-        return redirect('search_users')
-    else:
-        return render(request, 'show_user.html',
-            {'user': user}
         )
 
 # @login_required
@@ -75,23 +57,99 @@ def search_books(request):
         books = Book.objects.all()
     return render(request, 'search_books.html', {'books': books})
 
-# @login_required
-def search_clubs(request):
-    search_club = request.GET.get('club_searchbar')
-    if search_club:
-        clubs= Club.objects.filter(Q(name__icontains=search_club))
-    else:
-        clubs = Club.objects.all()
-    return render(request, 'search_clubs.html', {'clubs': clubs})
 
-# @login_required
-def search_users(request):
-    search_user = request.GET.get('user_searchbar')
-    if search_user:
-        users= User.objects.filter(Q(username__icontains=search_user))
-    else:
-        users= User.objects.all()
-    return render(request, 'search_users.html', {'users': users})
+# class FeedView(LoginRequiredMixin, ListView):
+#     """Class-based generic view for displaying a view."""
+#
+#     model = Post
+#     template_name = "feed.html"
+#     context_object_name = 'posts'
+#
+#     def get_queryset(self):
+#         """Return the user's feed."""
+#         current_user = self.request.user
+#         authors = list(current_user.followees.all()) + [current_user]
+#         posts = Post.objects.filter(author__in=authors)
+#         return posts
+#
+#     def get_context_data(self, **kwargs):
+#         """Return context data, including new post form."""
+#         context = super().get_context_data(**kwargs)
+#         context['user'] = self.request.user
+#         context['form'] = ClubForm()
+#         return context
+
+class HomeView(LoginProhibitedMixin,View):
+    template_name = 'home.html'
+
+    def get(self,request):
+        return self.render()
+
+    def post(self,request):
+        return self.render()
+
+    def render(self):
+        return render(self.request, 'home.html')
+
+# class MemberListView(LoginRequiredMixin, ListView):
+class MemberListView(ListView):
+    model= User
+    template_name= 'member_list.html'
+    context_object_name= 'users'
+
+    # def get_context_data(self, *args, **kwargs):
+    #     context= super().get_context_data(*args, **kwargs)
+    #     user= User.objects.all()
+    #     context['members']= Role.objects.all().filter(role= "M")
+    #     return context
+
+# class ClubListView(LoginRequiredMixin, ListView):
+class ClubListView(ListView):
+    model= Club
+    template_name= 'club_list.html'
+    context_object_name= 'clubs'
+
+    def get_context_data(self, *args, **kwargs):
+        context= super().get_context_data(*args, **kwargs)
+        club= Club.objects.all()
+        context['roles']= Role.objects.all().filter(role= "O")
+        return context
+
+# class OwnerClubListView(LoginRequiredMixin, ListView):
+class OwnerClubListView(ListView):
+    model= Club
+    template_name= 'owner_club_list.html'
+    context_object_name= 'user'
+
+    def get_context_data(self, *args, **kwargs):
+        context= super().get_context_data(*args, **kwargs)
+        current_user= self.request.user
+        context['roles']= Role.objects.all().filter(user= current_user, role= "O")
+        return context
+
+# class MemberClubListView(LoginRequiredMixin, ListView):
+class MemberClubListView(ListView):
+    model= Club
+    template_name= 'member_club_list.html'
+    context_object_name= 'user'
+
+    def get_context_data(self, *args, **kwargs):
+        context= super().get_context_data(*args, **kwargs)
+        current_user= self.request.user
+        context['roles']= Role.objects.all().filter(user= current_user, role= "M")
+        return context
+
+
+class ShowUserView(DetailView):
+    model = User
+    template_name = 'show_user.html'
+    pk_url_kwarg = "user_id"
+
+class ShowClubView(DetailView):
+    model = Club
+    template_name = 'show_club.html'
+    pk_url_kwarg = "club_id"
+
 
 # class LoginProhibitedMixin:
 
@@ -142,6 +200,11 @@ class LogInView(View):
         form = LogInForm()
         return render(self.request, 'login.html', {'form': form, 'next' : self.next})
 
+"""View used for logging out."""
+def log_out(request):
+    logout(request)
+    return redirect('home')
+
     """This function standardize the requirements for
         user registration, if the user successfully
         registers, it will be created in the system,
@@ -149,7 +212,7 @@ class LogInView(View):
 class SignUpView(FormView):
     """View that signs up user."""
 
-    form_class = SignUpForm()
+    form_class = SignUpForm
     template_name = "sign_up.html"
     #redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
 
@@ -168,19 +231,26 @@ class SignUpView(FormView):
     it will be store in the database and client will
     be redirected to the feed page"""
 @login_required
-def CreateClubView(request):
-    if request.method == "POST":
-        form = CreateClubForm(request.POST)
+def create_club(request):
+    current_user = request.user
+    if request.method == 'POST':
         current_user = request.user
-        if form.is_valid():
-            name = form.cleaned_data.get('name')
-            location = form.cleaned_data.get('location')
-            description = form.cleaned_data.get('description')
-            Club.objects.create(leader=current_user, name=name, location=location, description=description)
-            return redirect('/feed/')
+        current_owned_clubs = Role.objects.filter(user = current_user, role = 'O')
+        if len(current_owned_clubs) < 3:
+            form = ClubForm(request.POST)
+            if form.is_valid():
+                newClub = form.save()
+                role = Role.objects.create(user = current_user, club = newClub, role = 'O')
+                return redirect('club_list')
+        else:
+            messages.add_message(request, messages.ERROR, "You already own too many clubs!")
+            form = ClubForm()
+        return render(request, 'create_club.html' , {'form': form})
+
     else:
-        form = CreateClubForm()
-    return render(request, 'create_club.html', {'form': form})
+        form = ClubForm()
+        return render(request, 'create_club.html' , {'form': form})
+
 
 
 class EditProfileView(View):
@@ -197,22 +267,20 @@ class EditProfileView(View):
             return redirect('feed')
         return render(request, 'edit_profile.html', {'form': form, 'user': current_user})
 
-
     def render(self):
         current_user = self.request.user
         form = EditProfileForm(instance=current_user)
         return render(self.request,'edit_profile.html', {'form': form})
 
-class LogOutView(View):
-    template_name = 'home.html'
+"""Includes the view for a user's wishlist."""
+class WishlistView(LoginRequiredMixin, ListView):
+    def get(self, request, user_id):
+        return self.render(user_id)
 
-    def get(self,request):
-        logout(request)
-        return redirect('home')
+    def render(self, user_id):
+        try:
+            user = User.objects.get(id = user_id)
+            return render(self.request, 'wishlist.html', {'user': user})
 
-    def post(self,request):
-        logout(request)
-        return redirect('home')
-
-    def render(self):
-        return render(self.request, template_name)
+        except ObjectDoesNotExist:
+            return redirect('feed')

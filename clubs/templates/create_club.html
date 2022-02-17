@@ -1,15 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>club</title>
-</head>
-<body>
-    <h1>create club</h1>
-    <form action="{% url 'create_club' %}" method="post">
+{% extends 'base_content.html' %}
+{% block title %}
+| Create Club
+{% endblock %}
+{% block content %}
+<div class="container" style="padding-left:100px">
+  <div class="row">
+    <div class="col-12">
+      <h1>Create Club</h1>
+      <form action="{% url 'create_club' %}" method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Create">
-    </form>
-</body>
-</html>
+        {% include "partials/bootstrap_form.html" with form=form %}
+        <input type='submit' value="Create club" class="btn btn-primary">
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

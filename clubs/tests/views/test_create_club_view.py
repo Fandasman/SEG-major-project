@@ -1,7 +1,7 @@
 """Test of the create club view"""
 from django.test import TestCase
 from django.urls import reverse
-from clubs.models import Club, User
+from clubs.models import Club, User, Role
 
 
 class CreateClubViewTestCase(TestCase):
@@ -41,10 +41,11 @@ class CreateClubViewTestCase(TestCase):
     def test_successful_create_club(self):
         self.client.login(username = self.user.username, password = "Password123")
         before_count = Club.objects.count()
+        role_before_count = Role.objects.count()
         response = self.client.post(self.url, self.form_input, follow=True)
         after_count = Club.objects.count()
+        role_after_count = Role.objects.count()
         self.assertEqual(after_count, before_count+1)
-        new_club = Club.objects.get(name = 'test_club')
-        self.assertEqual(new_club.leader, self.user)
-        response_url = reverse('feed')
+        self.assertEqual(role_after_count, role_before_count+1)
+        response_url = reverse('club_list')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)

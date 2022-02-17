@@ -4,7 +4,6 @@
         "pk": 1,
         "fields": {
             "name": "Booker",
-            "leader": 1,
             "location": "London",
             "description": "Your friendly neighbourhood book club."
         }

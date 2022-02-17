@@ -1,0 +1,24 @@
+{% extends 'base_content.html' %}
+{% block title %}
+| Wishlist
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-lg-6 col-xl-8">
+            <h1>Wishlist</h1>
+            <ul class="vertical-list">
+                {% for book in user.wishlist.all %}
+                
+                <li>{{book.name}}</li>
+
+                    {% empty %}
+
+                <p><b>{{user.username}}'s</b> wishlist is empty.</p>
+
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
