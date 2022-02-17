@@ -3,7 +3,11 @@
     <img src="{{ user.gravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle profile-image" >
     <div class="profile-text">
       <h3 class="profile-title">{{ user.full_name }}</h3>
-      <p class="profile-username">{{ user.username }}</p>
+      <p class="profile-username">{{ user.username }}
+        &nbsp
+        &nbsp
+        <a style="text-decoration: none;" class="text text-secondary" href="{% url 'wishlist' user.id %}">Wishlist</a>
+      </p>
       <p class="profile-bio">{{ user.bio }}</p>
     </div>
   </div>
