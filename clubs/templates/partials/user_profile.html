@@ -6,7 +6,7 @@
       <p class="profile-username">{{ user.username }}
         &nbsp
         &nbsp
-        <a style="text-decoration: none;" class="text text-secondary" href="{% url 'wishlist' user.id %}">Wishlist</a>
+        <a style="text-decoration: none;" class="text text-secondary" href="{% url 'wishlist' user.id %}">Wishlist {{user.wishlist.count}}</a>
       </p>
       <p class="profile-bio">{{ user.bio }}</p>
     </div>
