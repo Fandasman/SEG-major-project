@@ -71,14 +71,15 @@ class Club(models.Model):
 ROLES= (
     ('A', 'Applicant'),
     ('M', 'Member'),
-    ('O', 'Owner'),
+    ('O', 'Officer'),
+    ('CO', 'Owner')
 )
 
 class Role(models.Model):
     user= models.ForeignKey(User, on_delete=models.CASCADE)
     club= models.ForeignKey(Club, on_delete=models.CASCADE)
     role= models.CharField(
-        max_length=1,
+        max_length=2,
         choices=ROLES,
         default='A'
     )

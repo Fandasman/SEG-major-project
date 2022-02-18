@@ -1,6 +1,7 @@
 from django import template
 from django.conf import settings
 from django.contrib import messages
+from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -235,12 +236,12 @@ def create_club(request):
     current_user = request.user
     if request.method == 'POST':
         current_user = request.user
-        current_owned_clubs = Role.objects.filter(user = current_user, role = 'O')
+        current_owned_clubs = Role.objects.filter(user = current_user, role = 'CO')
         if len(current_owned_clubs) < 3:
             form = ClubForm(request.POST)
             if form.is_valid():
                 newClub = form.save()
-                role = Role.objects.create(user = current_user, club = newClub, role = 'O')
+                role = Role.objects.create(user = current_user, club = newClub, role = 'CO')
                 return redirect('club_list')
         else:
             messages.add_message(request, messages.ERROR, "You already own too many clubs!")
@@ -285,6 +286,253 @@ class WishlistView(LoginRequiredMixin, ListView):
         except ObjectDoesNotExist:
             return redirect('feed')
 
+
+"""This function allows the club owner of the club to
+    promote the member to the officer"""
+def promote_member_to_officer(request, club_id, member_id):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            user = request.user
+            club = Club.objects.get(id = club_id)
+            userrole = Role.objects.get(club=club,user=user)
+            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            member = User.objects.get(id = member_id)
+            newOfficer = Role.objects.get(club = club, user = member)
+            isOwner = Role.objects.get(club=club,user=request.user,role = 'CO')
+            newOfficer.role = 'O'
+            newOfficer.save()
+            members = [member for member in Role.objects.filter(club=club)]
+            return redirect(redirect_url,members = members,
+                                                userrole = userrole,
+                                                club = club)
+        else:
+            return redirect('log_in')
+    else:
+        return HttpResponseForbidden()
+
+"""This function allows the club owner of the club to
+    promote the officer to the club owner, and the club
+    owner will be the officer of the club"""
+def promote_officer_to_ClubOwner(request, club_id, member_id):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            user = request.user
+            club = Club.objects.get(id = club_id)
+            userrole = Role.objects.get(club=club,user=user)
+            userrole = Role.objects.get(club=club,user=user)
+            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            member = User.objects.get(id = member_id)
+            newClubOwner = Role.objects.get(club = club, user = member)
+            userrole.role = 'O'
+            userrole.save()
+            newClubOwner.role = 'CO'
+            newClubOwner.save()
+            members = [member for member in Role.objects.filter(club=club)]
+            return redirect(redirect_url,members = members,
+                                                userrole = userrole,
+                                                club = club)
+        else:
+            return redirect('log_in')
+    else:
+        return HttpResponseForbidden()
+
+"""This function allows the club owner of the club to
+    demote the officer to the member"""
+def demote_officer_to_member(request, club_id, member_id):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            user = request.user
+            userrole = Role.objects.filter(user=user)
+            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            club = Club.objects.get(id = club_id)
+            member = User.objects.get(id = member_id)
+            newMember = Role.objects.get(club = club, user = member)
+            isOwner = Role.objects.get(club=club,user=request.user,role = 'CO')
+            newMember.role = 'M'
+            newMember.save()
+            members = [member for member in Role.objects.filter(club=club)]
+            return redirect(redirect_url,members = members,
+                                                userrole = userrole,
+                                                club = club)
+        else:
+            return redirect('log_in')
+    else:
+        return HttpResponseForbidden()
+
+"""This function allows the club owner of the club to
+    remove the member of the club"""
+def remove_member(request, club_id, member_id):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            user = request.user
+            userrole = Role.objects.filter(user=user)
+            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            club = Club.objects.get(id = club_id)
+            member = User.objects.get(id = member_id)
+            newMember = Role.objects.get(club = club, user = member)
+            newMember.delete()
+            members = Role.objects.filter(club=club)
+            return redirect(redirect_url,members = members,
+                                                userrole = userrole,
+                                                club = club)
+        else:
+            return redirect('log_in')
+    else:
+        return HttpResponseForbidden()
+
+"""This function allows the member of the club to
+    leave the club, which means the role has been
+    deleted"""
+def leave_club(request, club_id):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            user = request.user
+            current_club = Club.objects.get(id=club_id)
+            userrole = Role.objects.filter(club=current_club).get(user=user)
+            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            members = Role.objects.filter(club=current_club)
+            userrole.delete()
+            return redirect('user_details')
+        else:
+            return redirect('log_in')
+    else:
+        return HttpResponseForbidden()
+
+"""This function allows the club owner of the club to
+    accept the application the applicant, it means
+    the applicant will be the member of the club"""
+def accept_applicant_to_club_as_Owner(request,club_id,member_id):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            user = request.user
+            userrole = Role.objects.filter(user=user)
+            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            club = Club.objects.get(id = club_id)
+            member = User.objects.get(id = member_id)
+            newMember = Role.objects.get(club = club, user = member)
+            newMember.role = 'M'
+            newMember.save()
+            members = Role.objects.filter(club=club)
+            return redirect(redirect_url,members = members,
+                                                userrole = userrole,
+                                                club = club)
+        else:
+            return redirect('log_in')
+    else:
+        return HttpResponseForbidden()
+
+"""This function allows the officer of the club to
+    accept the application the applicant, it means
+    the applicant will be the member of the club"""
+def accept_applicant_to_club_as_officer(request,club_id,member_id):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            user = request.user
+            userrole = Role.objects.filter(user=user)
+            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            club = Club.objects.get(id = club_id)
+            member = User.objects.get(id = member_id)
+            newMember = Role.objects.get(club = club, user = member)
+            newMember.role = 'M'
+            newMember.save()
+            members = Role.objects.filter(club=club)
+            return redirect(redirect_url,members = members,
+                                                userrole = userrole,
+                                                club = club)
+        return redirect('log_in')
+    else:
+        return HttpResponseForbidden()
+
+"""This function allows the club owner of the club to
+    reject the application the applicant, it means
+    the applicant will be removed from the club"""
+def reject_applicant_to_club_as_Owner(request,club_id,member_id):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            user = request.user
+            userrole = Role.objects.filter(user=user)
+            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            club = Club.objects.get(id = club_id)
+            member = User.objects.get(id = member_id)
+            newMember = Role.objects.get(club = club, user = member)
+            newMember.delete()
+            members = Role.objects.filter(club=club)
+            return redirect(redirect_url,members = members,
+                                                userrole = userrole,
+                                                club = club)
+        else:
+            return redirect('log_in')
+    else:
+        return HttpResponseForbidden()
+
+"""This function allows the officer of the club to
+    reject the application the applicant, it means
+    the applicant will be removed from the club"""
+def reject_applicant_to_club_as_Officer(request,club_id,member_id):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            user = request.user
+            userrole = Role.objects.filter(user=user)
+            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            club = Club.objects.get(id = club_id)
+            member = User.objects.get(id = member_id)
+            newMember = Role.objects.get(club = club, user = member)
+            newMember.delete()
+            members = Role.objects.filter(club=club)
+            return redirect(redirect_url,members = members,
+                                                userrole = userrole,
+                                                club = club)
+        else:
+            return redirect('log_in')
+    else:
+        return HttpResponseForbidden()
+
+"""This function returns the member list of the club,
+    if the user does not belong to the club or the user
+    is the applicant of the club does not have the
+    authority to view the list.
+    Otherwise, the user will see the list of the members of the club
+    And the member can not see the details of the members
+    only officers and club owners can do this"""
+@login_required
+def member_list(request, club_id):
+    club = Club.objects.get(id=club_id)
+    members = Role.objects.filter(club=club)
+    try:
+        userrole = Role.objects.get(club = club, user=request.user)
+    except ObjectDoesNotExist:
+        messages.add_message(request,messages.ERROR,"It seem you don't belong to this club!")
+        return redirect('club_list')
+    else:
+        if userrole.role == "A":
+            messages.add_message(request,messages.ERROR,"You are the applicant in this club, so you don't have authority to view the member list!")
+            return redirect('club_list')
+        else:
+            return render(request, 'club_page.html', {'members': members,
+                                                    'userrole': userrole,
+                                                    'club' : club})
+"""This function is for the user to apply for the club.
+    If the user already in the club, system will refuse
+    to create a role for the user with an error message."""
+def apply(request, club_id):
+    current_club = Club.objects.get(id=club_id)
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            current_user = request.user
+            try:
+                role = Role.objects.filter(club=current_club).get(user=current_user)
+            except ObjectDoesNotExist:
+                messages.add_message(request,messages.SUCCESS,"You applied to this club successfully")
+                role = Role.objects.create(user=current_user, club=current_club, role='A')
+                return redirect('club_list')
+            else:
+                messages.add_message(request,messages.ERROR,"You've already applied for this club!")
+                return redirect('feed')
+        else:
+            return redirect('log_in')
+    else:
+        return HttpResponseForbidden()
+      
 def wish(request, book_id):
     user = request.user
     try:
@@ -306,3 +554,4 @@ def unwish(request, book_id):
     
     except ObjectDoesNotExist:
         return redirect('search_books')
+
