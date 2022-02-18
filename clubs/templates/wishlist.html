@@ -5,31 +5,42 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-xs-12 col-lg-6 col-xl-8">
+        <div class="col-12">
             <h1>Wishlist</h1>
-            {% for book in user.wishlist.all %}
-            <tr>
-                <td>
-                    <img src="{{ book.imgSmall }}" alt="Cover of {{ book.title }}">
-                </td>
-                <td>{{ book.title }}</td>
-                <td>{{ book.author }}</td>
-                <td>{{ book.publisher }}</td>
-                <td>{{ book.published }}</td>
-                <td>{{ book.isbn }}</td>
-                <td>
-                    <a class="btn btn-primary" href="{% url 'show_book' book.id %}">See book</a>
-                </td>
-                <td>
-                    <a class="btn btn-danger" href="{% url 'unwish' book.id %}">Remove from wishlist</a>
-                </td>
-            </tr>
+            <br>
+            {% if user.wishlist.all.count > 0 %}
+            <table class="table table-striped table-hover">
+                <thead>
+                    <th scope="col"></th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Author</th>
+                    <th scope="col">Publisher</th>
+                    <th scope="col">Year of publishing</th>
+                </thead>
+            {% endif %}
+                {% for book in user.wishlist.all %}
+                <tr>
+                    <td>
+                        <img src="{{ book.imgURLSmall }}" alt="Cover of {{ book.title }}">
+                    </td>
+                    <td>{{ book.title }}</td>
+                    <td>{{ book.author }}</td>
+                    <td>{{ book.publisher }}</td>
+                    <td>{{ book.published }}</td>
+                    <td>
+                        <a class="btn btn-primary" href="{% url 'show_book' book.id %}">See book</a>
+                    </td>
+                    <td>
+                        <a class="btn btn-danger" href="{% url 'unwish' book.id %}">Remove from wishlist</a>
+                    </td>
+                </tr>
 
-                {% empty %}
+                    {% empty %}
 
-            <p><b>{{user.username}}'s</b> wishlist is empty.</p>
+                <p><b>{{user.username}}'s</b> wishlist is empty.</p>
 
-            {% endfor %}
+                {% endfor %}
+            </table>
         </div>
     </div>
 </div>
