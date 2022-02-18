@@ -30,14 +30,21 @@
                     <td>
                         <a class="btn btn-primary" href="{% url 'show_book' book.id %}">See book</a>
                     </td>
+                    {% if user == current_user %}
                     <td>
                         <a class="btn btn-danger" href="{% url 'unwish' book.id %}">Remove from wishlist</a>
                     </td>
+                    {% endif %}
                 </tr>
 
-                    {% empty %}
+                {% empty %}
 
-                <p><b>{{user.username}}'s</b> wishlist is empty.</p>
+                {% if user == current_user %}
+                <h3>Your wishlist is empty. Maybe fill it with some books? :)</h3>
+
+                {% else %}
+                <h3><b>{{user.username}}'s</b> wishlist is empty.</h3>
+                {% endif %}
 
                 {% endfor %}
             </table>
