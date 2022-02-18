@@ -11,7 +11,7 @@ class RejectApplicationAsOwnerTestCase(TestCase):
                 'clubs/tests/fixtures/default_applicant.json',
                 'clubs/tests/fixtures/default_user.json',
                 'clubs/tests/fixtures/other_users.json',
-                'clubs/tests/fixtures/other_applicants.json',
+                # 'clubs/tests/fixtures/other_applicants.json',
                 'clubs/tests/fixtures/other_clubs.json']
 
     def setUp(self):

@@ -16,7 +16,7 @@ class ApproveTheApplicationAsCOTestCase(TestCase):
 
     def setUp(self):
         self.club = Club.objects.get(name='Booker')
-        self.user = User.objects.get(email='alicesmith@example.org')
+        self.user = User.objects.get(email='bobsmith@example.org')
         self.member_user = User.objects.get(email='johndoe@example.org')
         self.role_user = Role.objects.get(user=self.member_user)
         self.url = reverse('accept_applicant_as_owner',kwargs={'club_id':self.club.id,'member_id':self.member_user.id})
