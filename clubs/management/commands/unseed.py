@@ -14,7 +14,7 @@ class Command(BaseCommand):
         Command.delete_clubs(self)
 
         print("Unseeding complete!")
-    
+
 
     # Delete functions
     def delete_books(self):
