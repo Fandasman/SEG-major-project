@@ -104,6 +104,7 @@ class SetClubBookForm(forms.Form):
         except ObjectDoesNotExist:
             redirect('set_club_book')
 
+
     def get_club(self):
         try:
             club = Club.objects.get(name=self.cleaned_data.get('club_name'))

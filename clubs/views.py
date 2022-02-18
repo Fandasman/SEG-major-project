@@ -62,42 +62,22 @@ def set_club_book(request):
         if form.is_valid():
             club = form.get_club()
             book = form.get_book()
-            #current_owned_clubs = Role.objects.filter(user=current_user, role='O')
-            #if club in current_owned_clubs:
-            club._add_book(book)
-            return redirect('login')
-            #else:
-                #messages.add_message(request, messages.ERROR, "you don't own this club")
-               # form = SetClubBookForm()
+            current_owned_club = Role.objects.filter(user=current_user, role='O', club=club)
+            if current_owned_club.count() == 1:
+                club._add_book(book)
+                return redirect('login')
+            else:
+                messages.add_message(request, messages.ERROR, "you don't own this club")
+                form = SetClubBookForm()
         else:
             messages.add_message(request, messages.ERROR, "Invalid club name or book name")
             form = SetClubBookForm()
-        return render(request, 'set_club_book.html', {'form' : form})
+        return render(request, 'set_club_book.html', {'form': form})
     else:
         form = SetClubBookForm()
         return render(request, 'set_club_book.html', {'form': form})
 
 
-@login_required
-def create_club(request):
-    current_user = request.user
-    if request.method == 'POST':
-        current_user = request.user
-        current_owned_clubs = Role.objects.filter(user = current_user, role = 'O')
-        if len(current_owned_clubs) < 3:
-            form = ClubForm(request.POST)
-            if form.is_valid():
-                newClub = form.save()
-                role = Role.objects.create(user = current_user, club = newClub, role = 'O')
-                return redirect('club_list')
-        else:
-            messages.add_message(request, messages.ERROR, "You already own too many clubs!")
-            form = ClubForm()
-        return render(request, 'create_club.html' , {'form': form})
-
-    else:
-        form = ClubForm()
-        return render(request, 'create_club.html' , {'form': form})
 # class FeedView(LoginRequiredMixin, ListView):
 #     """Class-based generic view for displaying a view."""
 #
