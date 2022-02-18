@@ -52,6 +52,13 @@ class User(AbstractUser):
     def get_wishlist(self):
         return "\n".join([b.wishlist for b in self.wishlist.all()])
 
+class BooksRatings(models.Model):
+    isbn = models.CharField(max_length = 13, blank = False)
+    rating = models.IntegerField(
+        validators = [MaxValueValidator(5), MinValueValidator(1)]
+    )
+    user = models.ForeignKey(User, related_name='books', on_delete=models.CASCADE)
+
 
 # Create the book Club model
 class Club(models.Model):

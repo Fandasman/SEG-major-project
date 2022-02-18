@@ -1,7 +1,7 @@
 import pandas as pd
 from tqdm import tqdm
 from django.core.management.base import BaseCommand, CommandError
-from clubs.models import User, Book, Club, Role
+from clubs.models import User, Book, BooksRatings, Club, Role
 from django.contrib.auth.hashers import make_password
 from faker import Faker
 
@@ -46,6 +46,14 @@ class Command(BaseCommand):
             password = Command.PASSWORD,
             bio = 'Hi, I own all the clubs here. Care to join?'
         )
+
+        for index, row in main_dataset[main_dataset['User-ID'] == 1].iterrows():
+            BooksRatings.objects.create(
+                isbn = row['ISBN'],
+                rating = row['Book-Rating'],
+                user = User.objects.get(id=1)
+            )
+
         print("Done!")
 
         print("Generating fake users...")
@@ -65,6 +73,14 @@ class Command(BaseCommand):
                 password = Command.PASSWORD,
                 bio = fakeBio
             )
+
+            for index, row in main_dataset[main_dataset['User-ID'] == i + 2].iterrows():
+                BooksRatings.objects.create(
+                    isbn = row['ISBN'],
+                    rating = row['Book-Rating'],
+                    user = User.objects.get(id=i+2)
+                )
+
         print("Done!")
 
 
