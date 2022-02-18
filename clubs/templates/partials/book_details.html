@@ -5,5 +5,10 @@
       <h3 class="profile-title">{{ book.title }}</h3>
       <p class="profile-username">{{ book.author }}</p>
     </div>
+    {% if book in current_user.wishlist.all %}
+    <a class="btn btn-danger" href="{% url 'unwish' book.id %}">Remove from wishlist</a>
+    {% else %}
+    <a class="btn btn-success" href="{% url 'wish' book.id %}">Add to wishlist</a>
+    {% endif %}
   </div>
 </div>
