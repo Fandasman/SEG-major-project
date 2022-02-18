@@ -9,6 +9,10 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
 from django.views import View
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
@@ -49,7 +53,7 @@ def profile(request):
 def search_books(request):
     search_book = request.GET.get('book_searchbar')
     if search_book:
-        books= Book.objects.filter(Q(name__icontains=search_book))
+        books= Book.objects.filter(name__icontains=search_book)
     else:
         books = Book.objects.all()
     return render(request, 'search_books.html', {'books': books})
@@ -281,6 +285,7 @@ class WishlistView(LoginRequiredMixin, ListView):
 
         except ObjectDoesNotExist:
             return redirect('feed')
+
 
 """This function allows the club owner of the club to
     promote the member to the officer"""
@@ -527,3 +532,26 @@ def apply(request, club_id):
             return redirect('log_in')
     else:
         return HttpResponseForbidden()
+      
+def wish(request, book_id):
+    user = request.user
+    try:
+        book = Book.objects.get(pk = book_id)
+        if user.wishlist.filter(isbn=book.isbn).exists() == False:
+            user.wishlist.add(book)
+        return redirect('show_book', book.id)
+
+    except ObjectDoesNotExist:
+        return redirect('search_books')
+
+def unwish(request, book_id):
+    user = request.user
+    try:
+        book = Book.objects.get(pk = book_id)
+        if user.wishlist.filter(isbn=book.isbn).exists():
+            user.wishlist.remove(book)
+        return redirect('wishlist', user.id)
+    
+    except ObjectDoesNotExist:
+        return redirect('search_books')
+
