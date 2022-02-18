@@ -26,6 +26,8 @@ class Command(BaseCommand):
 
         Command.generate_users(self, main_dataset)
 
+        Command.get_ratings(self, main_dataset)
+
         Command.generate_clubs(self)
 
         Command.get_books(self, books_dataset)
@@ -47,13 +49,6 @@ class Command(BaseCommand):
             bio = 'Hi, I own all the clubs here. Care to join?'
         )
 
-        for index, row in main_dataset[main_dataset['User-ID'] == 1].iterrows():
-            BooksRatings.objects.create(
-                isbn = row['ISBN'],
-                rating = row['Book-Rating'],
-                user = User.objects.get(id=1)
-            )
-
         print("Done!")
 
         print("Generating fake users...")
@@ -74,12 +69,19 @@ class Command(BaseCommand):
                 bio = fakeBio
             )
 
-            for index, row in main_dataset[main_dataset['User-ID'] == i + 2].iterrows():
-                BooksRatings.objects.create(
-                    isbn = row['ISBN'],
-                    rating = row['Book-Rating'],
-                    user = User.objects.get(id=i+2)
-                )
+        print("Done!")
+
+
+    # Read ratings from the main dataset
+    def get_ratings(self, main_dataset):
+        print("Reading ratings from the main dataset...")
+
+        for index, row in tqdm(main_dataset.iterrows(), total=main_dataset.shape[0]):
+            BooksRatings.objects.create(
+                isbn = row['ISBN'],
+                rating = row['Book-Rating'],
+                user = User.objects.get(id=row['User-ID'])
+            )
 
         print("Done!")
 
@@ -107,12 +109,11 @@ class Command(BaseCommand):
         print("Done!")
 
 
-
     # Read books from the dataset
     def get_books(self, books_dataset):
         print("Reading books from the dataset...")
 
-        for index, row in tqdm(books_dataset.iterrows()):
+        for index, row in tqdm(books_dataset.iterrows(), total=books_dataset.shape[0]):
             Book.objects.create(
                 isbn = row['ISBN'],
                 title = row['Book-Title'],
