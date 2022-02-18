@@ -7,17 +7,29 @@
     <div class="row">
         <div class="col-xs-12 col-lg-6 col-xl-8">
             <h1>Wishlist</h1>
-            <ul class="vertical-list">
-                {% for book in user.wishlist.all %}
-                
-                <li>{{book.title}}</li>
+            {% for book in user.wishlist.all %}
+            <tr>
+                <td>
+                    <img src="{{ book.imgSmall }}" alt="Cover of {{ book.title }}">
+                </td>
+                <td>{{ book.title }}</td>
+                <td>{{ book.author }}</td>
+                <td>{{ book.publisher }}</td>
+                <td>{{ book.published }}</td>
+                <td>{{ book.isbn }}</td>
+                <td>
+                    <a class="btn btn-primary" href="{% url 'show_book' book.id %}">See book</a>
+                </td>
+                <td>
+                    <a class="btn btn-danger" href="{% url 'unwish' book.id %}">Remove from wishlist</a>
+                </td>
+            </tr>
 
-                    {% empty %}
+                {% empty %}
 
-                <p><b>{{user.username}}'s</b> wishlist is empty.</p>
+            <p><b>{{user.username}}'s</b> wishlist is empty.</p>
 
-                {% endfor %}
-            </ul>
+            {% endfor %}
         </div>
     </div>
 </div>
