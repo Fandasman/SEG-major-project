@@ -291,10 +291,10 @@ def wish(request, book_id):
         book = Book.objects.get(pk = book_id)
         if user.wishlist.filter(isbn=book.isbn).exists() == False:
             user.wishlist.add(book)
-        return redirect('wishlist', user.id)
+        return redirect('show_book', book.id)
 
     except ObjectDoesNotExist:
-        return redirect('feed')
+        return redirect('search_books')
 
 def unwish(request, book_id):
     user = request.user
@@ -305,4 +305,4 @@ def unwish(request, book_id):
         return redirect('wishlist', user.id)
     
     except ObjectDoesNotExist:
-        return redirect('feed')
+        return redirect('search_books')
