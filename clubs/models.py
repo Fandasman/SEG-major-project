@@ -14,6 +14,7 @@ class Book(models.Model):
         default = datetime.datetime.now().year,
         validators = [MaxValueValidator(datetime.datetime.now().year), MinValueValidator(0)]
     )
+    genre = models.CharField(max_length = 50, blank = False)
     imgURLSmall = models.URLField(blank = True)
     imgURLMedium = models.URLField(blank = True)
     imgURLLarge = models.URLField(blank = True)
