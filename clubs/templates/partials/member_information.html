@@ -1,0 +1,19 @@
+{% for member in members %}
+  <div class="card border-dark mb-3" style="max-width: 90rem;">
+    <div class="card">
+      <div class="card-body">
+          <h5 class="card-header">{{member.user.first_name}}   {{member.user.last_name}}</h5>
+            <div class="card-body text">
+              <p class="text-muted">Public Bio: {{member.user.bio}}<p>
+                <h6>Role: {{member.role}}</h6>
+                <img src="{{ member.user.avatar.url }}" width="60" height="60"><br></br>
+                {% if userrole.role == "O" or userrole.role == "CO" %}
+                  <h6>Contact Details: {{member.user.email}}<h6>
+                {% endif %}
+            </div>
+          {% include 'partials/officer_operation.html' with userrole=userrole member=member%}
+          {% include 'partials/club_owner_operation.html' with userrole=userrole member=member%}
+       </div>
+    </div>
+  </div>
+{% endfor %}

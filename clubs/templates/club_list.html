@@ -14,12 +14,18 @@
           <tr>
             <td>{{ club.name }}</td>
             <td>
-              <form action = "{% url 'show_club' club.id %}" method = "get">
+              <p>
+              <form action = "{% url 'member_list' club.id %}" method = "get">
                 {% csrf_token %}
                 <input type = "hidden" name = "next" value = "{{ next }}">
                 {% include 'partials/bootstrap_form.html' with form=form %}
                 <input type = "submit" value = "View page" class="btn btn-primary">
               </form>
+              <form action="{% url 'apply' club.id%}" method="post">
+              {% csrf_token %}
+              <button type="submit", class='btn btn-success'>Apply</button>
+            </form>
+          </p>
             </td>
           </tr>
         {% endfor %}

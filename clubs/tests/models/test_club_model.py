@@ -42,9 +42,9 @@ class ClubModelTestCase(TestCase):
         self._assert_club_is_invalid()
 
 # Location tests.
-    def test_location_can_be_blank(self):
+    def test_location_cannot_be_blank(self):
         self.club.location = ''
-        self._assert_club_is_valid()
+        self._assert_club_is_invalid()
 
     def test_location_can_have_less_than_100_characters(self):
         self.club.location='x' * 100
@@ -60,9 +60,9 @@ class ClubModelTestCase(TestCase):
         self._assert_club_is_valid()
 
 # Description tests.
-    def test_description_can_be_blank(self):
+    def test_description_cannot_be_blank(self):
         self.club.description=''
-        self._assert_club_is_valid()
+        self._assert_club_is_invalid()
 
     def test_description_does_not_need_to_be_unique(self):
         second_club=Club.objects.get(name="Clubber")

@@ -52,6 +52,7 @@ class User(AbstractUser):
     def get_wishlist(self):
         return "\n".join([b.wishlist for b in self.wishlist.all()])
 
+# Create the Books and Ratings model
 class BooksRatings(models.Model):
     isbn = models.CharField(max_length = 13, blank = False)
     rating = models.IntegerField(
@@ -72,21 +73,22 @@ class Club(models.Model):
                 )
         ]
     )
-    location = models.CharField(max_length = 100, blank = True)
-    description = models.CharField(max_length = 500, blank = True)
+    location = models.CharField(max_length = 100, blank = False)
+    description = models.CharField(max_length = 500, blank = False)
 
 # Create the user's Roles model
 ROLES= (
     ('A', 'Applicant'),
     ('M', 'Member'),
-    ('O', 'Owner'),
+    ('O', 'Officer'),
+    ('CO', 'Owner')
 )
 
 class Role(models.Model):
     user= models.ForeignKey(User, on_delete=models.CASCADE)
     club= models.ForeignKey(Club, on_delete=models.CASCADE)
     role= models.CharField(
-        max_length=1,
+        max_length=2,
         choices=ROLES,
         default='A'
     )
