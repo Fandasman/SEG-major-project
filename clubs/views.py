@@ -612,7 +612,6 @@ def invite(request, club_id):
                                                                   "or this user already a member of this club")
                     form = InviteForm()
                     return redirect('invite', club.id)
-
             else:
                 messages.add_message(request, messages.ERROR, "you don't have the permission to invite others")
                 form = InviteForm()
