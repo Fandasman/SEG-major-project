@@ -26,7 +26,7 @@ class SetClubBookViewTestCase(TestCase):
         self.role.refresh_from_db()
         self.client.login(username=self.user.username, password="Password123")
         response = self.client.post(self.url, self.form_input, follow=True)
-        response_url = reverse('login')
+        response_url = '/club/1'
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.club.refresh_from_db()
         self.assertEqual(self.club.club_book, self.book)

@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 from django.views import View
 from django.contrib.auth.decorators import login_required
@@ -15,8 +15,9 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm
-from .models import Book, Club, Role, User
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
+from .models import Book, Club, Role, User, Invitation
+
 
 # Create your views here.
 
@@ -56,30 +57,6 @@ def search_books(request):
     else:
         books = Book.objects.all()
     return render(request, 'search_books.html', {'books': books})
-
-
-def set_club_book(request):
-    current_user = request.user
-
-    if request.method == 'POST':
-        form = SetClubBookForm(request.POST)
-        if form.is_valid():
-            club = form.get_club()
-            book = form.get_book()
-            current_owned_club = Role.objects.filter(user=current_user, role='O', club=club)
-            if current_owned_club.count() == 1:
-                club._add_book(book)
-                return redirect('login')
-            else:
-                messages.add_message(request, messages.ERROR, "you don't own this club")
-                form = SetClubBookForm()
-        else:
-            messages.add_message(request, messages.ERROR, "Invalid club name or book name")
-            form = SetClubBookForm()
-        return render(request, 'set_club_book.html', {'form': form})
-    else:
-        form = SetClubBookForm()
-        return render(request, 'set_club_book.html', {'form': form})
 
 
 # class FeedView(LoginRequiredMixin, ListView):
@@ -330,3 +307,84 @@ def unwish(request, book_id):
     
     except ObjectDoesNotExist:
         return redirect('feed')
+
+
+def set_club_book(request):
+    current_user = request.user
+
+    if request.method == 'POST':
+        form = SetClubBookForm(request.POST)
+        if form.is_valid():
+            club = form.get_club()
+            book = form.get_book()
+            current_owned_club = Role.objects.filter(user=current_user, role='O', club=club)
+            if current_owned_club.count() == 1:
+                club._add_book(book)
+                return redirect('show_club', club.id)
+            else:
+                messages.add_message(request, messages.ERROR, "you don't own this club")
+                form = SetClubBookForm()
+        else:
+            messages.add_message(request, messages.ERROR, "Invalid club name or book name")
+            form = SetClubBookForm()
+        return render(request, 'set_club_book.html', {'form': form})
+    else:
+        form = SetClubBookForm()
+        return render(request, 'set_club_book.html', {'form': form})
+
+
+def invite(request, club_id):
+    current_user = request.user
+    club = Club.objects.get(id=club_id)
+    if request.method == 'POST':
+        form = InviteForm(request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            invitations = Invitation.objects.create(user=user, club=club, status='P')
+            redirect('show_club', club.id)
+        else:
+            messages.add_message(request, messages.ERROR, "Invalid username")
+            form = InviteForm()
+        return render(request, 'invite.html', {'form': form, 'club':club})
+    else:
+        form = InviteForm()
+        return render(request, 'invite.html', {'form': form, 'club':club})
+
+
+def accept_invitation(request, inv_id):
+    if request.method == "POST":
+        user = request.user
+        invitation = Invitation.objects.get(id=inv_id)
+        club = invitation.club
+        new_role = Role.objects.create(user=user, club=club, role="M")
+        old_invitation = Invitation.objects.filter(id=inv_id).delete()
+        messages.add_message(request, messages.INFO, "join successful")
+        return redirect('invitation_list', user.id)
+    else:
+        return HttpResponseForbidden()
+
+
+def reject_invitation(request, inv_id):
+    if request.method == "POST":
+        user = request.user
+        invitation = Invitation.objects.get(id=inv_id)
+        club = invitation.club
+        old_invitation = Invitation.objects.filter(id=inv_id).delete()
+        messages.add_message(request, messages.INFO, "you have rejected this invitation")
+        return redirect('invitation_list', user.id)
+    else:
+        return HttpResponseForbidden()
+
+
+class InvitationlistView(LoginRequiredMixin, ListView):
+    def get(self, request, user_id):
+        return self.render(user_id)
+
+    def render(self, user_id):
+        try:
+            user = User.objects.get(id = user_id)
+            invitations = Invitation.objects.filter(user=user, status="P")
+            return render(self.request, 'invitation_list.html', {'invitations': invitations})
+
+        except ObjectDoesNotExist:
+            return redirect('feed')

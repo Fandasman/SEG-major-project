@@ -91,5 +91,26 @@ class Role(models.Model):
     def get_club_name(self):
         return self.club.name
 
-    def __str__(self):
-        return self.user.full_name + " is " + self.role
+
+    #def __str__(self):
+    #    return self.user.full_name + " is " + self.role
+
+
+# Create the Invitation model
+STATUS={
+    ('P', 'Pending'),
+    ('A', 'Accept'),
+    ('R', 'Reject'),
+}
+
+class Invitation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=1,
+        choices=STATUS,
+        default='P'
+    )
+
+    def get_club_name(self):
+        return self.club.name

@@ -98,16 +98,36 @@ class SetClubBookForm(forms.Form):
     club_name = forms.CharField(max_length=50, required=True, label="club name")
 
     def get_book(self):
-        try:
             book = Book.objects.get(title=self.cleaned_data.get('book_title'))
             return book
-        except ObjectDoesNotExist:
-            redirect('set_club_book')
 
 
     def get_club(self):
-        try:
             club = Club.objects.get(name=self.cleaned_data.get('club_name'))
             return club
+
+
+    def is_valid(self):
+        super().is_valid()
+        try:
+            book = Book.objects.get(title=self.cleaned_data.get('book_title'))
+            club = Club.objects.get(name=self.cleaned_data.get('club_name'))
+            return True
         except ObjectDoesNotExist:
-            redirect('set_club_book')
+            return False
+
+class InviteForm(forms.Form):
+    model = User
+    username = forms.CharField(max_length=50, required=True, label="username")
+
+    def get_user(self):
+        user = User.objects.get(username=self.cleaned_data.get('username'))
+        return user
+
+    def is_valid(self):
+        super().is_valid()
+        try:
+            user = User.objects.get(username=self.cleaned_data.get('username'))
+            return True
+        except ObjectDoesNotExist:
+            return False

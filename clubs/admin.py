@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import User, Book, Club, Role
+from .models import User, Book, Club, Role, Invitation
+
 
 # Register User model.
 @admin.register(User)
@@ -24,4 +25,10 @@ class ClubAdmin(admin.ModelAdmin):
 class RoleAdmin(admin.ModelAdmin):
     list_display = [
         'user', 'get_club_name', 'role',
+    ]
+
+@admin.register(Invitation)
+class InvitationAdmin(admin.ModelAdmin):
+    list_display = [
+        'user', 'club', 'status',
     ]
