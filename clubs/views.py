@@ -557,31 +557,41 @@ def unwish(request, book_id):
         return redirect('search_books')
 
 
-
-def set_club_book(request):
+"""This function is for club owner/officer to set the book for
+    club to read"""
+def set_club_book(request, club_id):
     current_user = request.user
-
+    club = Club.objects.get(id=club_id)
     if request.method == 'POST':
         form = SetClubBookForm(request.POST)
         if form.is_valid():
-            club = form.get_club()
             book = form.get_book()
-            current_owned_club = Role.objects.filter(user=current_user, role='O', club=club)
+            current_owned_club = Role.objects.filter(user=current_user, role='O', club=club) | \
+                                 Role.objects.filter(user=current_user, role='CO', club=club)
+            club_book = Club.objects.filter(club_book= book, id= club_id)
             if current_owned_club.count() == 1:
-                club._add_book(book)
-                return redirect('show_club', club.id)
+                if club_book.count() == 0:
+                    club._add_book(book)
+                    return redirect('show_club', club.id)
+                else:
+                    messages.add_message(request, messages.ERROR, "this book has already added")
+                    form = SetClubBookForm()
+                    return redirect('set_club_book', club.id)
             else:
                 messages.add_message(request, messages.ERROR, "you don't own this club")
                 form = SetClubBookForm()
+                return redirect('show_club', club.id)
         else:
             messages.add_message(request, messages.ERROR, "Invalid club name or book name")
             form = SetClubBookForm()
-        return render(request, 'set_club_book.html', {'form': form})
+            return redirect('set_club_book', club.id)
     else:
         form = SetClubBookForm()
-        return render(request, 'set_club_book.html', {'form': form})
+    return render(request, 'set_club_book.html', {'form': form, 'club': club})
 
 
+"""This function allows club office/owner to 
+    invite other users to join the club"""
 def invite(request, club_id):
     current_user = request.user
     club = Club.objects.get(id=club_id)
@@ -589,17 +599,34 @@ def invite(request, club_id):
         form = InviteForm(request.POST)
         if form.is_valid():
             user = form.get_user()
-            invitations = Invitation.objects.create(user=user, club=club, status='P')
-            redirect('show_club', club.id)
+            owned_club = Role.objects.filter(user=current_user, role='O', club=club) |\
+                                 Role.objects.filter(user=current_user, role='CO', club=club)
+            invited = Invitation.objects.filter(user=user, club=club, status='P')
+            isMember = Role.objects.filter(club=club, user=user, role='M')
+            if owned_club.count() == 1:
+                if invited.count() == 0 and isMember.count() == 0:
+                    invitations = Invitation.objects.create(user=user, club=club, status='P')
+                    return redirect('show_club', club.id)
+                else:
+                    messages.add_message(request, messages.ERROR, "you have already invited this user "
+                                                                  "or this user already a member of this club")
+                    form = InviteForm()
+                    return redirect('invite', club.id)
+
+            else:
+                messages.add_message(request, messages.ERROR, "you don't have the permission to invite others")
+                form = InviteForm()
+                return redirect('show_club', club.id)
         else:
             messages.add_message(request, messages.ERROR, "Invalid username")
             form = InviteForm()
-        return render(request, 'invite.html', {'form': form, 'club':club})
+            return redirect('invite', club.id)
     else:
         form = InviteForm()
-        return render(request, 'invite.html', {'form': form, 'club':club})
+    return render(request, 'invite.html', {'form': form, 'club':club})
 
 
+"""This function allows users to accept the invitation from the club"""
 def accept_invitation(request, inv_id):
     if request.method == "POST":
         user = request.user
@@ -613,6 +640,7 @@ def accept_invitation(request, inv_id):
         return HttpResponseForbidden()
 
 
+"""This function allows users to reject the invitation from the club"""
 def reject_invitation(request, inv_id):
     if request.method == "POST":
         user = request.user
@@ -625,6 +653,7 @@ def reject_invitation(request, inv_id):
         return HttpResponseForbidden()
 
 
+"""This view class allows users to see all the pending invitation from the club"""
 class InvitationlistView(LoginRequiredMixin, ListView):
     def get(self, request, user_id):
         return self.render(user_id)

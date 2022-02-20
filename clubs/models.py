@@ -102,8 +102,8 @@ class Role(models.Model):
         return self.club.name
 
 
-    #def __str__(self):
-    #    return self.user.full_name + " is " + self.role
+    def __str__(self):
+        return self.user.full_name + " is " + self.role
 
 
 # Create the Invitation model

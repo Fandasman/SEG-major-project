@@ -95,23 +95,23 @@ class EditProfileForm(forms.ModelForm):
 
 class SetClubBookForm(forms.Form):
     book_title = forms.CharField(max_length=50, required=True, label="book title")
-    club_name = forms.CharField(max_length=50, required=True, label="club name")
+    #club_name = forms.CharField(max_length=50, required=True, label="club name")
 
     def get_book(self):
             book = Book.objects.get(title=self.cleaned_data.get('book_title'))
             return book
 
 
-    def get_club(self):
-            club = Club.objects.get(name=self.cleaned_data.get('club_name'))
-            return club
+   # def get_club(self):
+           # club = Club.objects.get(name=self.cleaned_data.get('club_name'))
+           # return club
 
 
     def is_valid(self):
         super().is_valid()
         try:
             book = Book.objects.get(title=self.cleaned_data.get('book_title'))
-            club = Club.objects.get(name=self.cleaned_data.get('club_name'))
+           # club = Club.objects.get(name=self.cleaned_data.get('club_name'))
             return True
         except ObjectDoesNotExist:
             return False
