@@ -1,7 +1,10 @@
 from django import forms
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
-from .models import Club, User
+from django.shortcuts import redirect
+
+from .models import Club, User, Book
 
 
 class SignUpForm(forms.ModelForm):
@@ -88,3 +91,43 @@ class EditProfileForm(forms.ModelForm):
         model = User
         fields = ['username', 'first_name', 'last_name', 'email', 'bio']
         widgets = { 'bio': forms.Textarea()}
+
+
+class SetClubBookForm(forms.Form):
+    book_title = forms.CharField(max_length=50, required=True, label="book title")
+    #club_name = forms.CharField(max_length=50, required=True, label="club name")
+
+    def get_book(self):
+            book = Book.objects.get(title=self.cleaned_data.get('book_title'))
+            return book
+
+
+   # def get_club(self):
+           # club = Club.objects.get(name=self.cleaned_data.get('club_name'))
+           # return club
+
+
+    def is_valid(self):
+        super().is_valid()
+        try:
+            book = Book.objects.get(title=self.cleaned_data.get('book_title'))
+           # club = Club.objects.get(name=self.cleaned_data.get('club_name'))
+            return True
+        except ObjectDoesNotExist:
+            return False
+
+class InviteForm(forms.Form):
+    model = User
+    username = forms.CharField(max_length=50, required=True, label="username")
+
+    def get_user(self):
+        user = User.objects.get(username=self.cleaned_data.get('username'))
+        return user
+
+    def is_valid(self):
+        super().is_valid()
+        try:
+            user = User.objects.get(username=self.cleaned_data.get('username'))
+            return True
+        except ObjectDoesNotExist:
+            return False

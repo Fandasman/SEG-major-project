@@ -1,0 +1,18 @@
+{% extends 'base_content.html' %}
+{% block title %}
+| Invite
+{% endblock %}
+{% block content %}
+<div class="container" style="padding-left:100px">
+  <div class="row">
+    <div class="col-12">
+      <h1>Invite</h1>
+      <form action="{% url 'invite' club.id %}" method="post">
+        {% csrf_token %}
+        {% include "partials/bootstrap_form.html" with form=form %}
+        <input type='submit' value="invite" class="btn btn-primary">
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

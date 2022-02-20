@@ -54,5 +54,10 @@ urlpatterns = [
     path('search_books/', views.search_books, name='search_books'),
     path('book/<int:book_id>/wish', views.wish, name='wish'),
     path('book/<int:book_id>/unwish', views.unwish, name='unwish'),
+    path('club/<int:club_id>/set_club_book/', views.set_club_book, name = 'set_club_book'),
+    path('club/<int:club_id>/invite/', views.invite, name='invite'),
+    path('user/<int:user_id>/invitation_list/', views.InvitationlistView.as_view(), name='invitation_list'),
+    path('accept_invitation/<int:inv_id>', views.accept_invitation, name='accept_invitation'),
+    path('reject_invitation/<int:inv_id>', views.reject_invitation, name='reject_invitation'),
 
 ]
