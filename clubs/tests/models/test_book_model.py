@@ -90,7 +90,7 @@ class BookModelTestCase(TestCase):
     def test_published_can_be_positive(self):
         self.book.published = 1978
         self._assert_book_is_valid()
-    
+
     def test_published_cannot_be_negative(self):
         self.book.published = -1978
         self._assert_book_is_invalid()
@@ -99,10 +99,28 @@ class BookModelTestCase(TestCase):
         currentYear = datetime.datetime.now().year
         self.book.published = currentYear
         self._assert_book_is_valid()
-    
+
     def test_published_cannot_be_larger_than_current_year(self):
         currentYear = datetime.datetime.now().year
         self.book.published = currentYear + 1
+        self._assert_book_is_invalid()
+
+# Genre tests
+    def test_genre_cannot_be_blank(self):
+        self.book.genre=''
+        self._assert_book_is_invalid()
+
+    def test_genre_does_not_need_to_be_unique(self):
+        second_book=Book.objects.get(title="The Transformation")
+        self.book.genre=second_book.genre
+        self._assert_book_is_valid()
+
+    def test_genre_can_have_less_than_50_characters(self):
+        self.book.genre='x' * 50
+        self._assert_book_is_valid()
+
+    def test_genre_cannot_have_more_than_50_characters(self):
+        self.book.genre='x' * 51
         self._assert_book_is_invalid()
 
 # IMGURL tests
@@ -110,11 +128,11 @@ class BookModelTestCase(TestCase):
     def test_imgURLSmall_can_be_blank(self):
         self.book.imgURLSmall=''
         self._assert_book_is_valid()
-    
+
     def test_imgURLMedium_can_be_blank(self):
         self.book.imgURLMedium=''
         self._assert_book_is_valid()
-    
+
     def test_imgURLLarge_can_be_blank(self):
         self.book.imgURLLarge=''
         self._assert_book_is_valid()
@@ -124,7 +142,7 @@ class BookModelTestCase(TestCase):
         second_book=Book.objects.get(title="The Transformation")
         self.book.imgURLSmall=second_book.imgURLSmall
         self._assert_book_is_valid()
-    
+
     def test_imgURLMedium_does_not_need_to_be_unique(self):
         second_book=Book.objects.get(title="The Transformation")
         self.book.imgURLMedium=second_book.imgURLMedium

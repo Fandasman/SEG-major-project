@@ -6,3 +6,6 @@ sqlparse==0.4.2
 libgravatar==1.0.0
 Faker==9.0.0
 django-widget-tweaks==1.4.9
+numpy==1.22.2
+pandas==1.4.1
+tqdm==4.62.3

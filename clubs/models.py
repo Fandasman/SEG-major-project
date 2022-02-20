@@ -14,6 +14,7 @@ class Book(models.Model):
         default = datetime.datetime.now().year,
         validators = [MaxValueValidator(datetime.datetime.now().year), MinValueValidator(0)]
     )
+    genre = models.CharField(max_length = 50, blank = False)
     imgURLSmall = models.URLField(blank = True)
     imgURLMedium = models.URLField(blank = True)
     imgURLLarge = models.URLField(blank = True)
@@ -51,6 +52,14 @@ class User(AbstractUser):
     def get_wishlist(self):
           return "\n".join([b.wishlist for b in self.wishlist.all()])
 
+# Create the Books and Ratings model
+class BooksRatings(models.Model):
+    isbn = models.CharField(max_length = 13, blank = False)
+    rating = models.IntegerField(
+        validators = [MaxValueValidator(5), MinValueValidator(1)]
+    )
+    user = models.ForeignKey(User, related_name='books', on_delete=models.CASCADE)
+
 
 # Create the book Club model
 class Club(models.Model):
@@ -76,14 +85,15 @@ class Club(models.Model):
 ROLES= (
     ('A', 'Applicant'),
     ('M', 'Member'),
-    ('O', 'Owner'),
+    ('O', 'Officer'),
+    ('CO', 'Owner')
 )
 
 class Role(models.Model):
     user= models.ForeignKey(User, on_delete=models.CASCADE)
     club= models.ForeignKey(Club, on_delete=models.CASCADE)
     role= models.CharField(
-        max_length=1,
+        max_length=2,
         choices=ROLES,
         default='A'
     )
