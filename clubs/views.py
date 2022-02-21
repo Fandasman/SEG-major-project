@@ -11,6 +11,7 @@ from django.views import View
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
+from itertools import chain
 from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm
 from .models import Book, Club, Role, User
 
@@ -27,31 +28,11 @@ class LoginProhibitedMixin:
         return super().dispatch(*args, **kwargs)
 
 # @login_required
-def show_book(request, book_id):
-    try:
-        book = Book.objects.get(id=book_id)
-    except ObjectDoesNotExist:
-        return redirect('search_books')
-    else:
-        return render(request, 'show_book.html',
-            {'book': book}
-        )
-
-# @login_required
 def profile(request):
     current_user = request.user
     return render(request, 'profile.html',
             {'user': current_user}
         )
-
-# @login_required
-def search_books(request):
-    search_book = request.GET.get('book_searchbar')
-    if search_book:
-        books= Book.objects.filter(Q(name__icontains=search_book))
-    else:
-        books = Book.objects.all()
-    return render(request, 'search_books.html', {'books': books})
 
 
 # class FeedView(LoginRequiredMixin, ListView):
@@ -86,6 +67,17 @@ class HomeView(LoginProhibitedMixin,View):
 
     def render(self):
         return render(self.request, 'home.html')
+
+# classBookListView(LoginRequiredMixin, ListView):
+class BookListView(ListView):
+    model= Book
+    template_name= 'book_list.html'
+    context_object_name= 'books'
+
+    def get_context_data(self, *args, **kwargs):
+        context= super().get_context_data(*args, **kwargs)
+        book= Book.objects.all()
+        return context
 
 # class MemberListView(LoginRequiredMixin, ListView):
 class MemberListView(ListView):
@@ -135,16 +127,20 @@ class MemberClubListView(ListView):
         context['roles']= Role.objects.all().filter(user= current_user, role= "M")
         return context
 
-
-class ShowUserView(DetailView):
-    model = User
-    template_name = 'show_user.html'
-    pk_url_kwarg = "user_id"
+class ShowBookView(DetailView):
+    model = Book
+    template_name = 'show_book.html'
+    pk_url_kwarg = "book_id"
 
 class ShowClubView(DetailView):
     model = Club
     template_name = 'show_club.html'
     pk_url_kwarg = "club_id"
+
+class ShowUserView(DetailView):
+    model = User
+    template_name = 'show_user.html'
+    pk_url_kwarg = "user_id"
 
 
 # class LoginProhibitedMixin:
@@ -280,3 +276,36 @@ class WishlistView(LoginRequiredMixin, ListView):
 
         except ObjectDoesNotExist:
             return redirect('feed')
+
+class SearchView(ListView):
+    template_name = 'search_view.html'
+    paginate_by = 20
+    count = 0
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['count'] = self.count or 0
+        context['query'] = self.request.GET.get('q')
+        return context
+
+    def get_queryset(self):
+        request = self.request
+        query = request.GET.get('q', None)
+
+        if query is not None:
+            book_results= Book.objects.search(query)
+            club_results= Club.objects.search(query)
+            user_results= User.objects.search(query)
+
+            # combine querysets
+            queryset_chain = chain(
+                    book_results,
+                    club_results,
+                    user_results
+            )
+            qs = sorted(queryset_chain,
+                        key=lambda instance: instance.pk,
+                        reverse=True)
+            self.count = len(qs) # since qs is actually a list
+            return qs
+        return User.objects.none() # just an empty queryset as default
