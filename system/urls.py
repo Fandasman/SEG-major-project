@@ -31,6 +31,7 @@ urlpatterns = [
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('login/', views.LogInView.as_view(), name='login'),
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
+    path('club_book/', views.ClubBookView.as_view(), name='club_book'),
     path('create_club/', views.CreateClubView, name ='create_club'),
 
 ]

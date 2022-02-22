@@ -74,3 +74,14 @@ class EditProfileForm(forms.ModelForm):
         model = User
         fields = ['username', 'first_name', 'last_name', 'email', 'bio']
         widgets = { 'bio': forms.Textarea()}
+
+
+class ClubBookForm(forms.ModelForm):
+    """Form to update a club's current book."""
+
+    class Meta:
+        """Form options."""
+
+        model = Club
+        fields = ['current_book','book_page']
+    

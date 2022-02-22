@@ -1,3 +1,4 @@
+# from asyncio.windows_events import NULL
 import datetime
 from django.db import models
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
@@ -64,8 +65,8 @@ class Club(models.Model):
     members = models.ManyToManyField(User, related_name = 'member', blank = True)
     location = models.CharField(max_length = 100, blank = True)
     description = models.CharField(max_length = 500, blank = True)
-    current_book = models.ForeignKey(Book, on_delete = models.DO_NOTHING)
-    book_progession = models.IntegerField(default = 0, 
+    current_book = models.ForeignKey(Book, on_delete = models.DO_NOTHING, default=None, blank=True)
+    book_page = models.IntegerField(default = 0, blank=True, 
     validators = [MaxValueValidator(9999), MinValueValidator(0)])
 
     def get_members(self):

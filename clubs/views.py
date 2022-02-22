@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.views.generic.edit import FormView
 from django.views import View
-from .forms import SignUpForm, LogInForm, EditProfileForm, CreateClubForm
+from .forms import ClubBookForm, SignUpForm, LogInForm, EditProfileForm, CreateClubForm
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from .models import Book, Club, User
@@ -202,3 +202,22 @@ class EditProfileView(View):
         current_user = self.request.user
         form = EditProfileForm(instance=current_user)
         return render(self.request,'edit_profile.html', {'form': form})
+
+
+class ClubBookView(View):
+    def get(self,request):
+        return self.render()
+
+    def post(self,request):
+        form = ClubBookForm(data=request.POST)
+        if form.is_valid():
+            messages.add_message(request, messages.SUCCESS, "Book amended!")
+            form.save()
+            return redirect('feed')
+        return render(request, 'club_book.html', {'form': form})
+
+
+    def render(self):
+        current_user = self.request.user
+        form = ClubBookForm(instance=current_user)
+        return render(self.request,'club_book.html', {'form': form})
