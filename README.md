@@ -38,7 +38,7 @@ Seed the development database with:
 
 ```
 $ python3 manage.py seed
-$ python3 manage.py seed -main_dataset ./main_data.csv --books_dataset ./new_books_data.csv
+$ python3 manage.py seed --main_dataset ./main_data.csv --books_dataset ./new_books_data.csv
 ```
 
 Run all tests with:
