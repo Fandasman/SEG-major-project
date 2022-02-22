@@ -1,0 +1,11 @@
+[
+  {
+    "model": "clubs.Role",
+    "pk": 1,
+    "fields": {
+      "user": "1",
+      "club": "1",
+      "role": "A"
+    }
+  }
+]

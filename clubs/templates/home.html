@@ -9,7 +9,12 @@
             <form action="{% url 'feed' %}" method="post">
               {% csrf_token %}
               <input type="hidden" name="next" value="{{ next }}">
-              <input type="submit" value="Enter" class="btn btn-primary">
+              {% if user.is_authenticated %}
+                <input type="submit" value="Enter" class="btn btn-primary">
+              {% else %}
+                <a class="btn btn-primary" href="{% url 'sign_up' %}">Sign up</a>
+                <a class="btn btn-secondary" href="{% url 'login' %}">Log in</a>
+              {% endif %}
             </form>
           </div>
         </div>

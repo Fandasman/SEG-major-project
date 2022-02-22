@@ -1,6 +1,7 @@
-import csv
+import pandas as pd
+from tqdm import tqdm
 from django.core.management.base import BaseCommand, CommandError
-from clubs.models import User, Book, Club
+from clubs.models import User, Book, BooksRatings, Club, Role
 from django.contrib.auth.hashers import make_password
 from faker import Faker
 
@@ -13,22 +14,33 @@ class Command(BaseCommand):
         super().__init__()
         self.faker = Faker('en_GB')
 
+    def add_arguments(self, parser):
+        parser.add_argument("--main_dataset", type=str, required=True)
+        parser.add_argument("--books_dataset", type=str, required=True)
+
     def handle(self, *args, **options):
+        main_dataset = pd.read_csv(options['main_dataset']).drop(columns='Unnamed: 0')
+        books_dataset = pd.read_csv(options['books_dataset']).drop(columns='Unnamed: 0')
+
         print("Starting seed...")
 
-        Command.generate_users(self)
+        Command.generate_users(self, main_dataset)
+
+        Command.get_ratings(self, main_dataset)
 
         Command.generate_clubs(self)
 
-        Command.get_books(self, **options)
+        Command.get_books(self, books_dataset)
 
         print("Seeding complete!")
 
-    
+
     # Generate fake users.
-    def generate_users(self):
+    def generate_users(self, main_dataset):
         print("Generating club owner profile...")
+        num_user_ids = len(set(main_dataset['User-ID'].tolist()))
         User.objects.create(
+            id = 1,
             username = 'charlie',
             first_name = 'Charlie',
             last_name = 'Czechman',
@@ -36,10 +48,11 @@ class Command(BaseCommand):
             password = Command.PASSWORD,
             bio = 'Hi, I own all the clubs here. Care to join?'
         )
+
         print("Done!")
 
-        print("Generating 100 fake users...")
-        for i in range(0, 100):
+        print("Generating fake users...")
+        for i in tqdm(range(num_user_ids - 1)):
             fakeUsername = self.faker.user_name() + str(i)
             fakeFirstName = self.faker.first_name()
             fakeLastName = self.faker.last_name()
@@ -47,6 +60,7 @@ class Command(BaseCommand):
             fakeBio = self.faker.text(max_nb_chars = 500)
 
             User.objects.create(
+                id = i + 2,
                 username = fakeUsername,
                 first_name = fakeFirstName,
                 last_name = fakeLastName,
@@ -54,10 +68,25 @@ class Command(BaseCommand):
                 password = Command.PASSWORD,
                 bio = fakeBio
             )
+
         print("Done!")
 
-    
-    # Generate 10 fake clubs.
+
+    # Read ratings from the main dataset
+    def get_ratings(self, main_dataset):
+        print("Reading ratings from the main dataset...")
+
+        for index, row in tqdm(main_dataset.iterrows(), total=main_dataset.shape[0]):
+            BooksRatings.objects.create(
+                isbn = row['ISBN'],
+                rating = row['Book-Rating'],
+                user = User.objects.get(id=row['User-ID'])
+            )
+
+        print("Done!")
+
+
+    # Generate 10 fake clubs and set charlie as their owner.
     def generate_clubs(self):
         print("Generating 10 fake book clubs...")
         for i in range(0, 10):
@@ -65,36 +94,36 @@ class Command(BaseCommand):
             fakeLocation = self.faker.address()
             fakeDescription = self.faker.text(max_nb_chars = 500)
 
-            Club.objects.create(
+            club = Club.objects.create(
                 name = fakeName,
-                leader = User.objects.get(username = 'charlie'),
                 location = fakeLocation,
                 description = fakeDescription
             )
+
+            Role.objects.create(
+                user = User.objects.get(username = "charlie"),
+                club = club,
+                role = 'O'
+            )
+
         print("Done!")
 
-    # Read books from BX_Books.csv
-    def get_books(self, **options):
-        print("Reading books from BX_Books.csv...")
-        
-        try:
-            with open("BX_Books.csv", 'r', encoding = 'latin-1') as csv_file:
-                csvreader = csv.reader(csv_file, delimiter = ";")
-                header = next(csvreader)
 
-                for row in csvreader:
-                    Book.objects.create(
-                        isbn = row[0],
-                        title = row[1],
-                        author = row[2],
-                        published = row[3],
-                        publisher = row[4],
-                        imgURLSmall = row[5],
-                        imgURLMedium = row[6],
-                        imgURLLarge = row[7]
-                    )
-        except OSError as e:
-            print("File not found. Make sure it's in the right directory!")
-            print(e)
+    # Read books from the dataset
+    def get_books(self, books_dataset):
+        print("Reading books from the dataset...")
+
+        for index, row in tqdm(books_dataset.iterrows(), total=books_dataset.shape[0]):
+            Book.objects.create(
+                isbn = row['ISBN'],
+                title = row['Book-Title'],
+                author = row['Book-Author'],
+                published = row['Year-Of-Publication'],
+                publisher = row['Publisher'],
+                genre = row['Genres'],
+                imgURLSmall = row['Image-URL-S'],
+                imgURLMedium = row['Image-URL-M'],
+                imgURLLarge = row['Image-URL-L']
+            )
 
         print("Done!")

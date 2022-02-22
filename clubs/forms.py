@@ -1,8 +1,10 @@
 from django import forms
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
-from .models import User
-from .models import Club
+from django.shortcuts import redirect
+
+from .models import Club, User, Book
 
 
 class SignUpForm(forms.ModelForm):
@@ -43,7 +45,8 @@ class SignUpForm(forms.ModelForm):
         return user
 
 class LogInForm(forms.Form):
-    username = forms.CharField(required=True, label = "username")
+    username = forms.CharField(required=True, label = "Username")
+
     # Tried to make email not case senstive.
     # def clean_email(self):
     #     data = self.cleaned_data['email']
@@ -59,11 +62,25 @@ class LogInForm(forms.Form):
             user = authenticate(username = username, password = password)
         return user
 
-class CreateClubForm(forms.ModelForm):
+class ClubForm(forms.ModelForm):
+    """Form allowing a user to create a new club model"""
+
     class Meta:
+        """Form options."""
         model = Club
         fields = ['name', 'location', 'description']
-        widgets = { 'description': forms.Textarea()}
+        widgets = { 'description': forms.Textarea() }
+
+
+    def save(self):
+        super().save(commit=False)
+        club = Club.objects.create(
+            name=self.cleaned_data.get('name'),
+            location=self.cleaned_data.get('location'),
+            description = self.cleaned_data.get('description')
+        )
+        return club
+
 
 class EditProfileForm(forms.ModelForm):
     """Form to update user profiles."""

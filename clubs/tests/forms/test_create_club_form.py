@@ -1,39 +1,49 @@
-'''unit test of the create club form'''
+"""Unit tests of the club creation form."""
+from django import forms
 from django.test import TestCase
-from clubs.forms import CreateClubForm
-from clubs.models import Club, User
+from clubs.forms import ClubForm
+from clubs.models import Club
+import datetime
 
+#This code was taken from the clucker application
 
-class CreateClubFormTestCase(TestCase):
-
+class ClubCreationFormTestCase(TestCase):
+    """Unit tests of the Club Creation form."""
     def setUp(self):
-        self.user = User.objects.create_user(
-            '@johndoe',
-            first_name='John',
-            last_name='Doe',
-            email='johndoe@example.org',
-            password='Password123',
-            bio='Hi, my name is John.'
-        )
-        self.form_input = {
-            'name': 'test_club',
-            'location': 'London',
-            'description': 'this is the test club'
-        }
+        self.form_input = {'name': 'KCL book club', 'location': '30 Aldwych, London WC2B 4BG', 'description': 'Book Club for KCL informatics students.'}
 
-    def test_valid_create_club_form(self):
-        form = CreateClubForm(data=self.form_input)
-        self.assertTrue(form.is_valid())
-
-    def test_form_has_necessary_fields(self):
-        form = CreateClubForm()
+    def test_form_contains_required_fields(self):
+        form = ClubForm()
         self.assertIn('name', form.fields)
         self.assertIn('location', form.fields)
         self.assertIn('description', form.fields)
 
-    def test_form_uses_model_validation(self):
+    def test_form_accepts_valid_input(self):
+        form = ClubForm(data=self.form_input)
+        self.assertTrue(form.is_valid())
+
+    def test_form_rejects_blank_name(self):
         self.form_input['name'] = ''
-        self.form_input['location'] = ''
-        self.form_input['description'] = 'a' * 501
-        form = CreateClubForm(data= self.form_input)
+        form = ClubForm(data=self.form_input)
         self.assertFalse(form.is_valid())
+
+    def test_form_rejects_blank_description(self):
+        self.form_input['description'] = ''
+        form = ClubForm(data=self.form_input)
+        self.assertFalse(form.is_valid())
+
+    def test_form_rejects_blank_location(self):
+        self.form_input['location'] = ''
+        form = ClubForm(data=self.form_input)
+        self.assertFalse(form.is_valid())
+
+    def test_form_must_save_correctly(self):
+        form = ClubForm(data=self.form_input)
+        before_count = Club.objects.count()
+        self.club = form.save()
+        after_count = Club.objects.count()
+        self.assertEqual(after_count, before_count+1)
+        this_club = Club.objects.get(name = self.club.name)
+        self.assertEqual(this_club.name,'KCL book club')
+        self.assertEqual(this_club.description,'Book Club for KCL informatics students.')
+        self.assertEqual(this_club.location,'30 Aldwych, London WC2B 4BG')

@@ -1,9 +1,12 @@
 {% extends 'base_content.html' %}
+{% block title %}
+| Profile
+{% endblock %}
 {% block content %}
 <div class="container">
   <div class="row content">
     <div class="col-xs-12 col-lg-6 col-xl-4">
-      {% include 'partials/user_profile.html' with form=form user=user%}
+      {% include 'partials/user_profile.html' with form=form%}
     </div>
   </div>
   <form action= "{% url 'edit_profile'%}" method = "get">
