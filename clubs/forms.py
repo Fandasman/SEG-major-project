@@ -100,5 +100,5 @@ class ClubBookForm(forms.ModelForm):
         """Form options."""
 
         model = Club
-        fields = ['current_book','book_page']
+        fields = ['club_book','book_page']
     

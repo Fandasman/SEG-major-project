@@ -9,11 +9,8 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http.response import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 from django.views import View
-<<<<<<< HEAD
-from .forms import ClubBookForm, SignUpForm, LogInForm, EditProfileForm, CreateClubForm
+from .forms import ClubBookForm, SignUpForm, LogInForm, EditProfileForm
 from django.conf import settings
-=======
->>>>>>> 12ae22848cd4354e96569ae65afbe984f6284dee
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -21,7 +18,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm
 from .models import Book, Club, Role, User, Invitation
 
 
@@ -284,11 +281,17 @@ class ClubBookView(View):
     def get(self,request):
         return self.render()
 
-    def post(self,request):
+    def post(self, club_id, request):
         form = ClubBookForm(data=request.POST)
+        book = form.cleaned_data(book)
+        book_page = form.cleaned_data(book_page)
+        club = Club.objects.get(id=club_id)
         if form.is_valid():
             messages.add_message(request, messages.SUCCESS, "Book amended!")
             form.save()
+            # club_book = Club.objects.filter(current_book= book, id= club_id)
+            # club._add_book(book)
+            # club.add_book_page(book_page)
             return redirect('feed')
         return render(request, 'club_book.html', {'form': form})
 
@@ -297,6 +300,7 @@ class ClubBookView(View):
         current_user = self.request.user
         form = ClubBookForm(instance=current_user)
         return render(self.request,'club_book.html', {'form': form})
+
 """Includes the view for a user's wishlist."""
 class WishlistView(LoginRequiredMixin, ListView):
     def get(self, request, user_id):
@@ -582,35 +586,35 @@ def unwish(request, book_id):
 
 """This function is for club owner/officer to set the book for
     club to read"""
-def set_club_book(request, club_id):
-    current_user = request.user
-    club = Club.objects.get(id=club_id)
-    if request.method == 'POST':
-        form = SetClubBookForm(request.POST)
-        if form.is_valid():
-            book = form.get_book()
-            current_owned_club = Role.objects.filter(user=current_user, role='O', club=club) | \
-                                 Role.objects.filter(user=current_user, role='CO', club=club)
-            club_book = Club.objects.filter(club_book= book, id= club_id)
-            if current_owned_club.count() == 1:
-                if club_book.count() == 0:
-                    club._add_book(book)
-                    return redirect('show_club', club.id)
-                else:
-                    messages.add_message(request, messages.ERROR, "this book has already added")
-                    form = SetClubBookForm()
-                    return redirect('set_club_book', club.id)
-            else:
-                messages.add_message(request, messages.ERROR, "you don't own this club")
-                form = SetClubBookForm()
-                return redirect('show_club', club.id)
-        else:
-            messages.add_message(request, messages.ERROR, "Invalid club name or book name")
-            form = SetClubBookForm()
-            return redirect('set_club_book', club.id)
-    else:
-        form = SetClubBookForm()
-    return render(request, 'set_club_book.html', {'form': form, 'club': club})
+# def set_club_book(request, club_id):
+#     current_user = request.user
+#     club = Club.objects.get(id=club_id)
+#     if request.method == 'POST':
+#         form = SetClubBookForm(request.POST)
+#         if form.is_valid():
+#             book = form.get_book()
+#             current_owned_club = Role.objects.filter(user=current_user, role='O', club=club) | \
+#                                  Role.objects.filter(user=current_user, role='CO', club=club)
+#             club_book = Club.objects.filter(club_book= book, id= club_id)
+#             if current_owned_club.count() == 1:
+#                 if club_book.count() == 0:
+#                     club._add_book(book)
+#                     return redirect('show_club', club.id)
+#                 else:
+#                     messages.add_message(request, messages.ERROR, "this book has already added")
+#                     form = SetClubBookForm()
+#                     return redirect('set_club_book', club.id)
+#             else:
+#                 messages.add_message(request, messages.ERROR, "you don't own this club")
+#                 form = SetClubBookForm()
+#                 return redirect('show_club', club.id)
+#         else:
+#             messages.add_message(request, messages.ERROR, "Invalid club name or book name")
+#             form = SetClubBookForm()
+#             return redirect('set_club_book', club.id)
+#     else:
+#         form = SetClubBookForm()
+#     return render(request, 'set_club_book.html', {'form': form, 'club': club})
 
 
 """This function allows club office/owner to 
