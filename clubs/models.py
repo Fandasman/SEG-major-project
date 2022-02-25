@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from libgravatar import Gravatar
+from django.urls import reverse
 
 # Create the Book model
 
@@ -71,6 +72,9 @@ class Book(models.Model):
     imgURLLarge = models.URLField(blank = True)
     objects= BookManager()
 
+    def get_absolute_url(self):
+        return reverse('show_book', args=[str(self.id)])
+
 # Create the User model
 class User(AbstractUser):
     username = models.CharField(
@@ -89,7 +93,7 @@ class User(AbstractUser):
     email = models.EmailField(unique = True, blank = False)
     bio = models.CharField(max_length = 500, blank = True)
     wishlist = models.ManyToManyField(Book, related_name="wishlist", blank=True)
-    objects= UserManager(), UserAccountManager()
+    objects= UserManager()
 
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
@@ -104,6 +108,9 @@ class User(AbstractUser):
 
     def get_wishlist(self):
         return "\n".join([b.wishlist for b in self.wishlist.all()])
+
+    def get_absolute_url(self):
+        return reverse('show_user', args=[str(self.id)])
 
 
 # Create the book Club model
@@ -121,6 +128,9 @@ class Club(models.Model):
     location = models.CharField(max_length = 100, blank = False)
     description = models.CharField(max_length = 500, blank = False)
     objects = ClubManager()
+
+    def get_absolute_url(self):
+        return reverse('show_club', args=[str(self.id)])
 
 # Create the user's Roles model
 ROLES= (

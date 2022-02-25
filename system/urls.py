@@ -40,4 +40,5 @@ urlpatterns = [
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('user/<int:user_id>', views.ShowUserView.as_view(), name='show_user'),
     path('search_view/', views.SearchView.as_view(), name='search_view'),
+    path('echo/', views.Echo.as_view(), name='echo'),
 ]

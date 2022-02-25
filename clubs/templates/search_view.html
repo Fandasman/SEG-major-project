@@ -1,4 +1,4 @@
-{% extends "base_content.html" %}
+{% extends 'base_content.html' %}
 {% load search_class_name %}
 {% block content %}
 
@@ -21,14 +21,14 @@
       {% elif c == 'Club' %}
            <div class='row'>
              <div class='col-12'>
-                Club: <a href='{{ object.get_absolute_url }}'>{{ object.title }}</a>
+                Club: <a href='{{ object.get_absolute_url }}'>{{ object.name }}</a>
               </div>
             </div>
 
       {% elif c == 'User' %}
            <div class='row'>
                 <div class='col-12'>
-                   User: <a href='{{ object.get_absolute_url }}'>{{ object.title }}</a>
+                   User: <a href='{{ object.get_absolute_url }}'>{{ object.username }}</a>
                 </div>
             </div>
       {% else %}

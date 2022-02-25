@@ -15,7 +15,33 @@ from itertools import chain
 from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm
 from .models import Book, Club, Role, User
 
+import csv
+from django.http import StreamingHttpResponse
+
 # Create your views here.
+
+
+class Echo(View):
+    """An object that implements just the write method of the file-like
+    interface.
+    """
+    def write(self, value):
+        """Write the value by returning it, instead of storing in a buffer."""
+        return value
+
+def some_streaming_csv_view(request):
+    """A view that streams a large CSV file."""
+    # Generate a sequence of rows. The range is based on the maximum number of
+    # rows that can be handled by a single sheet in most spreadsheet
+    # applications.
+    rows = (["Row {}".format(idx), str(idx)] for idx in range(271380))
+    book_buffer = Echo()
+    writer = csv.writer(book_buffer)
+    return StreamingHttpResponse(
+        (writer.writerow(row) for row in rows),
+        content_type="text/csv",
+        headers={'Content-Disposition': 'attachment; filename="BX_Books.csv"'},
+    )
 
 def feed(request):
     current_user = request.user
@@ -277,10 +303,11 @@ class WishlistView(LoginRequiredMixin, ListView):
         except ObjectDoesNotExist:
             return redirect('feed')
 
+
 class SearchView(ListView):
     template_name = 'search_view.html'
-    paginate_by = 20
     count = 0
+
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -308,4 +335,4 @@ class SearchView(ListView):
                         reverse=True)
             self.count = len(qs) # since qs is actually a list
             return qs
-        return User.objects.none() # just an empty queryset as default
+        return query
