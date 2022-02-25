@@ -18,6 +18,12 @@
           {% endif %}
 
         {% endfor %}
+          {% if userrole.role == "CO" %}
+            <form action="{% url 'invite' club.id %}">
+                {% csrf_token %}
+                <input type="submit" value="invite new member" class="btn btn-primary">
+            </form>
+          {% endif %}
       {% endif %}
       
       {% include 'partials/member_information.html' with members=members %}

@@ -629,14 +629,14 @@ def invite(request, club_id):
             owned_club = Role.objects.filter(user=current_user, role='O', club=club) |\
                                  Role.objects.filter(user=current_user, role='CO', club=club)
             invited = Invitation.objects.filter(user=user, club=club, status='P')
-            isMember = Role.objects.filter(club=club, user=user, role='M')
+            isMember = Role.objects.filter(club=club, user=user)
             if owned_club.count() == 1:
                 if invited.count() == 0 and isMember.count() == 0:
                     invitations = Invitation.objects.create(user=user, club=club, status='P')
                     return redirect('show_club', club.id)
                 else:
                     messages.add_message(request, messages.ERROR, "you have already invited this user "
-                                                                  "or this user already a member of this club")
+                                                                  "or this user already in the club")
                     form = InviteForm()
                     return redirect('invite', club.id)
             else:
