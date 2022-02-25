@@ -9,11 +9,8 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http.response import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 from django.views import View
-<<<<<<< HEAD
-from .forms import ClubBookForm, SignUpForm, LogInForm, EditProfileForm, CreateClubForm
+from .forms import ClubBookForm, SignUpForm, LogInForm, EditProfileForm, ClubForm
 from django.conf import settings
-=======
->>>>>>> 12ae22848cd4354e96569ae65afbe984f6284dee
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -21,7 +18,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
 from .models import Book, Club, Role, User, Invitation
 
 
@@ -281,14 +277,21 @@ class EditProfileView(View):
 
 
 class ClubBookView(View):
-    def get(self,request):
+    def get(self,club_id,request):
+        club = Club.objects.get(id=club_id)
         return self.render()
 
-    def post(self,request):
+    def post(self,club_id,request):
+    
         form = ClubBookForm(data=request.POST)
         if form.is_valid():
             messages.add_message(request, messages.SUCCESS, "Book amended!")
             form.save()
+            club = Club.objects.get(id=club_id)
+            current_book = form.cleaned_data.get('current_book')
+            book_page = form.cleaned_data.get('book_page')
+            Club.objects.filter(club_book=current_book, id= club_id)
+            Club.objects.filter(book_page=book_page, id= club_id)
             return redirect('feed')
         return render(request, 'club_book.html', {'form': form})
 
@@ -297,6 +300,7 @@ class ClubBookView(View):
         current_user = self.request.user
         form = ClubBookForm(instance=current_user)
         return render(self.request,'club_book.html', {'form': form})
+
 """Includes the view for a user's wishlist."""
 class WishlistView(LoginRequiredMixin, ListView):
     def get(self, request, user_id):

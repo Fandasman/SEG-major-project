@@ -11,6 +11,7 @@
       <h1>{{club.name}}</h1>
         <h5>Location: {{club.location}}</h5>
         <h5>Description: {{club.description}}</h5>
+        <h5>Currently Reading: {{club.club_book}}</h5>
         {% for member in members %}
           {% if member.role == "CO" %}
             <h3>Clubowner: {{member.user.first_name}} {{member.user.last_name}}</h3>

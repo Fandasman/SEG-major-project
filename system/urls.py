@@ -22,10 +22,10 @@ from clubs import views
 urlpatterns = [
     path('all_members/<int:club_id>', views.member_list, name = "member_list"),
     path('admin/', admin.site.urls),
+    path('add_book/<int:club_id>/',views.ClubBookView.as_view(), name='add_book'),
     path('', views.HomeView.as_view(), name = 'home'),
     path('club_list', views.ClubListView.as_view(), name = 'club_list'),
     path('club/<int:club_id>', views.ShowClubView.as_view(), name='show_club'),
-    path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
     path('feed/', views.feed, name='feed'),
     path('profile/', views.profile, name='profile'),
     # path('users/', views.search_users, name='search_users'),
