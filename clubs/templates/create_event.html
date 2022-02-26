@@ -1,0 +1,33 @@
+{%extends 'base_content.html'%}
+{% block content %}
+<style>
+card {
+
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+
+}
+</style>
+
+  {% include 'partials/club_page_jumbotron.html' with members=members club=club userrole=userrole%}
+
+  <div class="container" style="padding-left:100px">
+    <div class="row">
+      <div class="col-12">
+        <div class="card" style="max-width: 100rem;">
+          <div class="card">
+            <div class="card-body">
+            <form action="{% url 'create_event' club.id %}" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              {% include 'partials/bootstrap_form.html' with form=form %}
+            <div class="form-group">
+              <button type="submit" class="form-control btn btn-primary submit px-3" style="background:linear-gradient(to right, #5898ed, #4170e8); border-radius: 30px 30px 30px 30px; border-style:none;">Create Event</button>
+            </div>
+          </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+ <p>  </p>
+{% endblock %}

@@ -4,6 +4,7 @@ from django.core.validators import RegexValidator, MaxValueValidator, MinValueVa
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
 
+
 # Create the Book model
 class Book(models.Model):
     isbn = models.CharField(max_length = 13, unique = True, blank = False)
@@ -18,6 +19,10 @@ class Book(models.Model):
     imgURLSmall = models.URLField(blank = True)
     imgURLMedium = models.URLField(blank = True)
     imgURLLarge = models.URLField(blank = True)
+
+    def get_title(self):
+        return self.title
+
 
 # Create the User model
 class User(AbstractUser):
@@ -124,3 +129,54 @@ class Invitation(models.Model):
 
     def get_club_name(self):
         return self.club.name
+
+class Event(models.Model):
+
+    name = models.CharField(
+        max_length = 50,
+        blank=False,
+        unique=True,
+    )
+
+    description = models.CharField(
+        max_length = 520,
+        blank = False
+    )
+
+    maxNumberOfParticipants = models.PositiveIntegerField(
+        verbose_name = "Maximum Number Of Participants (2 - 96)",
+        blank = False,
+        default = 16,
+        null = True,
+        validators=[
+            MinValueValidator(2),
+            MaxValueValidator(96)
+        ]
+    )
+
+    deadline = models.DateField(
+        verbose_name = "Sign Up Deadline (YYYY-MM-DD)",
+        blank = False,
+        default=datetime.date.today
+    )
+
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+
+    club = models.ForeignKey(Club, on_delete=models.CASCADE, blank = False, null = False)
+
+    participants = models.ManyToManyField(User, blank = True)
+
+    def join_event(self, club_member):
+        if self.is_part_of_event(club_member):
+            self.remove_from_event(club_member)
+        elif self.participants.count() < self.maxPlayers:
+            self.add_memeber_to_event(club_member)
+
+    def is_part_of_event(self, user):
+        return user in self.participants.all()
+
+    def remove_from_event(self, user):
+        self.participants.remove(user)
+
+    def add_memeber_to_event(self,user):
+        self.participants.add(user)

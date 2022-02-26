@@ -4,30 +4,54 @@
 {% endblock %}
 {% block content %}
 
+{% include 'partials/club_page_jumbotron.html' with members=members club=club %}
+<style>
+card {
+
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+
+}
+</style>
+
 <div class="container" style="padding-left:100px">
   <div class="row">
     <div class="col-12">
-      {% if club != null %}
-      <h1>{{club.name}}</h1>
-        <h5>Location: {{club.location}}</h5>
-        <h5>Description: {{club.description}}</h5>
-        {% for member in members %}
-          {% if member.role == "CO" %}
-            <h3>Clubowner: {{member.user.first_name}} {{member.user.last_name}}</h3>
-          {% endif %}
+      <div class="card" style="max-width: 90rem;">
+        <div class="card">
+          <div class="card-body">
 
-        {% endfor %}
-          {% if userrole.role == "CO" %}
-            <form action="{% url 'invite' club.id %}">
+      <table class="table table-striped table-hover">
+        {% for member in members %}
+          <tr>
+            <td>
+              <img src="{{ user.mini_gravatar }}" alt="Gravatar of {{ user.first_name }}" class="rounded-circle" >
+            </td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.full_name }}</td>
+            <td>
+              <form action = "{% url 'show_user' user.id %}" method = "get">
                 {% csrf_token %}
-                <input type="submit" value="invite new member" class="btn btn-primary">
-            </form>
-          {% endif %}
-      {% endif %}
-      
-      {% include 'partials/member_information.html' with members=members %}
-      {% include 'partials/officer_operation.html' with members=members userrole=userrole%}
-      {% include 'partials/club_owner_operation.html' with members=members userrole=userrole%}
+                <input type = "hidden" name = "next" value = "{{ next }}">
+                {% include 'partials/bootstrap_form.html' with form=form %}
+                <input type = "submit" value = "See profile" class="btn btn-primary">
+              </form>
+            </td>
+            {%if userrole.role == 'O'%}
+              <td>
+                {% include 'partials/officer_operation.html' with members=members userrole=userrole%}
+              </td>
+          {%endif%}
+          {%if userrole.role == "CO"%}
+              <td>
+                 {% include 'partials/club_owner_operation.html' with members=members userrole=userrole%}
+              </td>
+          {%endif%}
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+ </div>
+</div>
     </div>
   </div>
 </div>

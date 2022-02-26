@@ -1,0 +1,64 @@
+<style>
+h1 {text-align: center;}
+p {text-align: center;}
+div {text-align: center;}
+button {
+     background-color: transparent;
+     transition-duration: 0.4s;
+     font-size: 16px;
+     padding: 10px;
+     border: none;
+     margin: 4px 2px;
+     color: #808080
+
+  }
+
+  button:hover {
+    background-color: #D3D3D3;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    border-radius: 12px;
+    color: white;
+  }
+</style>
+
+
+
+<div class="shadow p-3 mb-5 bg-body rounded">
+<div  class="jumbotron">
+  <h1 class="display-4">{{club.name}}</h1>
+  <p class="lead">  {{club.description}}</p>
+  <hr class="my-4">
+  <p>Members : {{members | length }}</p>
+  <div class="btn-group btn-group-toggle" data-toggle="buttons">
+
+        <form action = "{% url 'club_feed' club.id %}" method = "get">
+            <button type="sumbit" >Feed</button>
+        </form>
+
+      <form action = "{% url 'member_list' club.id %}" method = "get">
+         <button type="submit" >Members</button>
+      </form>
+
+        <form action = "" method = "get">
+            <button type="sumbit" >Events</button>
+        </form>
+    {% if userrole.role == 'CO' or userrole.role == 'O' %}
+        <form action = "{% url 'create_event' club.id %}" method = "get">
+            <button type="submit" >Schedule Event</button>
+        </form>
+      {%endif%}
+
+        {% if userrole.role == 'CO' or userrole.role == 'O' %}
+        <form action="{% url 'invite' club.id %}">
+            {% csrf_token %}
+            <button type = "submit"> Invite</button>
+        </form>
+        {%endif%}
+     </div>
+   </div>
+</div>

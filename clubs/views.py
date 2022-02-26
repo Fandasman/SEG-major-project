@@ -16,7 +16,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm
 from .models import Book, Club, Role, User, Invitation
 
 
@@ -226,7 +226,6 @@ class SignUpView(FormView):
     def get_success_url(self):
         pass
         #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
-
 
 """This function standardize the requirements for
     creating clubs, if club is successfully created,
@@ -512,6 +511,7 @@ def member_list(request, club_id):
             return render(request, 'club_page.html', {'members': members,
                                                     'userrole': userrole,
                                                     'club' : club})
+
 """This function is for the user to apply for the club.
     If the user already in the club, system will refuse
     to create a role for the user with an error message."""
@@ -552,7 +552,7 @@ def unwish(request, book_id):
         if user.wishlist.filter(isbn=book.isbn).exists():
             user.wishlist.remove(book)
         return redirect('wishlist', user.id)
-    
+
     except ObjectDoesNotExist:
         return redirect('search_books')
 
@@ -590,7 +590,7 @@ def set_club_book(request, club_id):
     return render(request, 'set_club_book.html', {'form': form, 'club': club})
 
 
-"""This function allows club office/owner to 
+"""This function allows club office/owner to
     invite other users to join the club"""
 def invite(request, club_id):
     current_user = request.user
@@ -665,3 +665,38 @@ class InvitationlistView(LoginRequiredMixin, ListView):
 
         except ObjectDoesNotExist:
             return redirect('feed')
+
+def club_feed(request,club_id):
+    club = Club.objects.get(id=club_id)
+    members = Role.objects.filter(club=club)
+    try:
+        userrole = Role.objects.get(club = club, user=request.user)
+    except ObjectDoesNotExist:
+        messages.add_message(request,messages.ERROR,"It seem you don't belong to this club!")
+        return redirect('club_list')
+    else:
+        if userrole.role == "A":
+            messages.add_message(request,messages.ERROR,"You are the applicant in this club, so you don't have authority to view the member list!")
+            return redirect('club_list')
+        else:
+             return render(request, 'club_feed.html', {'members': members,
+                                                       'userrole': userrole,
+                                                       'club' : club})
+
+def create_event(request, club_id):
+    club = Club.objects.get(id=club_id)
+    members = Role.objects.filter(club=club)
+    userrole = Role.objects.get(club = club, user=request.user)
+    if request.method == 'POST':
+        form = EventForm(request.POST)
+        current_user = request.user
+        if form.is_valid():
+            this_event = form.save(club_id)
+            return redirect('club_list')
+        else:
+            messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
+    form = EventForm()
+    return render(request, 'create_event.html', {'form': form,
+                                                 'members': members,
+                                                  'userrole': userrole,
+                                                  'club': club} )
