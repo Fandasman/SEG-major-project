@@ -17,7 +17,7 @@ from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm
-from .models import Book, Club, Role, User, Invitation
+from .models import Book, Club, Role, User, Invitation,Event
 
 
 # Create your views here.
@@ -687,6 +687,7 @@ def create_event(request, club_id):
     club = Club.objects.get(id=club_id)
     members = Role.objects.filter(club=club)
     userrole = Role.objects.get(club = club, user=request.user)
+    events = Event.objects.filter(club = club)
     if request.method == 'POST':
         form = EventForm(request.POST)
         current_user = request.user
@@ -699,4 +700,18 @@ def create_event(request, club_id):
     return render(request, 'create_event.html', {'form': form,
                                                  'members': members,
                                                   'userrole': userrole,
-                                                  'club': club} )
+                                                  'club': club})
+def event_list(request,club_id):
+    club = Club.objects.get(id=club_id)
+    members = Role.objects.filter(club=club)
+    userrole = Role.objects.get(club = club, user=request.user)
+    try:
+        events = Event.objects.filter(club = club)
+    except ObjectDoesNotExist:
+        messages.add_message(request,messages.ERROR,"There are no events")
+        return redirect('club_list')
+    else:
+          return render(request, 'events_list.html', {'members': members,
+                                                      'userrole': userrole,
+                                                      'club' : club,
+                                                      'events' : events})

@@ -44,9 +44,10 @@ button {
          <button type="submit" >Members</button>
       </form>
 
-        <form action = "" method = "get">
+        <form action = "{%url 'events_list' club.id %}" method = "get">
             <button type="sumbit" >Events</button>
         </form>
+
     {% if userrole.role == 'CO' or userrole.role == 'O' %}
         <form action = "{% url 'create_event' club.id %}" method = "get">
             <button type="submit" >Schedule Event</button>

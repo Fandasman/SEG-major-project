@@ -1,0 +1,33 @@
+{%extends 'base_content.html'%}
+{% block content %}
+{% include 'partials/club_page_jumbotron.html' with members=members club=club userrole=userrole%}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Users</h1>
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Name</th>
+            <th scope="col">Deadline</th>
+          </tr>
+        </thead>
+        {% for event in events %}
+          <tr>
+            <td>{{ event.name }}</td>
+            <td>{{ event.deadline }}</td>
+            <td>
+              <form action ="" method = "get">
+                {% csrf_token %}
+                <input type = "submit" value = "See event" class="btn btn-primary">
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+</div>
+
+{%endblock%}
