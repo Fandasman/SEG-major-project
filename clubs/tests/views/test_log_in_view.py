@@ -16,7 +16,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.user = User.objects.get(username='johndoe')
 
     def test_login_url(self):
-        self.assertEqual(self.url, '/login/')
+        self.assertEqual(self.url, '/log_in/')
 
     def test_get_login(self):
         response = self.client.get(self.url)
