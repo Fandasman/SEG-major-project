@@ -17,14 +17,25 @@ from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
-from .models import Book, Club, Role, User, Invitation
+from .models import Book, Club, Role, User, Invitation, BooksRatings
+from django.db.models import Count
 
 
 # Create your views here.
 
 def feed(request):
     current_user = request.user
-    return render(request, 'feed.html', {'user': current_user})
+    ratings = BooksRatings.objects.annotate(
+        count_isbn = Count('isbn')
+    ).order_by('count_isbn').distinct()[:100]
+
+    books = []
+
+    for rating in ratings:
+        book = Book.objects.get(isbn = rating.isbn)
+        books.append(book)
+
+    return render(request, 'feed.html', {'user': current_user, 'favourites': books})
 
 class LoginProhibitedMixin:
     def dispatch(self, *args, **kwargs):

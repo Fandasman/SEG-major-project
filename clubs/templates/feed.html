@@ -3,18 +3,108 @@
 | Feed
 {% endblock %}
 {% block content %}
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
 <div class="container">
   <div class="row">
-    <div class="col-xs-12 col-lg-6 col-xl-8">
+    <div class="col-12">
       <h1>Welcome back, {{user.username}}.</h1>
+      
       <br>
+
+      <h2>Popular</h2>
+      <p>Books with the most reviews.</p>
+      <table class="table table-striped table-hover">
+        <thead>
+          <th scope="col"></th>
+          <th scope="col">Title</th>
+          <th scope="col">Author</th>
+          <th scope="col">Publisher</th>
+          <th scope="col">Year of publishing</th>
+          <th scope="col">Rating</th>
+        </thead>
+
+          {% for book in favourites %}
+        <tr>
+          <td>
+              <img src="{{ book.imgURLSmall }}" alt="Cover of {{ book.title }}">
+          </td>
+          <td>{{ book.title }}</td>
+          <td>{{ book.author }}</td>
+          <td>{{ book.publisher }}</td>
+          <td>{{ book.published }}</td>
+          <td>
+              <a class="btn btn-primary" href="{% url 'show_book' book.id %}">See book</a>
+          </td>
+          {% endfor %}
+      </tr>
+
+      </table>
+
+      <br>
+
       <h2>The Favourites</h2>
-        <p>This is where the top reviewed books will be displayed.</p>
+      <p>Books with the most reviews and highest average rating.</p>
+      <table class="table table-striped table-hover">
+        <thead>
+          <th scope="col"></th>
+          <th scope="col">Title</th>
+          <th scope="col">Author</th>
+          <th scope="col">Publisher</th>
+          <th scope="col">Year of publishing</th>
+          <th scope="col">Rating</th>
+        </thead>
+
+          {% for book in favourites %}
+        <tr>
+          <td>
+              <img src="{{ book.imgURLSmall }}" alt="Cover of {{ book.title }}">
+          </td>
+          <td>{{ book.title }}</td>
+          <td>{{ book.author }}</td>
+          <td>{{ book.publisher }}</td>
+          <td>{{ book.published }}</td>
+          <td>
+              <a class="btn btn-primary" href="{% url 'show_book' book.id %}">See book</a>
+          </td>
+          {% endfor %}
+      </tr>
+
+      </table>
 
       <br>
 
       <h2>Top picks</h2>
         <p>This is where recommendations based on genre preference will be displayed.</p>
+        <table class="table table-striped table-hover">
+          <thead>
+            <th scope="col"></th>
+            <th scope="col">Title</th>
+            <th scope="col">Author</th>
+            <th scope="col">Publisher</th>
+            <th scope="col">Year of publishing</th>
+            <th scope="col">Rating</th>
+          </thead>
+        {% for book in favourites %}
+        <tr>
+          <td>
+              <img src="{{ book.imgURLSmall }}" alt="Cover of {{ book.title }}">
+          </td>
+          <td>{{ book.title }}</td>
+          <td>{{ book.author }}</td>
+          <td>{{ book.publisher }}</td>
+          <td>{{ book.published }}</td>
+          <td>
+              <a class="btn btn-primary" href="{% url 'show_book' book.id %}">See book</a>
+          </td>
+          {% endfor %}
+      </tr>
+
+      </table>
     </div>
   </div>
 </div>
