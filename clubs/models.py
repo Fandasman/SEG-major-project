@@ -6,7 +6,7 @@ from libgravatar import Gravatar
 
 # Create the Book model
 class Book(models.Model):
-    isbn = models.CharField(max_length = 13, unique = True, blank = False)
+    isbn = models.CharField(primary_key=True,max_length = 13, unique = True, blank = False)
     title = models.CharField(max_length = 100, blank = False)
     author = models.CharField(max_length = 100, blank = False)
     publisher = models.CharField(max_length = 100, blank = False)
@@ -75,7 +75,9 @@ class Club(models.Model):
     )
     location = models.CharField(max_length = 100, blank = False)
     description = models.CharField(max_length = 500, blank = False)
-    club_book = models.ForeignKey(Book, related_name="club_book", blank = True, null = True, on_delete=models.CASCADE)
+    clubs_book = models.ForeignKey(Book, blank = True,related_name="club_book", null = True, on_delete=models.DO_NOTHING)
+    current_page = models.IntegerField(blank = True, null = True, default=0)
+
 
     def _add_book(self, club):
         club.club_book.add(self)

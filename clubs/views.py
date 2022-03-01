@@ -557,6 +557,24 @@ def unwish(request, book_id):
         return redirect('search_books')
 
 
+class ClubBookView(View):
+    def get(self,request):
+        return self.render()
+
+    def post(self, club_id, request):
+        form = ClubBookForm(data=request.POST)
+        book = form.cleaned_data(book)
+        book_page = form.cleaned_data(book_page)
+        club = Club.objects.get(id=club_id)
+        if form.is_valid():
+            messages.add_message(request, messages.SUCCESS, "Book amended!")
+            form.save()
+            # club_book = Club.objects.filter(current_book= book, id= club_id)
+            # club._add_book(book)
+            # club.add_book_page(book_page)
+            return redirect('feed')
+        return render(request, 'club_book.html', {'form': form})
+
 """This function is for club owner/officer to set the book for
     club to read"""
 def set_club_book(request, club_id):

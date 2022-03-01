@@ -116,6 +116,15 @@ class SetClubBookForm(forms.Form):
         except ObjectDoesNotExist:
             return False
 
+class ClubBookForm(forms.ModelForm):
+    """Form to update a club's current book."""
+
+    class Meta:
+        """Form options."""
+
+        model = Club
+        fields = ['clubs_book','current_page']
+
 class InviteForm(forms.Form):
     model = User
     username = forms.CharField(max_length=50, required=True, label="username")

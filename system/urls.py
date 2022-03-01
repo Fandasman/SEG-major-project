@@ -23,6 +23,7 @@ urlpatterns = [
     path('all_members/<int:club_id>', views.member_list, name = "member_list"),
     path('admin/', admin.site.urls),
     path('', views.HomeView.as_view(), name = 'home'),
+     path('add_book/', views.ClubBookView.as_view(), name = 'club_book'),
     path('club_list', views.ClubListView.as_view(), name = 'club_list'),
     path('club/<int:club_id>', views.ShowClubView.as_view(), name='show_club'),
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
