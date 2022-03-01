@@ -58,7 +58,7 @@ class BooksRatings(models.Model):
     rating = models.IntegerField(
         validators = [MaxValueValidator(5), MinValueValidator(1)]
     )
-    user = models.ForeignKey(User, related_name='books', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE)
 
 
 # Create the book Club model

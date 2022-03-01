@@ -18,22 +18,27 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
 from .models import Book, Club, Role, User, Invitation, BooksRatings
-from django.db.models import Count
+from collections import Counter
 
 
 # Create your views here.
 
 def feed(request):
     current_user = request.user
-    ratings = BooksRatings.objects.annotate(
-        count_isbn = Count('isbn')
-    ).order_by('count_isbn').distinct()[:100]
+    isbns = list(BooksRatings.objects.all().values_list('isbn'))
+
+    sorted = [rating for ratings, c in Counter(isbns).most_common()
+              for rating in [ratings] * c]
+
+    ratings = list(dict.fromkeys(sorted))[:100]
 
     books = []
 
     for rating in ratings:
-        book = Book.objects.get(isbn = rating.isbn)
+        book = Book.objects.get(isbn = rating[0])
         books.append(book)
+    
+    
 
     return render(request, 'feed.html', {'user': current_user, 'favourites': books})
 
