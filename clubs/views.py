@@ -30,7 +30,7 @@ def feed(request):
     sorted = [rating for ratings, c in Counter(isbns).most_common()
               for rating in [ratings] * c]
 
-    ratings = list(dict.fromkeys(sorted))[:100]
+    ratings = list(dict.fromkeys(sorted))[:50]
 
     books = []
 

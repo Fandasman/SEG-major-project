@@ -25,7 +25,6 @@
           <th scope="col">Author</th>
           <th scope="col">Publisher</th>
           <th scope="col">Year of publishing</th>
-          <th scope="col">Rating</th>
         </thead>
 
           {% for book in favourites %}
@@ -37,7 +36,6 @@
           <td>{{ book.author }}</td>
           <td>{{ book.publisher }}</td>
           <td>{{ book.published }}</td>
-          <td>{{ book.isbn }}</td>
           <td>
               <a class="btn btn-primary" href="{% url 'show_book' book.id %}">See book</a>
           </td>
