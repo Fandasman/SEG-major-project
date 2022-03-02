@@ -16,40 +16,11 @@
 
       <br>
 
-      <h2>Popular</h2>
-      <p>Books with the most reviews.</p>
+      <h2>The Favourites</h2>
+      <p>Books most people rated positively.</p>
       <table class="table table-striped table-hover">
         <thead>
           <th scope="col"></th>
-          <th scope="col">Title</th>
-          <th scope="col">Author</th>
-          <th scope="col">Publisher</th>
-          <th scope="col">Year of publishing</th>
-        </thead>
-
-          {% for book in favourites %}
-        <tr>
-          <td>
-              <img src="{{ book.imgURLSmall }}" alt="Cover of {{ book.title }}">
-          </td>
-          <td>{{ book.title }}</td>
-          <td>{{ book.author }}</td>
-          <td>{{ book.publisher }}</td>
-          <td>{{ book.published }}</td>
-          <td>
-              <a class="btn btn-primary" href="{% url 'show_book' book.id %}">See book</a>
-          </td>
-          {% endfor %}
-      </tr>
-
-      </table>
-
-      <br>
-
-      <h2>The Favourites</h2>
-      <p>Books with the most reviews and highest average rating.</p>
-      <table class="table table-striped table-hover">
-        <thead>
           <th scope="col"></th>
           <th scope="col">Title</th>
           <th scope="col">Author</th>
@@ -60,6 +31,7 @@
 
           {% for book in favourites %}
         <tr>
+          <td class="text-center"><b>#{{ forloop.counter }}</b></td>
           <td>
               <img src="{{ book.imgURLSmall }}" alt="Cover of {{ book.title }}">
           </td>
@@ -82,6 +54,7 @@
         <table class="table table-striped table-hover">
           <thead>
             <th scope="col"></th>
+            <th scope="col"></th>
             <th scope="col">Title</th>
             <th scope="col">Author</th>
             <th scope="col">Publisher</th>
@@ -90,6 +63,7 @@
           </thead>
         {% for book in favourites %}
         <tr>
+          <td class="text-center"><b>#{{ forloop.counter }}</b></td>
           <td>
               <img src="{{ book.imgURLSmall }}" alt="Cover of {{ book.title }}">
           </td>

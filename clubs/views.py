@@ -25,22 +25,24 @@ from collections import Counter
 
 def feed(request):
     current_user = request.user
-    isbns = list(BooksRatings.objects.all().values_list('isbn'))
 
-    sorted = [rating for ratings, c in Counter(isbns).most_common()
+    """Generate a query for books with the most positive ratings"""
+
+    good_isbns = list(BooksRatings.objects.filter(rating__gte = 4).values_list('isbn'))
+
+    good_sorted = [rating for ratings, c in Counter(good_isbns).most_common()
               for rating in [ratings] * c]
 
-    ratings = list(dict.fromkeys(sorted))[:50]
+    good_ratings = list(dict.fromkeys(good_sorted))[:30]
 
-    books = []
+    favourites = []
 
-    for rating in ratings:
+    for rating in good_ratings:
         book = Book.objects.get(isbn = rating[0])
-        books.append(book)
-    
+        favourites.append(book)   
     
 
-    return render(request, 'feed.html', {'user': current_user, 'favourites': books})
+    return render(request, 'feed.html', {'user': current_user, 'favourites': favourites})
 
 class LoginProhibitedMixin:
     def dispatch(self, *args, **kwargs):
