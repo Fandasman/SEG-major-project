@@ -38,6 +38,7 @@ def feed(request):
         book = Book.objects.get(isbn = rating[0])
         books.append(book)
     
+        
     
 
     return render(request, 'feed.html', {'user': current_user, 'favourites': books})

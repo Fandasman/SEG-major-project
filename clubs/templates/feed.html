@@ -26,10 +26,16 @@
           <th scope="col">Publisher</th>
           <th scope="col">Year of publishing</th>
         </thead>
-
+         {% comment %} <div id="myCarousel" class="carousel slide" data-bs-interval = 3000 data-bs-ride="carousel">
+          <div class="carousel-inner" >
+            <div class="carousel-item active">
+          {% for book in favourites %}
+            <img class="d-block w-100" src="{{ book.imgURLSmall }}" alt="Cover of {{ book.title }}">
+            </div> {% endcomment %}
           {% for book in favourites %}
         <tr>
           <td>
+            
               <img src="{{ book.imgURLSmall }}" alt="Cover of {{ book.title }}">
           </td>
           <td>{{ book.title }}</td>
