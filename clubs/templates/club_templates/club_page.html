@@ -28,25 +28,29 @@ card {
             </td>
             <td>{{ user.username }}</td>
             <td>{{ user.full_name }}</td>
-            <td>
-              <form action = "{% url 'show_user' user.id %}" method = "get">
-                {% csrf_token %}
-                <input type = "hidden" name = "next" value = "{{ next }}">
-                {% include 'partials/bootstrap_form.html' with form=form %}
-                <input type = "submit" value = "See profile" class="btn btn-primary">
-              </form>
-            </td>
-            {%if userrole.role == 'O'%}
               <td>
-                {% include 'partials/officer_operation.html' with members=members userrole=userrole%}
+                <form action = "{% url 'show_user' user.id %}" method = "get">
+                  {% csrf_token %}
+                  <input type = "hidden" name = "next" value = "{{ next }}">
+                  {% include 'partials/bootstrap_form.html' with form=form %}
+                  <input type = "submit" value = "See profile" class="btn btn-primary">
+                </form> 
               </td>
+              <td>
+          <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            {%if userrole.role == 'O'%}
+
+                {% include 'partials/officer_operation.html' with members=members userrole=userrole%}
+
           {%endif%}
           {%if userrole.role == "CO"%}
-              <td>
+
                  {% include 'partials/club_owner_operation.html' with members=members userrole=userrole%}
-              </td>
+
           {%endif%}
+        </td>
           </tr>
+        </div>
         {% endfor %}
       </table>
     </div>

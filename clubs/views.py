@@ -24,7 +24,7 @@ from .models import Book, Club, Role, User, Invitation,Event
 
 def feed(request):
     current_user = request.user
-    return render(request, 'feed.html', {'user': current_user})
+    return render(request, 'navbar_templates/feed.html', {'user': current_user})
 
 class LoginProhibitedMixin:
     def dispatch(self, *args, **kwargs):
@@ -39,14 +39,14 @@ def show_book(request, book_id):
     except ObjectDoesNotExist:
         return redirect('search_books')
     else:
-        return render(request, 'show_book.html',
+        return render(request, 'book_templates/show_book.html',
             {'book': book}
         )
 
 # @login_required
 def profile(request):
     current_user = request.user
-    return render(request, 'profile.html',
+    return render(request, 'user_templates/profile.html',
             {'user': current_user}
         )
 
@@ -57,7 +57,7 @@ def search_books(request):
         books= Book.objects.filter(name__icontains=search_book)
     else:
         books = Book.objects.all()
-    return render(request, 'search_books.html', {'books': books})
+    return render(request, 'book_templates/search_books.html', {'books': books})
 
 
 # class FeedView(LoginRequiredMixin, ListView):
@@ -82,7 +82,7 @@ def search_books(request):
 #         return context
 
 class HomeView(LoginProhibitedMixin,View):
-    template_name = 'home.html'
+    template_name = 'main_templates/home.html'
 
     def get(self,request):
         return self.render()
@@ -91,12 +91,12 @@ class HomeView(LoginProhibitedMixin,View):
         return self.render()
 
     def render(self):
-        return render(self.request, 'home.html')
+        return render(self.request, 'main_templates/home.html')
 
 # class MemberListView(LoginRequiredMixin, ListView):
 class MemberListView(ListView):
     model= User
-    template_name= 'member_list.html'
+    template_name= 'navbar_templates/member_list.html'
     context_object_name= 'users'
 
     # def get_context_data(self, *args, **kwargs):
@@ -108,7 +108,7 @@ class MemberListView(ListView):
 # class ClubListView(LoginRequiredMixin, ListView):
 class ClubListView(ListView):
     model= Club
-    template_name= 'club_list.html'
+    template_name= 'navbar_templates/club_list.html'
     context_object_name= 'clubs'
 
     def get_context_data(self, *args, **kwargs):
@@ -120,7 +120,7 @@ class ClubListView(ListView):
 # class OwnerClubListView(LoginRequiredMixin, ListView):
 class OwnerClubListView(ListView):
     model= Club
-    template_name= 'owner_club_list.html'
+    template_name= 'navbar_templates/owner_club_list.html'
     context_object_name= 'user'
 
     def get_context_data(self, *args, **kwargs):
@@ -132,7 +132,7 @@ class OwnerClubListView(ListView):
 # class MemberClubListView(LoginRequiredMixin, ListView):
 class MemberClubListView(ListView):
     model= Club
-    template_name= 'member_club_list.html'
+    template_name= 'navbar_templates/member_club_list.html'
     context_object_name= 'user'
 
     def get_context_data(self, *args, **kwargs):
@@ -144,7 +144,7 @@ class MemberClubListView(ListView):
 
 class ShowUserView(DetailView):
     model = User
-    template_name = 'show_user.html'
+    template_name = 'user_templates/show_user.html'
     pk_url_kwarg = "user_id"
 
 class ShowClubView(DetailView):
@@ -200,7 +200,7 @@ class LogInView(View):
 
     def render(self):
         form = LogInForm()
-        return render(self.request, 'login.html', {'form': form, 'next' : self.next})
+        return render(self.request, 'main_templates/login.html', {'form': form, 'next' : self.next})
 
 """View used for logging out."""
 def log_out(request):
@@ -215,7 +215,7 @@ class SignUpView(FormView):
     """View that signs up user."""
 
     form_class = SignUpForm
-    template_name = "sign_up.html"
+    template_name = "main_templates/sign_up.html"
     #redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
 
     def form_valid(self, form):
@@ -246,11 +246,11 @@ def create_club(request):
         else:
             messages.add_message(request, messages.ERROR, "You already own too many clubs!")
             form = ClubForm()
-        return render(request, 'create_club.html' , {'form': form})
+        return render(request, 'navbar_templates/create_club.html' , {'form': form})
 
     else:
         form = ClubForm()
-        return render(request, 'create_club.html' , {'form': form})
+        return render(request, 'navbar_templates/create_club.html' , {'form': form})
 
 
 
@@ -266,12 +266,12 @@ class EditProfileView(View):
             messages.add_message(request, messages.SUCCESS, "Profile updated!")
             form.save()
             return redirect('feed')
-        return render(request, 'edit_profile.html', {'form': form, 'user': current_user})
+        return render(request, 'user_templates/edit_profile.html', {'form': form, 'user': current_user})
 
     def render(self):
         current_user = self.request.user
         form = EditProfileForm(instance=current_user)
-        return render(self.request,'edit_profile.html', {'form': form})
+        return render(self.request,'user_templates/edit_profile.html', {'form': form})
 
 """Includes the view for a user's wishlist."""
 class WishlistView(LoginRequiredMixin, ListView):
@@ -295,7 +295,7 @@ def promote_member_to_officer(request, club_id, member_id):
             user = request.user
             club = Club.objects.get(id = club_id)
             userrole = Role.objects.get(club=club,user=user)
-            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            redirect_url = reverse('navbar_templates/member_list', kwargs={'club_id':club_id})
             member = User.objects.get(id = member_id)
             newOfficer = Role.objects.get(club = club, user = member)
             isOwner = Role.objects.get(club=club,user=request.user,role = 'CO')
@@ -320,7 +320,7 @@ def promote_officer_to_ClubOwner(request, club_id, member_id):
             club = Club.objects.get(id = club_id)
             userrole = Role.objects.get(club=club,user=user)
             userrole = Role.objects.get(club=club,user=user)
-            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            redirect_url = reverse('navbar_templates/member_list', kwargs={'club_id':club_id})
             member = User.objects.get(id = member_id)
             newClubOwner = Role.objects.get(club = club, user = member)
             userrole.role = 'O'
@@ -343,7 +343,7 @@ def demote_officer_to_member(request, club_id, member_id):
         if request.user.is_authenticated:
             user = request.user
             userrole = Role.objects.filter(user=user)
-            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            redirect_url = reverse('navbar_templates/member_list', kwargs={'club_id':club_id})
             club = Club.objects.get(id = club_id)
             member = User.objects.get(id = member_id)
             newMember = Role.objects.get(club = club, user = member)
@@ -366,7 +366,7 @@ def remove_member(request, club_id, member_id):
         if request.user.is_authenticated:
             user = request.user
             userrole = Role.objects.filter(user=user)
-            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            redirect_url = reverse('navbar_templates/member_list', kwargs={'club_id':club_id})
             club = Club.objects.get(id = club_id)
             member = User.objects.get(id = member_id)
             newMember = Role.objects.get(club = club, user = member)
@@ -389,7 +389,7 @@ def leave_club(request, club_id):
             user = request.user
             current_club = Club.objects.get(id=club_id)
             userrole = Role.objects.filter(club=current_club).get(user=user)
-            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            redirect_url = reverse('navbar_templates/member_list', kwargs={'club_id':club_id})
             members = Role.objects.filter(club=current_club)
             userrole.delete()
             return redirect('user_details')
@@ -406,7 +406,7 @@ def accept_applicant_to_club_as_Owner(request,club_id,member_id):
         if request.user.is_authenticated:
             user = request.user
             userrole = Role.objects.filter(user=user)
-            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            redirect_url = reverse('navbar_templates/member_list', kwargs={'club_id':club_id})
             club = Club.objects.get(id = club_id)
             member = User.objects.get(id = member_id)
             newMember = Role.objects.get(club = club, user = member)
@@ -429,7 +429,7 @@ def accept_applicant_to_club_as_officer(request,club_id,member_id):
         if request.user.is_authenticated:
             user = request.user
             userrole = Role.objects.filter(user=user)
-            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            redirect_url = reverse('navbar_templates/member_list', kwargs={'club_id':club_id})
             club = Club.objects.get(id = club_id)
             member = User.objects.get(id = member_id)
             newMember = Role.objects.get(club = club, user = member)
@@ -451,7 +451,7 @@ def reject_applicant_to_club_as_Owner(request,club_id,member_id):
         if request.user.is_authenticated:
             user = request.user
             userrole = Role.objects.filter(user=user)
-            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            redirect_url = reverse('navbar_templates/member_list', kwargs={'club_id':club_id})
             club = Club.objects.get(id = club_id)
             member = User.objects.get(id = member_id)
             newMember = Role.objects.get(club = club, user = member)
@@ -473,7 +473,7 @@ def reject_applicant_to_club_as_Officer(request,club_id,member_id):
         if request.user.is_authenticated:
             user = request.user
             userrole = Role.objects.filter(user=user)
-            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
+            redirect_url = reverse('navbar_templates/member_list', kwargs={'club_id':club_id})
             club = Club.objects.get(id = club_id)
             member = User.objects.get(id = member_id)
             newMember = Role.objects.get(club = club, user = member)
@@ -508,7 +508,7 @@ def member_list(request, club_id):
             messages.add_message(request,messages.ERROR,"You are the applicant in this club, so you don't have authority to view the member list!")
             return redirect('club_list')
         else:
-            return render(request, 'club_page.html', {'members': members,
+            return render(request, 'club_templates/club_page.html', {'members': members,
                                                     'userrole': userrole,
                                                     'club' : club})
 
@@ -587,7 +587,7 @@ def set_club_book(request, club_id):
             return redirect('set_club_book', club.id)
     else:
         form = SetClubBookForm()
-    return render(request, 'set_club_book.html', {'form': form, 'club': club})
+    return render(request, 'club_templates/et_club_book.html', {'form': form, 'club': club})
 
 
 """This function allows club office/owner to
@@ -622,7 +622,7 @@ def invite(request, club_id):
             return redirect('invite', club.id)
     else:
         form = InviteForm()
-    return render(request, 'invite.html', {'form': form, 'club':club})
+    return render(request, 'club_templates/invite.html', {'form': form, 'club':club})
 
 
 """This function allows users to accept the invitation from the club"""
@@ -661,7 +661,7 @@ class InvitationlistView(LoginRequiredMixin, ListView):
         try:
             user = User.objects.get(id = user_id)
             invitations = Invitation.objects.filter(user=user, status="P")
-            return render(self.request, 'invitation_list.html', {'invitations': invitations})
+            return render(self.request, 'navbar_templates/invitation_list.html', {'invitations': invitations})
 
         except ObjectDoesNotExist:
             return redirect('feed')
@@ -679,7 +679,7 @@ def club_feed(request,club_id):
             messages.add_message(request,messages.ERROR,"You are the applicant in this club, so you don't have authority to view the member list!")
             return redirect('club_list')
         else:
-             return render(request, 'club_feed.html', {'members': members,
+             return render(request, 'club_templates/club_feed.html', {'members': members,
                                                        'userrole': userrole,
                                                        'club' : club})
 
@@ -697,7 +697,7 @@ def create_event(request, club_id):
         else:
             messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
     form = EventForm()
-    return render(request, 'create_event.html', {'form': form,
+    return render(request, 'club_templates/create_event.html', {'form': form,
                                                  'members': members,
                                                   'userrole': userrole,
                                                   'club': club})
@@ -711,7 +711,11 @@ def event_list(request,club_id):
         messages.add_message(request,messages.ERROR,"There are no events")
         return redirect('club_list')
     else:
-          return render(request, 'events_list.html', {'members': members,
+          return render(request, 'club_templates/events_list.html', {'members': members,
                                                       'userrole': userrole,
                                                       'club' : club,
                                                       'events' : events})
+def join_event(request,event_id,club_id):
+     event = Event.objects.get(id=event_id)
+     event.join_event(request.user)
+     return redirect('events_list',club_id)

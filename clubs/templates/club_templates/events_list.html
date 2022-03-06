@@ -1,0 +1,86 @@
+{%extends 'base_content.html'%}
+{% block content %}
+
+{% include 'partials/club_page_jumbotron.html' with members=members club=club userrole=userrole%}
+<style>
+
+.card {
+     box-shadow: 0 0 10px 0 rgba(100, 100, 100, 0.26);
+   }
+.event_list_button{
+background-color: #e4e6eb;
+transition-duration: 0.4s;
+font-size: 16px;
+padding: 3px 6px;
+margin: 4px 2px;
+border-radius: 4px;
+border:none;
+}
+
+.event_list_button:hover{
+   background-color: #d8dadf;
+}
+
+body{
+  background-color: #f1f2f5;
+}
+
+</style>
+
+
+
+<div class="col d-flex justify-content-center">
+
+<div class="card" style="width: 60rem;">
+  <div class="card-body">
+    <h5 class="card-title">Events</h5>
+      {% for event in events %}
+
+    <div class="row">
+      <div class="col-md-2">
+        <div style="width: 8rem;">
+         <img class="card-img-top" src="..." alt="Card image cap">
+      </div>
+    </div>
+       <div class="col-md-9">
+      <div>
+      <p> </p>
+         <div class="row">
+         <p class="card-text" style="color:red; font-size:12px;">{{event.deadline}}</p>
+         </div>
+         <h5 class="card-title">{{ event.name }}</h5>
+         <div class="row">
+         <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+       </div>
+       <div class="btn-group" role="group" aria-label="Basic example">
+
+      {%if user in event.participants%}
+      <form action = " " method="post">
+        {% csrf_token %}
+        <button type="submit" class="event_list_button ">Cancel</button>
+      </form>
+     {%else%}
+     <form action = "{% url 'join_event' club.id event.id %}" method="post">
+       {% csrf_token %}
+       <button type="submit" class="event_list_button ">Join</button>
+     </form>
+
+      {%endif%}
+
+        <button type="button" class="event_list_button">Middle</button>
+        <button type="button" class="event_list_button">Right</button>
+       </div>
+        </div>
+         </div>
+       </div>
+
+       <hr class="my-4">
+
+       {%endfor%}
+     </div>
+  </div>
+
+<p> </p>
+
+
+{%endblock%}
