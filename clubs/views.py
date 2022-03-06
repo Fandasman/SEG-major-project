@@ -295,7 +295,7 @@ def promote_member_to_officer(request, club_id, member_id):
             user = request.user
             club = Club.objects.get(id = club_id)
             userrole = Role.objects.get(club=club,user=user)
-            redirect_url = reverse('navbar_templates/member_list', kwargs={'club_id':club_id})
+            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
             member = User.objects.get(id = member_id)
             newOfficer = Role.objects.get(club = club, user = member)
             isOwner = Role.objects.get(club=club,user=request.user,role = 'CO')
@@ -343,7 +343,7 @@ def demote_officer_to_member(request, club_id, member_id):
         if request.user.is_authenticated:
             user = request.user
             userrole = Role.objects.filter(user=user)
-            redirect_url = reverse('navbar_templates/member_list', kwargs={'club_id':club_id})
+            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
             club = Club.objects.get(id = club_id)
             member = User.objects.get(id = member_id)
             newMember = Role.objects.get(club = club, user = member)
