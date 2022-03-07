@@ -88,6 +88,7 @@ nav a{
     position: relative;
     font-family: 'Noto Sans TC',sans-serif;
 }
+
  nav a+a::before{
      content: '';
      position: absolute;
@@ -96,6 +97,7 @@ nav a{
      right: 10px;
      top: 0;
  }
+
  /* Method 1 */
  nav a .fas{
      margin-right: -1.1em;

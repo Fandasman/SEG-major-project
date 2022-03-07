@@ -1,4 +1,5 @@
 {% load static %}
+{% load search_class_name %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,16 +13,19 @@
 <body>
   <input type="checkbox" name="" id="side-menu-switch">
 <div class="side-menu">
-    <form action="">
-        <input type="text" placeholder="Search For">
+    <form method='GET' class='' action="{% url 'my_view' %}">
+          <input type="text" name="q" data-toggle="popover" data-placement="bottom" data-content="Press enter to search" placeholder="Search..." value="" style="" data-original-title="" title="" autofocus="autofocus">
         <button>
-                <i class="fas fa-search"></i>
+                <i class="fas fa-search" aria-hidden="true"></i>
         </button>
     </form>
     <nav>
-        <a href="#"><i ></i>Books</a>
-        <a href="#"><i ></i>Clubs</a>
-        <a href="#"><i ></i>Users</a>
+      <a href="{% url 'book_list' %}"><i ></i>Books</a>
+      <a href="{% url 'club_list' %}"><i ></i>Clubs</a>
+      <a href="{% url 'member_list' %}"><i ></i>Users</a>
+      <input type="radio" value="Books" name="model" />Books <br />
+      <input type="radio" value="Clubs" name="model" />Clubs <br />
+      <input type="radio" value="Users" name="model"/>Users <br />
     </nav>
     <label for="side-menu-switch">
         <i class="fas fa-angle-left"></i>

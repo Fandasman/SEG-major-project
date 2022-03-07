@@ -27,6 +27,7 @@ urlpatterns = [
     path('club/<int:club_id>', views.ShowClubView.as_view(), name='show_club'),
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
     path('feed/', views.feed, name='feed'),
+    path('my_view/', views.my_view, name='my_view'),
     path('profile/', views.profile, name='profile'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('login/', views.LogInView.as_view(), name='login'),
@@ -39,6 +40,7 @@ urlpatterns = [
     path('owner_club_list', views.OwnerClubListView.as_view(), name = 'owner_club_list'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('user/<int:user_id>', views.ShowUserView.as_view(), name='show_user'),
-    path('search_view/', views.SearchView.as_view(), name='search_view'),
+    # path('search_view/', views.SearchView.as_view(), name='search_view'),
+    # path('search_by/', views.SearchBy.as_view(), name='search_by'),
     path('echo/', views.Echo.as_view(), name='echo'),
 ]

@@ -1,6 +1,7 @@
 asgiref==3.4.1
 coverage==6.0.1
 Django==3.2.5
+django-filter==21.1
 django-widget-tweaks==1.4.9
 Faker==9.0.0
 libgravatar==1.0.0
