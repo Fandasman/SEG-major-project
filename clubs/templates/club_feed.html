@@ -1,6 +1,24 @@
-{%extends 'base_content.html'%}
+{% extends 'base_content.html' %}
 {% block content %}
-
+{% load posts_extra %}
   {% include 'partials/club_page_jumbotron.html' with members=members club=club userrole=userrole%}
 
-{% endblock %}
+    <h2>Club Feed</h2>
+    <div class="grid-container">
+        {% for instance in posts %}
+            {% if instance|model_type == 'Event' %}
+            <div class="post">
+                    <h4>Event Name: {{ instance.name }}</h4>
+                    <img src="{{ instance.book.imgURLMedium }}">
+                    <p><strong>Description {{ instance.description }}</strong></p>
+                    <p>{{ instance.date_created }}</p>
+                </a>
+              <hr>
+            </div>
+            {% elif instance|model_type == 'UserPost' %}
+                 <div class = 'post'>
+                   <p> {{instance.user.username}} {{instance.description}}
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock content %}

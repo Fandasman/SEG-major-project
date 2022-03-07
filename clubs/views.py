@@ -2,6 +2,7 @@ from django import template
 from django.conf import settings
 from django.contrib import messages
 from django.urls import reverse
+from itertools import chain
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -17,7 +18,7 @@ from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm
-from .models import Book, Club, Role, User, Invitation,Event
+from .models import Book, Club, Role, User, Invitation,Event, UserPost
 
 
 # Create your views here.
@@ -392,6 +393,7 @@ def leave_club(request, club_id):
             redirect_url = reverse('member_list', kwargs={'club_id':club_id})
             members = Role.objects.filter(club=current_club)
             userrole.delete()
+            UserPost.objects.create(user = user, club = club, join = False)
             return redirect('user_details')
         else:
             return redirect('log_in')
@@ -632,6 +634,7 @@ def accept_invitation(request, inv_id):
         invitation = Invitation.objects.get(id=inv_id)
         club = invitation.club
         new_role = Role.objects.create(user=user, club=club, role="M")
+        UserPOst.objects.create(user = user, club = club, join = True)
         old_invitation = Invitation.objects.filter(id=inv_id).delete()
         messages.add_message(request, messages.INFO, "join successful")
         return redirect('invitation_list', user.id)
@@ -679,8 +682,12 @@ def club_feed(request,club_id):
             messages.add_message(request,messages.ERROR,"You are the applicant in this club, so you don't have authority to view the member list!")
             return redirect('club_list')
         else:
-             return render(request, 'club_feed.html', {'members': members,
+            events = Event.objects.all()
+            userposts = UserPost.objects.all()
+            posts = sorted(chain(events,userposts),key=lambda instance: instance.created_at,reverse=True)
+            return render(request, 'club_feed.html', {'members': members,
                                                        'userrole': userrole,
+                                                       'posts':posts,
                                                        'club' : club})
 
 def create_event(request, club_id):

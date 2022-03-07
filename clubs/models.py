@@ -166,6 +166,8 @@ class Event(models.Model):
 
     participants = models.ManyToManyField(User, blank = True)
 
+    created_at = models.DateTimeField(auto_now_add=True)
+
     def join_event(self, club_member):
         if self.is_part_of_event(club_member):
             self.remove_from_event(club_member)
@@ -180,3 +182,15 @@ class Event(models.Model):
 
     def add_memeber_to_event(self,user):
         self.participants.add(user)
+
+class UserPost(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    join = models.BooleanField
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def description(self):
+        if join == True:
+            return 'has joined this club'
+        else:
+            return 'has left this club'
