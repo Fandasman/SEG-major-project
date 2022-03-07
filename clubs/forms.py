@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import Form,ChoiceField, CharField
 from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from .models import Club, User
@@ -88,3 +89,13 @@ class EditProfileForm(forms.ModelForm):
         model = User
         fields = ['username', 'first_name', 'last_name', 'email', 'bio']
         widgets = { 'bio': forms.Textarea()}
+
+class SearchForm(Form):
+    FILTER_CHOICES = (
+        ('books', 'Books'),
+        ('users', 'Users'),
+        ('clubs', 'Clubs'),
+        ('all', 'All')
+    )
+    search = CharField(required=True)
+    filter_field = ChoiceField(choices=FILTER_CHOICES)

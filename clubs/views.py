@@ -12,7 +12,7 @@ from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from itertools import chain
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SearchForm
 from .models import Book, Club, Role, User
 
 import csv
@@ -312,27 +312,37 @@ class SearchView(ListView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['count'] = self.count or 0
-        context['query'] = self.request.GET.get('q')
+        context['form'] = SearchForm(initial={
+            'search' : self.request.GET.get('search',''),
+            'filter_field' : self.request.GET.get('filter_field', ''),
+        })
         return context
 
     def get_queryset(self):
         request = self.request
-        query = request.GET.get('q', None)
+        query = request.GET.get('search')
+        filter_field = self.request.GET.get('filter_field')
 
         if query is not None:
+            queryset = []
             book_results= Book.objects.search(query)
             club_results= Club.objects.search(query)
             user_results= User.objects.search(query)
-
-            # combine querysets
-            queryset_chain = chain(
+            if filter_field == 'books':
+                queryset = book_results
+            elif filter_field == 'clubs':
+                queryset =  club_results
+            elif filter_field == 'users':
+                queryset = user_results
+            elif filter_field == 'all':
+                queryset = chain(
                     book_results,
                     club_results,
                     user_results
-            )
-            qs = sorted(queryset_chain,
+                    )
+            qs_sorted = sorted(queryset,
                         key=lambda instance: instance.pk,
                         reverse=True)
-            self.count = len(qs) # since qs is actually a list
-            return qs
+            self.count = len(qs_sorted) # since qs is actually a list
+            return qs_sorted
         return query
