@@ -186,11 +186,11 @@ class Event(models.Model):
 class UserPost(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
-    join = models.BooleanField
+    join = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def description(self):
-        if join == True:
+        if self.join == True:
             return 'has joined this club'
         else:
             return 'has left this club'

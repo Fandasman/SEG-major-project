@@ -393,8 +393,10 @@ def leave_club(request, club_id):
             redirect_url = reverse('member_list', kwargs={'club_id':club_id})
             members = Role.objects.filter(club=current_club)
             userrole.delete()
-            UserPost.objects.create(user = user, club = club, join = False)
-            return redirect('user_details')
+            post = UserPost.objects.create(user = user, club = current_club)
+            post.join = False
+            post.save()
+            return redirect('feed')
         else:
             return redirect('log_in')
     else:
@@ -634,7 +636,7 @@ def accept_invitation(request, inv_id):
         invitation = Invitation.objects.get(id=inv_id)
         club = invitation.club
         new_role = Role.objects.create(user=user, club=club, role="M")
-        UserPOst.objects.create(user = user, club = club, join = True)
+        post = UserPost.objects.create(user = user, club = current_club)
         old_invitation = Invitation.objects.filter(id=inv_id).delete()
         messages.add_message(request, messages.INFO, "join successful")
         return redirect('invitation_list', user.id)
@@ -682,8 +684,8 @@ def club_feed(request,club_id):
             messages.add_message(request,messages.ERROR,"You are the applicant in this club, so you don't have authority to view the member list!")
             return redirect('club_list')
         else:
-            events = Event.objects.all()
-            userposts = UserPost.objects.all()
+            events = Event.objects.filter(club=club)
+            userposts = UserPost.objects.filter(club=club)
             posts = sorted(chain(events,userposts),key=lambda instance: instance.created_at,reverse=True)
             return render(request, 'club_feed.html', {'members': members,
                                                        'userrole': userrole,

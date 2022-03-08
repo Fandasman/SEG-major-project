@@ -34,6 +34,11 @@ button {
   <p class="lead">  {{club.description}}</p>
   <hr class="my-4">
   <p>Members : {{members | length }}</p>
+  <form action="{% url 'leave_club' club.id%}" method="post">
+  {% csrf_token %}
+  <button type="submit", class='btn btn-success'>Leave</button>
+</form>
+
   <div class="btn-group btn-group-toggle" data-toggle="buttons">
 
         <form action = "{% url 'club_feed' club.id %}" method = "get">

@@ -8,15 +8,16 @@
         {% for instance in posts %}
             {% if instance|model_type == 'Event' %}
             <div class="post">
+                    <hr>
                     <h4>Event Name: {{ instance.name }}</h4>
                     <img src="{{ instance.book.imgURLMedium }}">
                     <p><strong>Description {{ instance.description }}</strong></p>
                     <p>{{ instance.date_created }}</p>
                 </a>
-              <hr>
             </div>
             {% elif instance|model_type == 'UserPost' %}
                  <div class = 'post'>
+                   <hr>
                    <p> {{instance.user.username}} {{instance.description}}
             {% endif %}
         {% endfor %}
