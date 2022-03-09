@@ -59,5 +59,8 @@ urlpatterns = [
     path('user/<int:user_id>/invitation_list/', views.InvitationlistView.as_view(), name='invitation_list'),
     path('accept_invitation/<int:inv_id>', views.accept_invitation, name='accept_invitation'),
     path('reject_invitation/<int:inv_id>', views.reject_invitation, name='reject_invitation'),
+    path('club/<int:club_id>/chat/', views.club_chat, name='club_chat'),
+    path('send/', views.send, name='send'),
+    path('get_messages/<int:club_id>/', views.get_messages, name='get_messages')
 
 ]

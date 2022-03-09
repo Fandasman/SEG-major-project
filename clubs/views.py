@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.http.response import HttpResponse, HttpResponseForbidden
+from django.http.response import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 from django.contrib.auth.decorators import login_required
@@ -17,7 +17,7 @@ from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
-from .models import Book, Club, Role, User, Invitation
+from .models import Book, Club, Role, User, Invitation, Message
 
 
 # Create your views here.
@@ -665,3 +665,40 @@ class InvitationlistView(LoginRequiredMixin, ListView):
 
         except ObjectDoesNotExist:
             return redirect('feed')
+
+
+
+def club_chat(request, club_id):
+    user = request.user
+    club = Club.objects.get(id=club_id)
+    return render(request, 'club_chat.html', {
+        'user': user,
+        'club': club
+    })
+
+
+def send(request):
+    if request.method == "POST":
+        text = request.POST.get('text')
+        user_id = request.POST.get('user_id')
+        club_id = request.POST.get('club_id')
+        user = User.objects.get(id=user_id)
+        club = Club.objects.get(id=club_id)
+        new_message = Message.objects.create(text=text, user=user, club=club)
+        new_message.save()
+        return render(request, 'club_chat.html')
+    else:
+        return HttpResponseForbidden()
+
+
+def get_messages(request, club_id):
+    club = Club.objects.get(id=club_id)
+    messages = Message.objects.filter(club=club)
+    message_list = []
+    for message in messages:
+        message_list.append({
+            "username": message.get_username(),
+            "text":message.text
+            })
+
+    return JsonResponse({"messages":message_list})

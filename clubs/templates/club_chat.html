@@ -1,0 +1,80 @@
+{% extends 'base_content.html' %}
+{% block title %}
+chat
+{% endblock %}
+{% block content %}
+    <style>
+        .chatbox{
+            height: 400px;
+            width: 300px;
+          border: 5px outset black;
+          background-color: white;
+        }
+        </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <h4>chat box</h4>
+    <div id="chatbox" class="chatbox">
+
+    </div>
+
+    <script>
+        $(document).ready(function(){
+
+        setInterval(function(){
+            $.ajax({
+                type: 'GET',
+                url : "/get_messages/{{ club.id }}/",
+                success: function(response){
+                    console.log(response);
+                    $("#chatbox").empty();
+                    for (var message in response.messages)
+                    {
+                        var text="<b>"+response.messages[message].username+
+                            "</b><p>"+response.messages[message].text+"</p></div>";
+                        $("#chatbox").append(text);
+                    }
+                },
+                error: function(response){
+                    alert('An error occured')
+                }
+            });
+        },1000);
+        })
+        </script>
+
+    <div>
+        <form id="chat">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" id="user_id" value="{{user.id}}"/>
+            <input type="hidden" name="club_id" id="club_id" value="{{club.id}}"/>
+            <input type="text" name="text" id="text" width="100px"/>
+            <input type="submit" value="Send">
+        </form>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#chat').on('submit', function (e) {
+                e.preventDefault();
+                $.ajax({
+                    method: 'POST',
+                    url: '/send/',
+                    data: {
+                        user_id: $('#user_id').val(),
+                        club_id: $('#club_id').val(),
+                        text: $('#text').val(),
+                        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    },
+                    success: function () {
+                    }
+                });
+                document.getElementById('text').value = ''
+            });
+
+        });
+    </script>
+
+{% endblock %}
+

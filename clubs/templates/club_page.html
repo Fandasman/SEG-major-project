@@ -23,6 +23,11 @@
                 <input type="submit" value="invite new member" class="btn btn-primary">
             </form>
           {% endif %}
+
+          <form action="{% url 'club_chat' club.id %}">
+                {% csrf_token %}
+                <input type="submit" value="chat" class="btn btn-primary">
+            </form>
       {% endif %}
       
       {% include 'partials/member_information.html' with members=members %}

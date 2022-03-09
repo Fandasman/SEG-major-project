@@ -124,3 +124,13 @@ class Invitation(models.Model):
 
     def get_club_name(self):
         return self.club.name
+
+
+# Create the Chat model
+class Message(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    text = models.CharField(max_length = 200, blank = False)
+
+    def get_username(self):
+        return self.user.username

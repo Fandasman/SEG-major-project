@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Book, Club, Role, Invitation
+from .models import User, Book, Club, Role, Invitation, Message
 
 
 # Register User model.
@@ -31,4 +31,10 @@ class RoleAdmin(admin.ModelAdmin):
 class InvitationAdmin(admin.ModelAdmin):
     list_display = [
         'user', 'club', 'status',
+    ]
+
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    list_display = [
+        'user', 'club', 'text',
     ]
