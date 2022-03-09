@@ -1,43 +1,47 @@
+
+
 {% if userrole.role == "CO" and member.role == "M" %}
-  <form action="{% url 'promotion' club.id member.user.id %}" method="post">
-      {% csrf_token %}
-  <input type="submit" value="Promote To Officer" class="event_list_button">
-  </form>
+<form action="{% url 'promotion' club.id member.user.id %}" method="post">
+    {% csrf_token %}
+<li><button type="submit" class="dropdown-item" type="button">Promote To Officer</button></li>
+</form>
 {% endif %}
 <br>
 {%if userrole.role == "CO" and member.role == "M"%}
 <form action="{% url 'removemember' club.id member.user.id %}" method="post">
     {% csrf_token %}
-<input type="submit" value="Remove from the club" class="event_list_button">
-
+<li><button type="submit" class="dropdown-item" type="button">Remove from the club</button></li>
 </form>
+
 {%endif%}
 
 {% if userrole.role == "CO" and member.role == "A" %}
+
   <form action="{% url 'rejectasowner' club.id member.user.id %}" method="post">
       {% csrf_token %}
-  <input type="submit" value="Reject the applicant" class="event_list_button">
+<li><button type="submit" class="dropdown-item" type="button">Reject the applicant</button></li>
   </form>
+
 {% endif %}
 </br>
 {%if userrole.role == "CO" and member.role == "A"%}
+
   <form action="{% url 'accept_applicant_as_owner' club.id member.user.id %}" method="post">
       {% csrf_token %}
-  <input type="submit" value="Accept" class="event_list_button">
+<li><button type="submit" class="dropdown-item" type="button">Accept</button></li>
   </form>
 {%endif%}
 
 {% if userrole.role == "CO" and member.role == "O" %}
+
   <form action="{% url 'demotion' club.id member.user.id %}" method="post">
       {% csrf_token %}
-  <input type="submit" value="Demote To Member" class="event_list_button">
+<li><button type="submit" class="dropdown-item" type="button">Demote To Member</button></li>
   </form>
 {% endif %}
 <br>
 {% if userrole.role == "CO" and member.role == "O" %}
-<button type="button" class="event_list_button" data-bs-toggle="modal" data-bs-target="#exampleModal">
-  Promote to the Club owner
-</button>
+<button type="button" class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">Promote to the Club owner</button>
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">

@@ -7,6 +7,8 @@
 {% include 'partials/club_page_jumbotron.html' with members=members club=club %}
 <style>
 
+
+
 .card {
 
 box-shadow: 0 0 10px 0 rgba(100, 100, 100, 0.26);
@@ -32,6 +34,17 @@ border:none;
 }
 </style>
 
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+    ...
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+    <li><a class="dropdown-item" href="#">Action</a></li>
+    <li><a class="dropdown-item" href="#">Another action</a></li>
+    <li><a class="dropdown-item" href="#">Something else here</a></li>
+  </ul>
+</div>
+
 
 <div class="col d-flex justify-content-center">
 
@@ -46,7 +59,7 @@ border:none;
          <img src="{{ user.mini_gravatar }}" alt="Gravatar of {{ user.first_name }}" class="rounded-circle" >
       </div>
     </div>
-       <div class="col-md-9">
+       <div class="col-md-8">
       <div>
       <p> </p>
          <h5 class="card-title">{{ member.user.username}}</h5>
@@ -71,6 +84,23 @@ border:none;
 
        </div>
         </div>
+         </div>
+         <div class="col-md-2">
+           <div class="dropdown">
+             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+               ...
+             </button>
+             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+               {%if userrole.role == "CO"%}
+
+                      {% include 'partials/club_owner_operation.html' with members=members userrole=userrole%}
+
+               {%endif%}
+               <li><a class="dropdown-item" href="#">Action</a></li>
+               <li><a class="dropdown-item" href="#">Another action</a></li>
+               <li><a class="dropdown-item" href="#">Something else here</a></li>
+             </ul>
+           </div>
          </div>
        </div>
 
