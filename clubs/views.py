@@ -406,7 +406,7 @@ def accept_applicant_to_club_as_Owner(request,club_id,member_id):
         if request.user.is_authenticated:
             user = request.user
             userrole = Role.objects.filter(user=user)
-            redirect_url = reverse('navbar_templates/member_list', kwargs={'club_id':club_id})
+            redirect_url = reverse('member_list', kwargs={'club_id':club_id})
             club = Club.objects.get(id = club_id)
             member = User.objects.get(id = member_id)
             newMember = Role.objects.get(club = club, user = member)
@@ -719,9 +719,21 @@ def join_event(request,event_id,club_id):
      club = Club.objects.get(id=club_id)
      members = Role.objects.filter(club=club)
      userrole = Role.objects.get(club = club, user=request.user)
-     events = Event.objects.filter(club = club)
      event = Event.objects.get(id=event_id)
-     event.join_event(request)
+     event.save()
+     event.join_event(request.user)
+     events = Event.objects.filter(club = club)
+     return render(request, 'club_templates/events_list.html', {'members': members,
+                                                   'userrole': userrole,
+                                                   'club' : club,
+                                                   'events' : events})
+def add_user_to_interested_list(request,event_id,club_id):
+     club = Club.objects.get(id=club_id)
+     members = Role.objects.filter(club=club)
+     userrole = Role.objects.get(club = club, user=request.user)
+     event = Event.objects.get(id=event_id)
+     event.add_user_to_interested_field(request.user)
+     events = Event.objects.filter(club = club)
      return render(request, 'club_templates/events_list.html', {'members': members,
                                                    'userrole': userrole,
                                                    'club' : club,

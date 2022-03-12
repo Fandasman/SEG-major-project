@@ -166,12 +166,29 @@ class Event(models.Model):
 
     participants = models.ManyToManyField(User, blank = True)
 
+    users_interested_in_event = models.ManyToManyField(User,blank =True, related_name ="interested_users")
+
+    def add_user_to_interested_field(self,club_member):
+        if self.is_interested_in_event(club_member):
+            self.remove_user_from_interested_field(club_member)
+        else:
+           self.users_interested_in_event.add(club_member)
+
+    def remove_user_from_interested_field(self,club_member):
+        self.users_interested_in_event.remove(club_member)
+
+    def is_interested_in_event(self,club_member):
+        return club_member in self.users_interested_in_event.all()
+
     def join_event(self, club_member):
-        if self.is_part_of_event(club_member):
+        if self.is_part_of_event(club_member) :
             self.remove_from_event(club_member)
-            print("Here")
+
+        elif self.is_interested_in_event(club_member) and self.participants.count() < self.maxNumberOfParticipants:
+            self.remove_user_from_interested_field(club_member)
+            self.add_memeber_to_event(club_member)
+
         elif self.participants.count() < self.maxNumberOfParticipants:
-            print("Here2")
             self.add_memeber_to_event(club_member)
 
     def is_part_of_event(self, user):

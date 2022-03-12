@@ -25,6 +25,7 @@ urlpatterns = [
     path('club_event_creation/<int:club_id>/', views.create_event,name = "create_event"),
     path('club_events_list/<int:club_id>/',views.event_list,name = "events_list"),
     path('join_event/<int:club_id>/<int:event_id>/',views.join_event,name="join_event"),
+    path('interested_in_event/<int:club_id>/<int:event_id>/',views.add_user_to_interested_list,name="interested_in_event"),
     path('admin/', admin.site.urls),
     path('', views.HomeView.as_view(), name = 'home'),
     path('club_list', views.ClubListView.as_view(), name = 'club_list'),
