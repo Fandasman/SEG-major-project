@@ -20,11 +20,11 @@ from django.urls import path
 from clubs import views
 
 urlpatterns = [
-    path('all_members/<int:club_id>', views.member_list, name = "member_list"),
-    path('club_feed/<int:club_id>', views.club_feed, name = "club_feed"),
-    path('club_event_creation/<int:club_id>', views.create_event,name = "create_event"),
-    path('club_events_list/<int:club_id>',views.event_list,name = "events_list"),
-    path('join_event/<int:club_id>/<int:event_id>',views.join_event,name="join_event"),
+    path('all_members/<int:club_id>/', views.member_list, name = "member_list"),
+    path('club_feed/<int:club_id>/', views.club_feed, name = "club_feed"),
+    path('club_event_creation/<int:club_id>/', views.create_event,name = "create_event"),
+    path('club_events_list/<int:club_id>/',views.event_list,name = "events_list"),
+    path('join_event/<int:club_id>/<int:event_id>/',views.join_event,name="join_event"),
     path('admin/', admin.site.urls),
     path('', views.HomeView.as_view(), name = 'home'),
     path('club_list', views.ClubListView.as_view(), name = 'club_list'),
@@ -32,7 +32,6 @@ urlpatterns = [
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
     path('feed/', views.feed, name='feed'),
     path('profile/', views.profile, name='profile'),
-    # path('users/', views.search_users, name='search_users'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('logout/', views.log_out, name='log_out'),
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),

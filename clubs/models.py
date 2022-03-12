@@ -169,7 +169,9 @@ class Event(models.Model):
     def join_event(self, club_member):
         if self.is_part_of_event(club_member):
             self.remove_from_event(club_member)
+            print("Here")
         elif self.participants.count() < self.maxNumberOfParticipants:
+            print("Here2")
             self.add_memeber_to_event(club_member)
 
     def is_part_of_event(self, user):

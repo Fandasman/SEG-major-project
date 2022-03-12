@@ -167,6 +167,7 @@ class EventForm(forms.ModelForm):
             deadline = self.cleaned_data.get('deadline'),
             book = self.cleaned_data.get('book'),
             club = Club.objects.get(id = id),
+             
         )
         event.save()
         return event

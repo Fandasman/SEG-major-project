@@ -6,7 +6,7 @@
 <li><button type="submit" class="dropdown-item" type="button">Promote To Officer</button></li>
 </form>
 {% endif %}
-<br>
+
 {%if userrole.role == "CO" and member.role == "M"%}
 <form action="{% url 'removemember' club.id member.user.id %}" method="post">
     {% csrf_token %}
@@ -23,7 +23,7 @@
   </form>
 
 {% endif %}
-</br>
+
 {%if userrole.role == "CO" and member.role == "A"%}
 
   <form action="{% url 'accept_applicant_as_owner' club.id member.user.id %}" method="post">
@@ -33,13 +33,13 @@
 {%endif%}
 
 {% if userrole.role == "CO" and member.role == "O" %}
-
   <form action="{% url 'demotion' club.id member.user.id %}" method="post">
       {% csrf_token %}
 <li><button type="submit" class="dropdown-item" type="button">Demote To Member</button></li>
   </form>
 {% endif %}
-<br>
+
+
 {% if userrole.role == "CO" and member.role == "O" %}
 <button type="button" class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">Promote to the Club owner</button>
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

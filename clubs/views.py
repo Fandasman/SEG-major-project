@@ -693,7 +693,7 @@ def create_event(request, club_id):
         current_user = request.user
         if form.is_valid():
             this_event = form.save(club_id)
-            return redirect('club_list')
+            return redirect('events_list',club_id)
         else:
             messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
     form = EventForm()
@@ -716,6 +716,13 @@ def event_list(request,club_id):
                                                       'club' : club,
                                                       'events' : events})
 def join_event(request,event_id,club_id):
+     club = Club.objects.get(id=club_id)
+     members = Role.objects.filter(club=club)
+     userrole = Role.objects.get(club = club, user=request.user)
+     events = Event.objects.filter(club = club)
      event = Event.objects.get(id=event_id)
-     event.join_event(request.user)
-     return redirect('events_list',club_id)
+     event.join_event(request)
+     return render(request, 'club_templates/events_list.html', {'members': members,
+                                                   'userrole': userrole,
+                                                   'club' : club,
+                                                   'events' : events})

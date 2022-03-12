@@ -7,8 +7,6 @@
 {% include 'partials/club_page_jumbotron.html' with members=members club=club %}
 <style>
 
-
-
 .card {
 
 box-shadow: 0 0 10px 0 rgba(100, 100, 100, 0.26);
@@ -32,34 +30,42 @@ border:none;
 .event_list_button:hover{
    background-color: #d8dadf;
 }
+
+.dropdown_actions
+{
+background-color: #e4e6eb;
+transition-duration: 0.4s;
+font-size: 16px;
+padding: 3px 6px;
+margin: 4px 2px;
+border-radius: 4px;
+border:none;
+min-width: 50px;
+min-height: 20px;
+
+}
+
+.dropdown_actions:hover{
+   background-color: #d8dadf;
+}
+
+
 </style>
-
-<div class="dropdown">
-  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-    ...
-  </button>
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-    <li><a class="dropdown-item" href="#">Action</a></li>
-    <li><a class="dropdown-item" href="#">Another action</a></li>
-    <li><a class="dropdown-item" href="#">Something else here</a></li>
-  </ul>
-</div>
-
 
 <div class="col d-flex justify-content-center">
 
-<div class="card" style="width: 40rem;">
+
+<div class="card" style="width: 30rem;">
   <div class="card-body">
     <h5 class="card-title">Users</h5>
       {% for member in members%}
-
     <div class="row">
       <div class="col-md-2">
         <div style="width: 8rem;">
          <img src="{{ user.mini_gravatar }}" alt="Gravatar of {{ user.first_name }}" class="rounded-circle" >
       </div>
     </div>
-       <div class="col-md-8">
+       <div class="col-md-6">
       <div>
       <p> </p>
          <h5 class="card-title">{{ member.user.username}}</h5>
@@ -68,47 +74,51 @@ border:none;
          <p class="card-text"></p>
        </div>
 
-       <div class="btn-group" role="group" aria-label="Basic example">
 
-      {%if userrole.role == 'O'%}
-
-          {% include 'partials/officer_operation.html' with members=members userrole=userrole%}
-
-    {%endif%}
-
-    {%if userrole.role == "CO"%}
-
-           {% include 'partials/club_owner_operation.html' with members=members userrole=userrole%}
-
-    {%endif%}
-
-       </div>
         </div>
          </div>
          <div class="col-md-2">
+           {%if member.role != "CO"%}
+           <div class="btn-group" role="group" aria-label="Basic example">
+
+           <form action = "{% url 'show_user' user.id %}" method = "get">
+             {% csrf_token %}
+             <input type = "hidden" name = "next" value = "{{ next }}">
+             {% include 'partials/bootstrap_form.html' with form=form %}
+             <input type = "submit" value = "See profile" class="event_list_button">
+           </form>
+
            <div class="dropdown">
-             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+
+             <button class="dropdown_actions" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                ...
              </button>
+
              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+
+            {%if member.role != "CO"%}
                {%if userrole.role == "CO"%}
 
                       {% include 'partials/club_owner_operation.html' with members=members userrole=userrole%}
 
+               {%if userrole.role == 'O'%}
+
+                   {% include 'partials/officer_operation.html' with members=members userrole=userrole%}
+
                {%endif%}
-               <li><a class="dropdown-item" href="#">Action</a></li>
-               <li><a class="dropdown-item" href="#">Another action</a></li>
-               <li><a class="dropdown-item" href="#">Something else here</a></li>
+
+              {%endif%}
+               {%endif%}
              </ul>
            </div>
          </div>
+           {%endif%}
+         </div>
        </div>
-
        <hr class="my-4">
-
        {%endfor%}
      </div>
   </div>
-
+</div>
 <p> </p>
 {%endblock%}
