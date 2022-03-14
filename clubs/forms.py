@@ -12,6 +12,7 @@ class SignUpForm(forms.ModelForm):
         model = User
         fields = ['username','first_name','last_name', 'email','bio']
         widgets = { 'bio': forms.Textarea()}
+        
     new_password = forms.CharField(
         label='Password',
         widget=forms.PasswordInput(),
