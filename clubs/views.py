@@ -239,11 +239,16 @@ class SignUpView(FormView):
     def form_valid(self, form):
         self.object = form.save()
         login(self.request, self.object)
-        return super().form_valid(form)
+        super().form_valid(form)
+        return redirect('select_genres')
 
     def get_success_url(self):
         pass
         #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
+"""This function allows the user to select prefered genres upon sign up."""
+def select_genres(request):
+    return render(request, "select_genres.html")
 
 
 """This function standardize the requirements for
