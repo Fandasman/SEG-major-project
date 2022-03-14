@@ -247,6 +247,7 @@ class SignUpView(FormView):
         #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
 """This function allows the user to select prefered genres upon sign up."""
+@login_required
 def select_genres(request):
     return render(request, "select_genres.html")
 
