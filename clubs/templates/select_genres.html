@@ -8,6 +8,24 @@
         <div class="col-12">
             <h1>Select genres</h1>
             <p>Select a few genres that you're interested in!</p>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <th scope="col">Genre</th>
+                    <th scope="col">Like this genre?</th>
+                </thead>
+                {% for genre in genres %}
+                <tr>
+                    <td>
+                        {{genre}}
+                    </td>
+                    <td>
+                        <input type="checkbox" id="genreCheck">
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+
+            <button class="btn btn-primary">Save</button>
         </div>
     </div>
 </div>

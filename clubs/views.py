@@ -249,7 +249,9 @@ class SignUpView(FormView):
 """This function allows the user to select prefered genres upon sign up."""
 @login_required
 def select_genres(request):
-    return render(request, "select_genres.html")
+    genres = Book.objects.values_list('genre').distinct
+
+    return render(request, "select_genres.html", {'genres': genres})
 
 
 """This function standardize the requirements for
