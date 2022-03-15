@@ -55,6 +55,9 @@ body{
     font-size: 30px;
     border-radius: 0 10px 10px 0;
 }
+.side-menu.radioselect{
+
+}
 #side-menu-switch{
     position: absolute;
     opacity: 0;

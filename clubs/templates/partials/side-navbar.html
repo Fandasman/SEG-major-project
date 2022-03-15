@@ -10,19 +10,18 @@
   <script src="https://kit.fontawesome.com/9a416a1cca.js" crossorigin="anonymous"></script>
 </head>
 <body>
-  <input type="checkbox" name="" id="side-menu-switch" checked>
+  <input type="checkbox" checked name="" id="side-menu-switch">
 <div class="side-menu">
-    <form action="">
-        <input type="text" placeholder="Search For">
-        <button>
-                <i class="fas fa-search"></i>
-        </button>
-    </form>
-    <nav>
-        <a href="#"><i ></i>Books</a>
-        <a href="#"><i ></i>Clubs</a>
-        <a href="#"><i ></i>Users</a>
-    </nav>
+  <form action="">
+      {{form.search}}
+      <button>
+              <i class="fas fa-search"></i>
+      </button>
+      <div class = "radioselect">
+      {{form.filter_field}}
+    </div>
+  </form>
+
     <label for="side-menu-switch">
         <i class="fas fa-angle-left"></i>
     </label>
