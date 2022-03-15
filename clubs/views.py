@@ -19,6 +19,10 @@ from django.views.generic.edit import FormView
 from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
 from .models import Book, Club, Role, User, Invitation, BooksRatings
 from collections import Counter
+from surprise import dump
+
+
+_, model = dump.load('./model.pkl')
 
 
 # Create your views here.
@@ -39,10 +43,37 @@ def feed(request):
 
     for rating in good_ratings:
         book = Book.objects.get(isbn = rating[0])
-        favourites.append(book)   
-    
+        favourites.append(book)
 
-    return render(request, 'feed.html', {'user': current_user, 'favourites': favourites})
+
+    """Generate a query for the recommended books"""
+
+    user_isbns = [i['isbn'] for i in current_user.users.values('isbn')]
+
+    user_genres = [Book.objects.get(isbn = i).genre for i in user_isbns]
+
+    filtered_user_isbns = Book.objects.exclude(isbn__in = user_isbns)
+
+    # filtered_user_genres = filtered_user_isbns.filter(genre__in = user_genres)
+
+    recommended_books = {}
+
+    for book in filtered_user_isbns:
+        predicted_rating = model.predict(uid=current_user.id, iid=book.isbn).est
+        recommended_books[book.isbn] = predicted_rating
+
+    sorted_ratings = list(recommended_books.items())
+    sorted_ratings.sort(key=lambda k: k[1], reverse=True)
+
+    recommended = []
+
+    for pair in sorted_ratings[:30]:
+        book = Book.objects.get(isbn = pair[0])
+        recommended.append(book)
+
+
+
+    return render(request, 'feed.html', {'user': current_user, 'favourites': favourites, 'recommended': recommended})
 
 class LoginProhibitedMixin:
     def dispatch(self, *args, **kwargs):
@@ -570,7 +601,7 @@ def unwish(request, book_id):
         if user.wishlist.filter(isbn=book.isbn).exists():
             user.wishlist.remove(book)
         return redirect('wishlist', user.id)
-    
+
     except ObjectDoesNotExist:
         return redirect('search_books')
 
@@ -608,7 +639,7 @@ def set_club_book(request, club_id):
     return render(request, 'set_club_book.html', {'form': form, 'club': club})
 
 
-"""This function allows club office/owner to 
+"""This function allows club office/owner to
     invite other users to join the club"""
 def invite(request, club_id):
     current_user = request.user
