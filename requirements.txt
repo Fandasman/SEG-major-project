@@ -9,3 +9,4 @@ django-widget-tweaks==1.4.9
 numpy==1.22.2
 pandas==1.4.1
 tqdm==4.62.3
+django-location-field==2.1.0

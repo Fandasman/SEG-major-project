@@ -4,6 +4,8 @@ from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
 
+
+
 from .models import Club, User, Book,Event
 
 
@@ -145,8 +147,9 @@ class EventForm(forms.ModelForm):
     class Meta:
         """Form options."""
         model = Event
-        fields = ['name', 'description', 'maxNumberOfParticipants','deadline','book']
+        fields = ['name', 'description', 'maxNumberOfParticipants','deadline','book','location']
         widgets = { 'description': forms.Textarea()}
+
         book = BookModelChoiceField(label ="Book",queryset = Book.objects.values_list('title',flat = True))
 
 
@@ -158,7 +161,7 @@ class EventForm(forms.ModelForm):
 
     def clean(self):
         pass
-    def save(self, id):
+    def save(self, club_id,current_user):
         super().save(commit = False)
         event = Event.objects.create(
             name=self.cleaned_data.get('name'),
@@ -166,8 +169,9 @@ class EventForm(forms.ModelForm):
             maxNumberOfParticipants= self.cleaned_data.get('maxNumberOfParticipants'),
             deadline = self.cleaned_data.get('deadline'),
             book = self.cleaned_data.get('book'),
-            club = Club.objects.get(id = id),
-             
+            club = Club.objects.get(id = club_id),
+            organiser = current_user,
+
         )
         event.save()
         return event

@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'clubs',
     'widget_tweaks',
+    'location_field.apps.DefaultConfig',
+
 ]
 
 MIDDLEWARE = [

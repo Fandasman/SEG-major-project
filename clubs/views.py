@@ -692,7 +692,7 @@ def create_event(request, club_id):
         form = EventForm(request.POST)
         current_user = request.user
         if form.is_valid():
-            this_event = form.save(club_id)
+            this_event = form.save(club_id,current_user)
             return redirect('events_list',club_id)
         else:
             messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
@@ -727,6 +727,7 @@ def join_event(request,event_id,club_id):
                                                    'userrole': userrole,
                                                    'club' : club,
                                                    'events' : events})
+
 def add_user_to_interested_list(request,event_id,club_id):
      club = Club.objects.get(id=club_id)
      members = Role.objects.filter(club=club)
@@ -738,3 +739,26 @@ def add_user_to_interested_list(request,event_id,club_id):
                                                    'userrole': userrole,
                                                    'club' : club,
                                                    'events' : events})
+def event_page(request,event_id,club_id):
+     club = Club.objects.get(id=club_id)
+     event = Event.objects.get(id=event_id)
+     return render(request, 'club_templates/event_page.html', {'event': event,
+                                                               'club' : club})
+def join_event_from_event_page(request,event_id,club_id):
+    club = Club.objects.get(id=club_id)
+    event = Event.objects.get(id=event_id)
+    event.join_event(request.user)
+    return render(request, 'club_templates/event_page.html', {'event': event,
+                                                              'club' : club})
+
+def add_user_to_interested_list_from_event_page(request,event_id,club_id):
+    club = Club.objects.get(id=club_id)
+    event = Event.objects.get(id=event_id)
+    event.add_user_to_interested_field(request.user)
+    return render(request, 'club_templates/event_page.html', {'event': event,
+                                                              'club' : club})
+
+def leave_club(request,club_id):
+    club = Club.objects.get(id = club_id)
+    role = Role.objects.filter(club= club).get(user = request.user).delete()
+    return redirect('feed')

@@ -31,99 +31,12 @@ body{
 
 <div class="col d-flex justify-content-center">
 
-<div class="card" style="width: 50rem;">
-  <div class="card-body">
-    <h5 class="card-title">Events</h5>
-      {% for event in events %}
-
-     <div class="row">
-      <div class="col-md-2">
-        <div style="width: 8rem;">
-         <img class="card-img-top" src="..." alt="Card image cap">
-      </div>
-    </div>
-       <div class="col-md-9">
-      <div>
-      <p> </p>
-         <div class="row">
-         <p class="card-text" style="color:red; font-size:12px;">{{event.deadline}}</p>
-         </div>
-         <h5 class="card-title">{{ event.name }}</h5>
-         <div class="row">
-         <p class="card-text">{{event.book.title}}</p>
-       </div>
-       <div class="btn-group" role="group" aria-label="Basic example">
-
-         {%if user in event.participants.all%}
-
-          <form action = "{% url 'join_event' club.id event.id %}" method="post">
-            {% csrf_token %}
-
-        <button type="submit" class="event_list_button "><i class="bi bi-check-circle-fill"> Going</i></button>
-
-      </form>
-
-        {%else%}
-
-        {%if user in event.users_interested_in_event.all%}
 
 
-
-        <div class="dropdown">
-
-          <button class="event_list_button" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-               Interested <i class="bi bi-caret-down-fill"></i>
-          </button>
-
-          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-
-            <form action = "{% url 'join_event' club.id event.id %}" method="post">
-              {% csrf_token %}
-             <li><button type="submit" class="dropdown-item"><i class="bi bi-check-circle"> Going</i></button></li>
-            </form>
-
-            <form action = "{%url 'interested_in_event' club.id event.id %}" method= "post">
-                {% csrf_token %}
-          <li><button type="submit" class="dropdown-item"><i class="bi bi-x-circle-fill">Uninterested</i></button></li>
-       </form>
-          </ul>
-        </div>
-
-        {# <button type="button" class="event_list_button"><i class="bi bi-star"> Interested</i></button> #}
-
-        {%else%}
-
-        <form action = "{% url 'join_event' club.id event.id %}" method="post">
-          {% csrf_token %}
-
-        <button type="submit" class="event_list_button "><i class="bi bi-check-circle"> Going</i></button>
-      </form>
+  {% include 'partials/events_listing.html' with members=events club=club%}
 
 
-      <form action = "{%url 'interested_in_event' club.id event.id %}" method= "post">
-          {% csrf_token %}
-
-        <button type="submit" class="event_list_button"><i class="bi bi-star"> Interested</i></button>
-
-      </form>
-
-        {%endif%}
-
-        {%endif%}
-
-        <button type="button" class="event_list_button"><i class="bi bi-envelope-fill"> Invite</i></button>
-       </div>
-        </div>
-         </div>
-       </div>
-
-       <hr class="my-4">
-
-       {%endfor%}
-     </div>
-  </div>
-
-<p> </p>
+</div>
 
 
 {%endblock%}
