@@ -16,13 +16,11 @@
         <button>
                 <i class="fas fa-search"></i>
         </button>
+
+        {{form.filter_field }}
+
     </form>
-    <nav>
-      {% for filters in form.filter_field %}
-      <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" unchecked>
-        {{ filters }}
-      {% endfor %}
-    </nav>
+
     <label for="side-menu-switch">
         <i class="fas fa-angle-left"></i>
     </label>
