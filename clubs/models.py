@@ -106,7 +106,10 @@ class Club(models.Model):
        return Role.objects.filter(club = self).filter(role = 'O' ).count() + 1
 
     def get_upcoming_events(self):
-        return Event.objects.filter(club = self).filter(deadline >= date.today())
+        return Event.objects.filter(deadline__gt = date.today())
+
+    def get_past_events(self):
+        return Event.objects.filter(club=self)
 
 # Create the user's Roles model
 ROLES= (
