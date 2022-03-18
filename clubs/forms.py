@@ -4,7 +4,7 @@ from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
 
-from .models import Club, User, Book,Event
+from .models import Club, User, Book, Event, UserPost
 
 
 class SignUpForm(forms.ModelForm):
@@ -170,3 +170,18 @@ class EventForm(forms.ModelForm):
         )
         event.save()
         return event
+
+class UserPostForm(forms.ModelForm):
+    """Form to ask user for post text.
+
+    The post author must be by the post creator.
+    """
+
+    class Meta:
+        """Form options."""
+
+        model = UserPost
+        fields = ['text']
+        widgets = {
+            'Post': forms.Textarea(attrs={'rows':10, 'cols':10})
+        }

@@ -2,74 +2,67 @@
 {% block content %}
 {% load posts_extra %}
   {% include 'partials/club_page_jumbotron.html' with members=members club=club userrole=userrole%}
+  <style>
+    div.feed_container {
+      overflow: scroll;
+      height: 1000px;
+      margin-left: auto;
+    margin-right: auto;
 
-<style>
+    }
 
-.card {
-     box-shadow: 0 0 10px 0 rgba(100, 100, 100, 0.26);
-   }
+  .card {
+       box-shadow: 0 0 10px 0 rgba(100, 100, 100, 0.26);
+     }
+  </style>
+  <div class="feed_container" style="padding-left:100px">
+    <div class="row">
+      <div class="col-12">
+        <div class="card" style="max-width: 100rem;">
 
-body{
-  background-color: #f1f2f5;
-}
-
-</style>
-
-
-
-<div class="col d-flex justify-content-center">
-  <div class="card" style="width: 50rem;">
-  <div class="card-body">
-    <h5 class="card-title">Club Feed</h5>
+<form action="{% url 'new_post' club.id%}" method="post">
+  {% csrf_token %}
+  {% include 'partials/bootstrap_form.html' with form=form %}
+  <input type="submit" value="Post" class="btn btn-primary">
+</form>
 
       {% for instance in posts %}
-          {% if instance|model_type == 'Event' %}
-          <div class="post">
-            <div class="row">
+          {% if instance|model_type == 'EventPost' %}
+          <div class="card m-2" style="width: 50rem;">
+            <div class="row no-gutters">
               <div class="col-md-2">
-                <div style="width: 8rem;">
-                  <img src="{{ instance.book.imgURLMedium }}">
+                <img src="{{ instance.event.book.imgURLMedium}}" class="card-img" alt="Picture of {{instance.event.title}}">
+              </div>
+              <div class="col-md-6">
+                <div class="card-body">
+                  <h5 class="card-title">{{instance.event.name}}</h5>
+                  <p class="card-text">{{instance.event.book.title}}</p>
+                  <p class="card-text"><small class="text-muted">{{instance.event.deadline}}</small></p>
                 </div>
-                </div>
-                <div class="col-md-9">
-                <div>
-                <p> </p>
-                <div class = "row">
-                <p class="card-text" style="color:red; font-size:12px;">{{instance.deadline}}</p>
-                </div>
-                <div class="row">
-                <p class="card-text">{{instance.name}}</p>
-              </div>              </a>
-
-               <div class="row">
-                <p class="card-text">{{instance.book.title}}</p>
               </div>
             </div>
+          </div>
+          {% elif instance|model_type == 'MembershipPost' %}
+          <div class="card m-2" style="width: 50rem;">
+            <div class="card-body">
+              <img src="{{ instance.user.mini_gravatar }}" alt="Gravatar of {{ instance.user.username }}" class="rounded-circle profile-image" >
+              {{instance.user.username}} {{instance.description}}
             </div>
-            </div>
-            </div>
-          {% elif instance|model_type == 'UserPost' %}
-          <div class="post">
-            <div class="row">
-              <div class="col-md-2">
-                <div style="width: 8rem;">
-                  <img src="{{ instance.gravatar }}" alt="Gravatar of {{ instance.user.username }}" class="rounded-circle profile-image" >
-                </div>
-                </div>
-                <div class="col-md-9">
-                <div>
-                <p> </p>
-               <div class="row">
-                <p class="card-text">{{instance.user.username}} {{instance.description}}</p>
-              </div>
-            </div>
-            </div>
-            </div>
-            </div>
+          </div>
           {% endif %}
+          {% if instance|model_type == 'UserPost' %}
+          <div class="card m-2" style="width: 50rem;">
+            <div class="card-body">
+
+              <img src="{{ instance.author.mini_gravatar }}" alt="Gravatar of {{ instance.user.username }}" class="rounded-circle profile-image" > {{ post.author.username }}
+             {{ instance.author.username }}  ·  {{ instance.created_at }} <hr>
+
+             {{ instance.text }}           </div>
+        </div>
+          {%endif%}
       {% endfor %}
   </div>
-
-</div>
+  </div>
+  </div>
 
 {% endblock content %}

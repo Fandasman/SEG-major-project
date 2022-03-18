@@ -166,7 +166,6 @@ class Event(models.Model):
 
     participants = models.ManyToManyField(User, blank = True)
 
-    created_at = models.DateTimeField(auto_now_add=True)
 
     def join_event(self, club_member):
         if self.is_part_of_event(club_member):
@@ -183,14 +182,58 @@ class Event(models.Model):
     def add_memeber_to_event(self,user):
         self.participants.add(user)
 
-class UserPost(models.Model):
+class EventPost(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """Model options."""
+
+        ordering = ['-created_at']
+
+
+class MembershipPost(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
     join = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
 
     def description(self):
         if self.join == True:
             return 'has joined this club'
         else:
             return 'has left this club'
+
+    class Meta:
+        """Model options."""
+
+        ordering = ['-created_at']
+
+
+
+class UserPost(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.CharField(max_length=280)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def number_of_likes(self):
+        return self.likes.count()
+
+    class Meta:
+        """Model options."""
+
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.text
+
+
+# class LikedPost(models.Model):
+#     user = models.ForeignKey(User,on_delete=models.CASCADE)
+#     post = models.ForeignKey(UserPost, on_delete=models.CASCADE)
+#     liked_date = models.DateTimeField(auto_now_add=True)
+#
+#     def __str__(self):
+#         return self.post.title + " liked by " + self.user.username
