@@ -16,7 +16,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
+from .forms import GenreForm, SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
 from .models import Book, Club, Role, User, Invitation, BooksRatings
 from collections import Counter
 
@@ -249,8 +249,10 @@ class SignUpView(FormView):
 """This function allows the user to select prefered genres upon sign up."""
 @login_required
 def select_genres(request):
-    genres = Book.objects.values_list('genre').distinct
+    genres = Book.objects.values_list('genre',flat=True).distinct
+    #form = GenreForm
 
+        
     return render(request, "select_genres.html", {'genres': genres})
 
 
