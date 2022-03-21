@@ -7,20 +7,56 @@ chat
         .chatbox{
             height: 400px;
             width: 300px;
-          border: 5px outset black;
-          background-color: white;
+            border: 5px outset black;
+            background-color: white;
+            overflow-y: scroll;
+            box-shadow: 0 0 4px rgba(0,0,0,.14),0 4px 8px rgba(0,0,0,.28);
+
         }
+        .messagebox{
+            background: lightgray;
+            padding: 10px 10px 0 10px;
+            border-radius: 0 6px 6px 0;
+            max-width: 80%;
+            width: auto;
+            box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 4px rgba(0,0,0,.24);
+
+        }
+        .chat-input{
+            flex: 0 0 auto;
+            height: 60px;
+            width: 300px;
+            background: dimgray;
+            border-top: 1px solid lightblue;
+            box-shadow: 0 0 4px rgba(0,0,0,.14),0 4px 8px rgba(0,0,0,.28);
+        }
+        .input{
+            height: 59px;
+            line-height: 60px;
+            outline: 0 none;
+            border: none;
+            width: calc(100% - 60px);
+            color: white;
+            text-indent: 10px;
+            font-size: 12pt;
+            padding: 0;
+            background: dimgray;
+        }
+
         </style>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-    <h4>chat box</h4>
+    <h4 >chat box</h4>
     <div id="chatbox" class="chatbox">
 
     </div>
 
     <script>
         $(document).ready(function(){
+
+        var scrolled = false
+        var msgCounter = 0
 
         setInterval(function(){
             $.ajax({
@@ -29,27 +65,39 @@ chat
                 success: function(response){
                     console.log(response);
                     $("#chatbox").empty();
-                    for (var message in response.messages)
-                    {
-                        var text="<b>"+response.messages[message].username+
+                    var msg = 0
+                    for (var message in response.messages) {
+                        var text="<div class='messagebox'><b>"+response.messages[message].username+
                             "</b><p>"+response.messages[message].text+"</p></div>";
                         $("#chatbox").append(text);
+                        msg += 1;
                     }
+                    if(msg != msgCounter) {
+                            msgCounter = msg
+                            scrolled = false
+                        }
+                        else
+                            scrolled = true
+                    if(!scrolled)
+                        $("#chatbox").scrollTop($("#chatbox")[0].scrollHeight);
+
                 },
+
                 error: function(response){
                     alert('An error occured')
                 }
             });
         },1000);
+        $("#chatbox").on('scroll', function(){scrolled=true;})
         })
         </script>
 
     <div>
-        <form id="chat">
+        <form id="chat" class="chat-input">
             {% csrf_token %}
             <input type="hidden" name="user_id" id="user_id" value="{{user.id}}"/>
             <input type="hidden" name="club_id" id="club_id" value="{{club.id}}"/>
-            <input type="text" name="text" id="text" width="100px"/>
+            <input type="text" name="text" id="text" class="input"/>
             <input type="submit" value="Send">
         </form>
     </div>
