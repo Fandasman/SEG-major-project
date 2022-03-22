@@ -22,7 +22,7 @@ from collections import Counter
 
 
 # Create your views here.
-
+@login_required
 def feed(request):
     current_user = request.user
 

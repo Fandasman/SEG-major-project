@@ -28,7 +28,6 @@ urlpatterns = [
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
     path('feed/', views.feed, name='feed'),
     path('profile/', views.profile, name='profile'),
-    # path('users/', views.search_users, name='search_users'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('logout/', views.log_out, name='log_out'),
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
