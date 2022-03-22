@@ -12,7 +12,11 @@ from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from itertools import chain
+<<<<<<< HEAD
 from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, RadioForm
+=======
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SearchForm
+>>>>>>> fix-search
 from .models import Book, Club, Role, User
 
 import csv
@@ -275,83 +279,45 @@ class WishlistView(LoginRequiredMixin, ListView):
             return redirect('feed')
 
 
-# class SearchView(ListView):
-#     template_name = 'search_view.html'
-#     count = 0
-#
-#
-#     def get_context_data(self, *args, **kwargs):
-#         context = super().get_context_data(*args, **kwargs)
-#         context['count'] = self.count or 0
-#         context['query'] = self.request.GET.get('q')
-#         return context
-#
-#     def get_queryset(self):
-#         request = self.request
-#         query = request.GET.get('q', None)
-#
-#         if query is not None:
-#             book_results= Book.objects.search(query)
-#             club_results= Club.objects.search(query)
-#             user_results= User.objects.search(query)
-#
-#             # combine querysets
-#             queryset_chain = chain(
-#                     book_results,
-#                     club_results,
-#                     user_results
-#             )
-#
-#             qs = sorted(queryset_chain,
-#                         key=lambda instance: instance.pk,
-#                         reverse=True)
-#             self.count = len(qs) # since qs is actually a list
-#             return qs
-#         return query
-#
-# class SearchBy(ListView):
-#     template_name = 'search_view.html'
-#     count = 0
-#
-#
-#     def get_context_data(self, *args, **kwargs):
-#         context = super().get_context_data(*args, **kwargs)
-#         context['count'] = self.count or 0
-#         context['query'] = self.request.GET.get('q')
-#         return context
-#
-#     def get_queryset(self):
-#         request = self.request
-#         query = request.GET.get('q', None)
-#         model= request.GET.get('model', None)
-#
-#         if query is not None:
-#             # if request.method=="GET":
-#             #     results=[]
-#             #     if model=="Books":
-#             #         results= Book.objects.search(query)
-#             #     elif model=="Clubs":
-#             #         results= Clubs.objects.search(query)
-#             #     elif model=="Users":
-#             #         results= Users.objects.search(query)
-#             if query is not None:
-#                 book_results= Book.objects.search(query)
-#                 club_results= Club.objects.search(query)
-#                 user_results= User.objects.search(query)
-#
-#             qs=[]
-#             if model=="Books":
-#                 qs = sorted(book_results,
-#                             key=lambda instance: instance.pk,
-#                             reverse=True)
-#             elif model=="Clubs":
-#                 qs = sorted(club_results,
-#                             key=lambda instance: instance.pk,
-#                             reverse=True)
-#             elif model=="Users":
-#                 qs = sorted(user_results,
-#                             key=lambda instance: instance.pk,
-#                             reverse=True)
-#             self.count = len(qs) # since qs is actually a list
-#             return qs
-#         return query
+class SearchView(ListView):
+    template_name = 'search_view.html'
+    count = 0
+
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['count'] = self.count or 0
+        context['form'] = SearchForm(initial={
+            'search' : self.request.GET.get('search',''),
+            'filter_field' : self.request.GET.get('filter_field', ''),
+        })
+        return context
+
+    def get_queryset(self):
+        request = self.request
+        query = request.GET.get('search')
+        filter_field = self.request.GET.get('filter_field')
+
+        if query is not None:
+            queryset = []
+            book_results= Book.objects.search(query)
+            club_results= Club.objects.search(query)
+            user_results= User.objects.search(query)
+            if filter_field == 'books':
+                queryset = book_results
+            elif filter_field == 'clubs':
+                queryset =  club_results
+            elif filter_field == 'users':
+                queryset = user_results
+            elif filter_field == 'all':
+                queryset = chain(
+                    book_results,
+                    club_results,
+                    user_results
+                    )
+            qs_sorted = sorted(queryset,
+                        key=lambda instance: instance.pk,
+                        reverse=True)
+            self.count = len(qs_sorted) # since qs is actually a list
+            return qs_sorted
+        return query
