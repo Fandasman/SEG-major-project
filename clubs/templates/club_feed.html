@@ -36,8 +36,9 @@
               <div class="col-md-6">
                 <div class="card-body">
                   <h5 class="card-title">{{instance.event.name}}</h5>
-                  <p class="card-text">{{instance.event.book.title}}</p>
-                  <p class="card-text"><small class="text-muted">{{instance.event.deadline}}</small></p>
+                  <p class="card-text">{{instance.user.username}} has schedualed {{instance.event.name}}</p>
+                  <p class="card-text">Book: {{instance.event.book.title}}</p>
+                  <p class="card-text"><small class="text-muted">Apply before: {{instance.event.deadline}}</small></p>
                 </div>
               </div>
             </div>
@@ -57,7 +58,9 @@
               <img src="{{ instance.author.mini_gravatar }}" alt="Gravatar of {{ instance.user.username }}" class="rounded-circle profile-image" > {{ post.author.username }}
              {{ instance.author.username }}  ·  {{ instance.created_at }} <hr>
 
-             {{ instance.text }}           </div>
+             {{ instance.text }}<br>
+             <a class="bi bi-hand-thumbs-up" href="{% url 'like_post' instance.club.id instance.id %}">Like</a>  <p style="font-size:12px">{{instance.number_of_likes}} Likes</p>
+             </div>
         </div>
           {%endif%}
       {% endfor %}

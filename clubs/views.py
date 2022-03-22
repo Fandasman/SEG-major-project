@@ -693,7 +693,7 @@ def club_feed(request,club_id):
         else:
             event_posts = EventPost.objects.filter(event__club=club)
             membership_posts = MembershipPost.objects.filter(club=club)
-            user_posts = UserPost.objects.all()
+            user_posts = UserPost.objects.filter(club=club)
             posts = sorted(chain(event_posts,membership_posts, user_posts),key=lambda instance: instance.created_at,reverse=True)
             return render(request, 'club_feed.html', {'members': members,
                                                        'userrole': userrole,
@@ -748,7 +748,7 @@ class NewPostView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         """Process a valid form."""
         form.instance.author = self.request.user
-        form.instance.club = self.kwargs['club_id']
+        form.instance.club = Club.objects.get(id=(self.kwargs['club_id']))
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -758,11 +758,11 @@ class NewPostView(LoginRequiredMixin, CreateView):
     def handle_no_permission(self):
         return redirect('log_in')
 
-# def userPostLike(request, club_id, post_id):
-#     post = get_object_or_404(UserPost, id=request.POST.get('post_id'))
-#     if post.likes.filter(id=request.user.id).exists():
-#         post.likes.remove(request.user)
-#     else:
-#         post.likes.add(request.user)
-#
-#     return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':self.kwargs['club_id']}))
+def like_post(request, club_id, post_id):
+    post = UserPost.objects.get(id=post_id)
+    if post.likes.filter(id=request.user.id).exists():
+        post.likes.remove(request.user)
+    else:
+        post.likes.add(request.user)
+
+    return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))

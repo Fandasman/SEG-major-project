@@ -216,7 +216,10 @@ class MembershipPost(models.Model):
 class UserPost(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.CharField(max_length=280)
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    likes= models.ManyToManyField(User, related_name="post_likes", blank=True)
+
 
     def number_of_likes(self):
         return self.likes.count()
@@ -226,8 +229,36 @@ class UserPost(models.Model):
 
         ordering = ['-created_at']
 
+
+
+
+class Preference(models.Model):
+    user= models.ForeignKey(User, on_delete=models.CASCADE)
+    post= models.ForeignKey(UserPost, on_delete=models.CASCADE)
+    value= models.IntegerField()
+    date= models.DateTimeField(auto_now= True)
+
+
     def __str__(self):
-        return self.text
+        return str(self.user) + ':' + str(self.post) +':' + str(self.value)
+
+    class Meta:
+       unique_together = ("user", "post", "value")
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(UserPost,
+                             on_delete=models.CASCADE,
+                             related_name='comments')
+    body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('created',)
+
+    def __str__(self):
+        return 'Comment by {} on {}'.format(self.name, self.post)
 
 
 # class LikedPost(models.Model):
