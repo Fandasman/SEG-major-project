@@ -12,11 +12,7 @@ from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from itertools import chain
-<<<<<<< HEAD
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, RadioForm
-=======
 from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SearchForm
->>>>>>> fix-search
 from .models import Book, Club, Role, User
 
 import csv

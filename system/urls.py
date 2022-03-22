@@ -27,7 +27,6 @@ urlpatterns = [
     path('club/<int:club_id>', views.ShowClubView.as_view(), name='show_club'),
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
     path('feed/', views.feed, name='feed'),
-    path('my_view/', views.my_view, name='my_view'),
     path('profile/', views.profile, name='profile'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('login/', views.LogInView.as_view(), name='login'),
