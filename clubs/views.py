@@ -250,10 +250,10 @@ class SignUpView(FormView):
 @login_required
 def select_genres(request):
     genres = Book.objects.values_list('genre',flat=True).distinct
-    #form = GenreForm
+    form = GenreForm
 
         
-    return render(request, "select_genres.html", {'genres': genres})
+    return render(request, "select_genres.html", {'genres': genres, 'form': form})
 
 
 """This function standardize the requirements for

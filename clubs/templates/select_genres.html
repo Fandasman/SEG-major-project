@@ -2,12 +2,22 @@
 {% block title %}
 | Select genres
 {% endblock %}
+<script></script>
 {% block content %}
 <div class="container">
     <div class="row">
         <div class="col-12">
             <h1>Select genres</h1>
-            <p>Select a few genres that you're interested in!</p>
+            <p>Select up to <b>5</b> genres that you're interested in!</p>
+            <br>
+            {% if current_user.genres != None %}
+                <p>Your current preferences are </p>
+                <p><b>{{current_user.genres}}</b></p>
+
+            {% else %}
+                <p>You currently have no preferences. Try adding some!</p>
+                <p>The more information you share, the more accurate our recomendations will be ;)</p>
+            {% endif %}
             <table class="table table-striped table-hover">
                 <thead>
                     <th scope="col">Genre</th>
@@ -19,13 +29,11 @@
                         {{genre}}
                     </td>
                     <td>
-                        <input type="checkbox" id="genreCheck">
+                        <button class="btn btn-primary">Add to preferences</button>
                     </td>
                 </tr>
                 {% endfor %}
             </table>
-
-            <button class="btn btn-primary">Save</button>
         </div>
     </div>
 </div>
