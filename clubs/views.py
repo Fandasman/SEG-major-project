@@ -170,34 +170,6 @@ class ShowClubView(DetailView):
     template_name = 'show_club.html'
     pk_url_kwarg = "club_id"
 
-
-# class LoginProhibitedMixin:
-
-#          """Mixin that redirects when a user is logged in."""
-
-#          redirect_when_logged_in_url = None
-
-#          def dispatch(self, *args, **kwargs):
-#             """Redirect when logged in, or dispatch as normal otherwise."""
-#             if self.request.user.is_authenticated:
-#                 return self.handle_already_logged_in(*args, **kwargs)
-#             return super().dispatch(*args, **kwargs)
-
-#          def handle_already_logged_in(self, *args, **kwargs):
-#              url = self.get_redirect_when_logged_in_url()
-#              return redirect('feed')
-
-#          def get_redirect_when_logged_in_url(self):
-#              """Returns the url to redirect to when not logged in."""
-#              if self.redirect_when_logged_in_url is None:
-#                 raise ImproperlyConfigured(
-#                  "LoginProhibitedMixin requires either a value for "
-#                  "'redirect_when_logged_in_url', or an implementation for "
-#                  "'get_redirect_when_logged_in_url()'."
-#                  )
-#              else:
-#                  return self.redirect_when_logged_in_url
-
 class LogInView(View):
     """Log-in handling view"""
     def get(self,request):
@@ -252,9 +224,7 @@ def select_genres(request):
     genres = Book.objects.values_list('genre',flat=True).distinct
     form = GenreForm
 
-        
     return render(request, "select_genres.html", {'genres': genres, 'form': form})
-
 
 """This function standardize the requirements for
     creating clubs, if club is successfully created,
@@ -562,6 +532,9 @@ def apply(request, club_id):
     else:
         return HttpResponseForbidden()
 
+
+"""These functions are for adding/removing
+    books from a user's wishlist."""
 def wish(request, book_id):
     user = request.user
     try:
@@ -583,7 +556,6 @@ def unwish(request, book_id):
     
     except ObjectDoesNotExist:
         return redirect('search_books')
-
 
 """This function is for club owner/officer to set the book for
     club to read"""

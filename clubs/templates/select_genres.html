@@ -9,32 +9,16 @@
         <div class="col-12">
             <h1>Select genres</h1>
             <p>Select up to <b>5</b> genres that you're interested in!</p>
-            <br>
-            {% if current_user.genres != None %}
-                <p>Your current preferences are </p>
-                <p><b>{{current_user.genres}}</b></p>
+            <p>The more information you share, the more accurate our recomendations will be ;)</p>
 
-            {% else %}
-                <p>You currently have no preferences. Try adding some!</p>
-                <p>The more information you share, the more accurate our recomendations will be ;)</p>
-            {% endif %}
-            <table class="table table-striped table-hover">
-                <thead>
-                    <th scope="col">Genre</th>
-                    <th scope="col">Like this genre?</th>
-                </thead>
-                {% for genre in genres %}
-                <tr>
-                    <td>
-                        {{genre}}
-                    </td>
-                    <td>
-                        <button class="btn btn-primary">Add to preferences</button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
+            <form action="{% url 'select_genres' %}" method="post">
+                {% csrf_token %}
+                
+                {{ form.as_table }}
+                <input type='submit' value="Save" class="btn btn-primary">
+              </form>
         </div>
     </div>
 </div>
+
 {% endblock %}
