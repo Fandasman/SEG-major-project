@@ -60,7 +60,7 @@ urlpatterns = [
     path('accept_invitation/<int:inv_id>', views.accept_invitation, name='accept_invitation'),
     path('reject_invitation/<int:inv_id>', views.reject_invitation, name='reject_invitation'),
     path('club/<int:club_id>/chat/', views.club_chat, name='club_chat'),
-    path('send/', views.send, name='send'),
-    path('get_messages/<int:club_id>/', views.get_messages, name='get_messages')
+    path('send_club_message/', views.send_club_message, name='send_club_message'),
+    path('get_club_messages/<int:club_id>/', views.get_club_messages, name='get_club_messages')
 
 ]

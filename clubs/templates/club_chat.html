@@ -43,15 +43,39 @@ chat
             background: dimgray;
         }
 
+        .openChat {
+          display: none;
+          position: fixed;
+          bottom: 80px;
+          right: 15px;
+          border: 3px solid mediumpurple;
+          z-index: 9;
+       }
+
+        .openChatBtn {
+          background-color: rgb(123, 28, 179);
+          color: white;
+          padding: 16px 20px;
+          border: none;
+          font-weight: 500;
+          font-size: 18px;
+          cursor: pointer;
+          opacity: 0.8;
+          position: fixed;
+          bottom: 23px;
+          right: 28px;
+          width: 280px;
+       }
+
         </style>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
+<!--
     <h4 >chat box</h4>
     <div id="chatbox" class="chatbox">
 
     </div>
-
+-->
     <script>
         $(document).ready(function(){
 
@@ -61,7 +85,7 @@ chat
         setInterval(function(){
             $.ajax({
                 type: 'GET',
-                url : "/get_messages/{{ club.id }}/",
+                url : "/get_club_messages/{{ club.id }}/",
                 success: function(response){
                     console.log(response);
                     $("#chatbox").empty();
@@ -91,24 +115,24 @@ chat
         $("#chatbox").on('scroll', function(){scrolled=true;})
         })
         </script>
-
+<!--
     <div>
         <form id="chat" class="chat-input">
-            {% csrf_token %}
+             {% csrf_token %}
             <input type="hidden" name="user_id" id="user_id" value="{{user.id}}"/>
             <input type="hidden" name="club_id" id="club_id" value="{{club.id}}"/>
             <input type="text" name="text" id="text" class="input"/>
             <input type="submit" value="Send">
         </form>
     </div>
-
+-->
     <script type="text/javascript">
         $(document).ready(function() {
             $('#chat').on('submit', function (e) {
                 e.preventDefault();
                 $.ajax({
                     method: 'POST',
-                    url: '/send/',
+                    url: '/send_club_message/',
                     data: {
                         user_id: $('#user_id').val(),
                         club_id: $('#club_id').val(),
@@ -123,6 +147,33 @@ chat
 
         });
     </script>
+
+    <button class="openChatBtn" onclick="openBox()">Group Chat</button>
+    <div class="openChat">
+    <h4 >Club Chat</h4>
+    <div id="chatbox" class="chatbox">
+
+    </div>
+     <form id="chat" class="chat-input">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" id="user_id" value="{{user.id}}"/>
+            <input type="hidden" name="club_id" id="club_id" value="{{club.id}}"/>
+            <input type="text" name="text" id="text" class="input"/>
+            <input type="submit" value="Send">
+        </form>
+    <button type="button" class="openChatBtn" onclick="closeBox()">close</button>
+    </div>
+    <script>
+        document.querySelector(".openChatBtn").addEventListener("click", openBox);
+        document.querySelector("").addEventListener("click", closeBox);
+        function openBox(){
+            document.querySelector(".openChat").style.display = "block";
+        }
+        function closeBox(){
+            document.querySelector(".openChat").style.display = "none";
+        }
+    </script>
+
 
 {% endblock %}
 
