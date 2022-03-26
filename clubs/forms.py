@@ -196,15 +196,15 @@ class InviteForm(forms.Form):
     
 class GenreForm(forms.ModelForm):
 
-    genre_preferences = forms.MultipleChoiceField(
-        choices=GENRE_CHOICES, 
-        widget=forms.CheckboxInput()
-    )
-
     class Meta:
         model = User
         fields = ["genres_preferences"]
+        genres_preferences = forms.MultipleChoiceField(
+            choices=GENRE_CHOICES, 
+            widget=forms.CheckboxInput()
+        )
 
-
-  
-
+    def save(self):
+        super().save(commit=False)
+        genres_preferences = self.cleaned_data.get('genres_preferences')
+        return genres_preferences
