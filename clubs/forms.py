@@ -201,8 +201,11 @@ class GenreForm(forms.ModelForm):
         fields = ["genres_preferences"]
         genres_preferences = forms.MultipleChoiceField(
             choices=GENRE_CHOICES, 
-            widget=forms.CheckboxInput()
+            widget=forms.CheckboxInput(),
         )
+        error_messages={'genres_preferences': 
+            {'max_choices': 'Try selecting just a few of your favourites. Keep it nice and simple!'}
+        }
 
     def save(self):
         super().save(commit=False)

@@ -223,19 +223,20 @@ class SignUpView(FormView):
 def select_genres(request):
 
     genres = Book.objects.values_list('genre',flat=True).distinct
+    current_user = request.user
 
     if request.method=='POST':
             form = GenreForm(request.POST)
             if form.is_valid():
-                current_user = request.user
-                current_user.genres_preferences = form.save()
-                current_user.save()
-                messages.add_message(request, messages.SUCCESS, "Preferences updated!")
-                return redirect('feed')
+                    current_user.genres_preferences = form.save()
+                    current_user.save()
+                    messages.add_message(request, messages.SUCCESS, "Preferences updated!")
+                    return redirect('feed')
+            else:
+                messages.add_message(request, messages.ERROR, "You must select a maximum of 5 choices!")
     else:
-        current_user = request.user
         form = GenreForm(instance = current_user)
-    return render(request, "select_genres.html", {'genres': genres, 'form': form, 'user': current_user})
+    return render(request, "select_genres.html", {'genres': genres, 'form': form})
 
 
 """This function standardize the requirements for

@@ -98,7 +98,11 @@ class User(AbstractUser):
     email = models.EmailField(unique = True, blank = False)
     bio = models.CharField(max_length = 500, blank = True)
     wishlist = models.ManyToManyField(Book, related_name="wishlist", blank=True)
-    genres_preferences = MultiSelectField(choices=GENRE_CHOICES, max_choices=5, blank=True)
+    genres_preferences = MultiSelectField(
+        choices=GENRE_CHOICES,
+        max_choices=5,
+        blank=True,
+    )
 
     
 
