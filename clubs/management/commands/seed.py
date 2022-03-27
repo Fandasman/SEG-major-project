@@ -1,3 +1,4 @@
+import random
 import pandas as pd
 from tqdm import tqdm
 from django.core.management.base import BaseCommand, CommandError
@@ -24,18 +25,18 @@ class Command(BaseCommand):
 
         print("Starting seed...")
 
-        Command.generate_users(self, main_dataset)
+        # Command.generate_users(self, main_dataset)
 
-        Command.get_ratings(self, main_dataset)
+        # Command.get_ratings(self, main_dataset)
+
+        # Command.get_books(self, books_dataset)
 
         Command.generate_clubs(self)
-
-        Command.get_books(self, books_dataset)
 
         print("Seeding complete!")
 
 
-    # Generate fake users.
+    # Generate fake users
     def generate_users(self, main_dataset):
         print("Generating club owner profile...")
         num_user_ids = len(set(main_dataset['User-ID'].tolist()))
@@ -86,29 +87,6 @@ class Command(BaseCommand):
         print("Done!")
 
 
-    # Generate 10 fake clubs and set charlie as their owner.
-    def generate_clubs(self):
-        print("Generating 10 fake book clubs...")
-        for i in range(0, 10):
-            fakeName = self.faker.company()
-            fakeLocation = self.faker.address()
-            fakeDescription = self.faker.text(max_nb_chars = 500)
-
-            club = Club.objects.create(
-                name = fakeName,
-                location = fakeLocation,
-                description = fakeDescription
-            )
-
-            Role.objects.create(
-                user = User.objects.get(username = "charlie"),
-                club = club,
-                role = 'O'
-            )
-
-        print("Done!")
-
-
     # Read books from the dataset
     def get_books(self, books_dataset):
         print("Reading books from the dataset...")
@@ -125,5 +103,54 @@ class Command(BaseCommand):
                 imgURLMedium = row['Image-URL-M'],
                 imgURLLarge = row['Image-URL-L']
             )
+
+        print("Done!")
+
+
+    # Generate fake clubs and set charlie as their owner
+    def generate_clubs(self):
+        print("Generating fake book clubs...")
+        for i in tqdm(range(10)):
+            fakeName = self.faker.company()
+            fakeLocation = self.faker.address()
+            fakeDescription = self.faker.text(max_nb_chars = 500)
+            club_book = Book.objects.get(id=random.randint(1, len(Book.objects.all())))
+
+            club = Club.objects.create(
+                name = fakeName,
+                location = fakeLocation,
+                description = fakeDescription,
+                club_book = club_book
+            )
+
+            Role.objects.create(
+                user = User.objects.get(username = "charlie"),
+                club = club,
+                role = 'CO'
+            )
+
+            for i in range(random.randint(2, 3)):
+                user = User.objects.get(id=random.randint(2, len(User.objects.all())))
+                club_roles = Role.objects.filter(club = club)
+                club_user_ids = [i['user_id'] for i in club_roles.values('user_id')]
+
+                if user.id not in club_user_ids:
+                    Role.objects.create(
+                        user = user,
+                        club = club,
+                        role = 'O'
+                    )
+
+            for i in range(random.randint(5, 10)):
+                user = User.objects.get(id=random.randint(2, len(User.objects.all())))
+                club_roles = Role.objects.filter(club = club)
+                club_user_ids = [i['user_id'] for i in club_roles.values('user_id')]
+
+                if user.id not in club_user_ids:
+                    Role.objects.create(
+                        user = user,
+                        club = club,
+                        role = 'M'
+                    )
 
         print("Done!")

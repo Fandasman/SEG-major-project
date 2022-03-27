@@ -7,9 +7,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         print("Starting unseed...")
 
-        Command.delete_books(self)
-
-        Command.delete_users(self)
+        # Command.delete_books(self)
+        #
+        # Command.delete_users(self)
 
         Command.delete_clubs(self)
 

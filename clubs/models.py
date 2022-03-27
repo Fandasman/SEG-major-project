@@ -101,13 +101,12 @@ class Role(models.Model):
     def get_club_name(self):
         return self.club.name
 
-
     def __str__(self):
-        return self.user.full_name + " is " + self.role
+        return self.user.full_name() + " is " + self.role
 
 
 # Create the Invitation model
-STATUS={
+STATUS = {
     ('P', 'Pending'),
     ('A', 'Accept'),
     ('R', 'Reject'),
