@@ -66,7 +66,7 @@ class Club(models.Model):
     name = models.CharField(
         max_length = 50,
         unique = True,
-        validators=[
+        validators = [
             RegexValidator(
                 regex = r'^.{3,}$',
                 message = 'The name of the club must contain at least three characters!'
@@ -82,7 +82,7 @@ class Club(models.Model):
 
 
 # Create the user's Roles model
-ROLES= (
+ROLES = (
     ('A', 'Applicant'),
     ('M', 'Member'),
     ('O', 'Officer'),
@@ -90,9 +90,9 @@ ROLES= (
 )
 
 class Role(models.Model):
-    user= models.ForeignKey(User, on_delete=models.CASCADE)
-    club= models.ForeignKey(Club, on_delete=models.CASCADE)
-    role= models.CharField(
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    role = models.CharField(
         max_length=2,
         choices=ROLES,
         default='A'

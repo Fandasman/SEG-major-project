@@ -1,3 +1,4 @@
+import sys
 from django import template
 from django.conf import settings
 from django.contrib import messages
@@ -22,8 +23,9 @@ from collections import Counter
 from surprise import dump
 
 
-print("Loading the model!")
-_, model = dump.load('./model.pkl')
+if "runserver" in sys.argv:
+    print("Loading the model!")
+    _, model = dump.load('./model.pkl')
 
 
 # Create your views here.
