@@ -21,6 +21,7 @@ from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBook
 from .models import Book, Club, Role, User, Invitation, BooksRatings
 from collections import Counter
 from surprise import dump
+from scipy import spatial
 
 
 if "runserver" in sys.argv:
@@ -106,7 +107,7 @@ def profile(request):
 def search_books(request):
     search_book = request.GET.get('book_searchbar')
     if search_book:
-        books= Book.objects.filter(name__icontains=search_book)
+        books = Book.objects.filter(name__icontains=search_book)
     else:
         books = Book.objects.all()
     return render(request, 'search_books.html', {'books': books})
@@ -147,9 +148,9 @@ class HomeView(LoginProhibitedMixin,View):
 
 # class MemberListView(LoginRequiredMixin, ListView):
 class MemberListView(ListView):
-    model= User
-    template_name= 'member_list.html'
-    context_object_name= 'users'
+    model = User
+    template_name = 'member_list.html'
+    context_object_name = 'users'
 
     # def get_context_data(self, *args, **kwargs):
     #     context= super().get_context_data(*args, **kwargs)
@@ -159,38 +160,71 @@ class MemberListView(ListView):
 
 # class ClubListView(LoginRequiredMixin, ListView):
 class ClubListView(ListView):
-    model= Club
-    template_name= 'club_list.html'
-    context_object_name= 'clubs'
+    model = Club
+    template_name = 'club_list.html'
+    context_object_name = 'clubs'
+
+    def get_club_recommendations(self):
+        club_similarities = {}
+
+        current_user = self.request.user
+        user_isbns = [i['isbn'] for i in current_user.users.values('isbn')]
+        user_genres = [Book.objects.get(isbn = i).genre for i in user_isbns]
+        user_genres_counter = Counter(user_genres)
+
+        for club in Club.objects.all():
+            distance_sum = 0
+            members = Role.objects.filter(club = club).filter(role = 'M')
+            for member in members.values():
+                current_member = User.objects.get(id=member['user_id'])
+                member_isbns = [i['isbn'] for i in current_member.users.values('isbn')]
+                member_genres = [Book.objects.get(isbn = i).genre for i in member_isbns]
+                member_genres_counter = Counter(member_genres)
+                all_genres  = list(user_genres_counter.keys() | member_genres_counter.keys())
+                user_vect = [user_genres_counter.get(word, 0) for word in all_genres]
+                member_vect = [member_genres_counter.get(word, 0) for word in all_genres]
+                distance_sum += 1 - spatial.distance.cosine(user_vect, member_vect)
+            club_similarities[club] = distance_sum / len(members)
+
+        sorted_clubs = list(club_similarities.items())
+        sorted_clubs.sort(key=lambda k: k[1], reverse=True)
+
+        return [i[0] for i in sorted_clubs]
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        recommended_clubs = self.get_club_recommendations()
+        qs = recommended_clubs
+        return qs
 
     def get_context_data(self, *args, **kwargs):
-        context= super().get_context_data(*args, **kwargs)
-        club= Club.objects.all()
-        context['roles']= Role.objects.all().filter(role= "O")
+        context = super().get_context_data(*args, **kwargs)
+        club = Club.objects.all()
+        context['roles'] = Role.objects.all().filter(role= "O")
         return context
 
 # class OwnerClubListView(LoginRequiredMixin, ListView):
 class OwnerClubListView(ListView):
-    model= Club
-    template_name= 'owner_club_list.html'
-    context_object_name= 'user'
+    model = Club
+    template_name = 'owner_club_list.html'
+    context_object_name = 'user'
 
     def get_context_data(self, *args, **kwargs):
-        context= super().get_context_data(*args, **kwargs)
-        current_user= self.request.user
-        context['roles']= Role.objects.all().filter(user= current_user, role= "O")
+        context = super().get_context_data(*args, **kwargs)
+        current_user = self.request.user
+        context['roles'] = Role.objects.all().filter(user= current_user, role= "O")
         return context
 
 # class MemberClubListView(LoginRequiredMixin, ListView):
 class MemberClubListView(ListView):
-    model= Club
-    template_name= 'member_club_list.html'
-    context_object_name= 'user'
+    model = Club
+    template_name = 'member_club_list.html'
+    context_object_name = 'user'
 
     def get_context_data(self, *args, **kwargs):
-        context= super().get_context_data(*args, **kwargs)
-        current_user= self.request.user
-        context['roles']= Role.objects.all().filter(user= current_user, role= "M")
+        context = super().get_context_data(*args, **kwargs)
+        current_user = self.request.user
+        context['roles'] = Role.objects.all().filter(user= current_user, role= "M")
         return context
 
 
