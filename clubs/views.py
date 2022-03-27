@@ -22,6 +22,7 @@ from collections import Counter
 from surprise import dump
 
 
+print("Loading the model!")
 _, model = dump.load('./model.pkl')
 
 
@@ -54,11 +55,11 @@ def feed(request):
 
     filtered_user_isbns = Book.objects.exclude(isbn__in = user_isbns)
 
-    # filtered_user_genres = filtered_user_isbns.filter(genre__in = user_genres)
+    filtered_user_genres = filtered_user_isbns.filter(genre__in = user_genres)
 
     recommended_books = {}
 
-    for book in filtered_user_isbns:
+    for book in filtered_user_genres:
         predicted_rating = model.predict(uid=current_user.id, iid=book.isbn).est
         recommended_books[book.isbn] = predicted_rating
 
