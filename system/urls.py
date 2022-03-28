@@ -18,11 +18,13 @@ from os import name
 from django.contrib import admin
 from django.urls import path
 from clubs import views
+from django.conf.urls import url
 
 urlpatterns = [
     path('all_members/<int:club_id>', views.member_list, name = "member_list"),
     path('club_feed/<int:club_id>/', views.club_feed, name = "club_feed"),
     path('club_event_creation/<int:club_id>', views.create_event,name = "create_event"),
+    path('add_comment/<int:club_id>/<int:post_id>', views.add_comment_to_post,name = "add_comment"),
     path('club_events_list/<int:club_id>',views.event_list,name = "events_list"),
     path('admin/', admin.site.urls),
     path('', views.HomeView.as_view(), name = 'home'),

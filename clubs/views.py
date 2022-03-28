@@ -1,7 +1,7 @@
 from django import template
 from django.conf import settings
 from django.contrib import messages
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from itertools import chain
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -18,10 +18,14 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm, UserPostForm
-from .models import Book, Club, Role, User, Invitation, Event, EventPost, UserPost, MembershipPost
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm, UserPostForm, CommentForm
+from .models import Book, Club, Role, User, Invitation, Event, EventPost, UserPost, MembershipPost, Comment
 
-
+from datetime import datetime
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.views import generic
+from django.utils.safestring import mark_safe
 # Create your views here.
 
 def feed(request):
@@ -678,7 +682,9 @@ class InvitationlistView(LoginRequiredMixin, ListView):
             return redirect('feed')
 
 def club_feed(request,club_id):
+    user=request.user
     form = UserPostForm()
+    comment_form = CommentForm
     club = Club.objects.get(id=club_id)
     members = Role.objects.filter(club=club)
     try:
@@ -692,6 +698,7 @@ def club_feed(request,club_id):
             return redirect('club_list')
         else:
             event_posts = EventPost.objects.filter(event__club=club)
+            comments = Comment.objects.filter(club=club)
             membership_posts = MembershipPost.objects.filter(club=club)
             user_posts = UserPost.objects.filter(club=club)
             posts = sorted(chain(event_posts,membership_posts, user_posts),key=lambda instance: instance.created_at,reverse=True)
@@ -699,7 +706,10 @@ def club_feed(request,club_id):
                                                        'userrole': userrole,
                                                        'posts':posts,
                                                        'club' : club,
-                                                       'form' : form})
+                                                       'form' : form,
+                                                       'comment_form' : comment_form,
+                                                       'comments' : comments,
+                                                       'user':user})
 
 
 
@@ -753,6 +763,7 @@ class NewPostView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         """Return URL to redirect the user too after valid form handling."""
+
         return reverse('club_feed',kwargs={'club_id':self.kwargs['club_id']})
 
     def handle_no_permission(self):
@@ -763,6 +774,18 @@ def like_post(request, club_id, post_id):
     if post.likes.filter(id=request.user.id).exists():
         post.likes.remove(request.user)
     else:
+
         post.likes.add(request.user)
 
+    return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
+
+
+def add_comment_to_post(request, club_id, post_id):
+    post = UserPost.objects.get(id=post_id)
+    club = Club.objects.get(id=club_id)
+    if request.method == "POST":
+        comment = Comment.objects.create(club=club,post=post,user=request.user)
+        form = CommentForm(request.POST, instance = comment)
+        if form.is_valid():
+            comment = form.save()
     return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))

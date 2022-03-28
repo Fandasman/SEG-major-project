@@ -224,6 +224,12 @@ class UserPost(models.Model):
     def number_of_likes(self):
         return self.likes.count()
 
+    def has_liked(self,user):
+        if self.likes.filter(id=user.id).exists():
+            return True
+        else:
+            return False
+
     class Meta:
         """Model options."""
 
@@ -235,7 +241,7 @@ class UserPost(models.Model):
 class Preference(models.Model):
     user= models.ForeignKey(User, on_delete=models.CASCADE)
     post= models.ForeignKey(UserPost, on_delete=models.CASCADE)
-    value= models.IntegerField()
+    value= models.BooleanField(default=False)
     date= models.DateTimeField(auto_now= True)
 
 
@@ -251,14 +257,16 @@ class Comment(models.Model):
                              on_delete=models.CASCADE,
                              related_name='comments')
     body = models.TextField()
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+    user= models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+
 
     class Meta:
-        ordering = ('created',)
+        ordering = ('created_at',)
 
     def __str__(self):
-        return 'Comment by {} on {}'.format(self.name, self.post)
+        return 'Comment by {} on {}'.format(self.user.username, self.post)
 
 
 # class LikedPost(models.Model):

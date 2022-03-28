@@ -4,7 +4,7 @@ from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
 
-from .models import Club, User, Book, Event, UserPost
+from .models import Club, User, Book, Event, UserPost, Comment
 
 
 class SignUpForm(forms.ModelForm):
@@ -182,6 +182,20 @@ class UserPostForm(forms.ModelForm):
 
         model = UserPost
         fields = ['text']
+        labels = {
+            'text': ('Add post'),
+        }
         widgets = {
             'Post': forms.Textarea(attrs={'rows':10, 'cols':10})
+        }
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['body']
+        labels = {
+            'body': ('Add comment'),
+        }
+        widgets = {
+            'Comment': forms.Textarea(attrs={'rows':1, 'cols':1, 'style':'resize:none;'})
         }
