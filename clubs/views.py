@@ -52,13 +52,13 @@ def feed(request):
 
     """Generate a query for the recommended books"""
 
-    user_isbns = [i['isbn'] for i in current_user.users.values('isbn')]
+    user_books = Book.objects.filter(isbn__in = current_user.users.values('isbn'))
 
-    user_genres = [Book.objects.get(isbn = i).genre for i in user_isbns]
+    user_genres = user_books.values_list('genre', flat=True)
 
-    filtered_user_isbns = Book.objects.exclude(isbn__in = user_isbns)
+    filtered_user_books = Book.objects.exclude(isbn__in = user_books)
 
-    filtered_user_genres = filtered_user_isbns.filter(genre__in = user_genres)
+    filtered_user_genres = filtered_user_books.filter(genre__in = user_genres)
 
     recommended_books = {}
 
@@ -168,17 +168,18 @@ class ClubListView(ListView):
         club_similarities = {}
 
         current_user = self.request.user
-        user_isbns = [i['isbn'] for i in current_user.users.values('isbn')]
-        user_genres = [Book.objects.get(isbn = i).genre for i in user_isbns]
+        user_books = Book.objects.filter(isbn__in = current_user.users.values('isbn'))
+        user_genres = user_books.values_list('genre', flat=True)
         user_genres_counter = Counter(user_genres)
 
-        for club in Club.objects.all():
+        filtered_clubs = Club.objects.filter(club_book__genre__in = user_genres)
+        for club in filtered_clubs:
             distance_sum = 0
             members = Role.objects.filter(club = club).filter(role = 'M')
             for member in members.values():
                 current_member = User.objects.get(id=member['user_id'])
-                member_isbns = [i['isbn'] for i in current_member.users.values('isbn')]
-                member_genres = [Book.objects.get(isbn = i).genre for i in member_isbns]
+                member_books = Book.objects.filter(isbn__in = current_member.users.values('isbn'))
+                member_genres = member_books.values_list('genre', flat=True)
                 member_genres_counter = Counter(member_genres)
                 all_genres  = list(user_genres_counter.keys() | member_genres_counter.keys())
                 user_vect = [user_genres_counter.get(word, 0) for word in all_genres]
@@ -192,10 +193,9 @@ class ClubListView(ListView):
         return [i[0] for i in sorted_clubs]
 
     def get_queryset(self, *args, **kwargs):
-        qs = super().get_queryset(*args, **kwargs)
-        recommended_clubs = self.get_club_recommendations()
-        qs = recommended_clubs
-        return qs
+        queryset = super().get_queryset(*args, **kwargs)
+        queryset = self.get_club_recommendations()
+        return queryset
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
