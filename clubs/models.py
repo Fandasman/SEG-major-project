@@ -4,6 +4,7 @@ from django.core.validators import RegexValidator, MaxValueValidator, MinValueVa
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
 from datetime import date
+from datetime import timedelta
 
 
 
@@ -106,10 +107,12 @@ class Club(models.Model):
        return Role.objects.filter(club = self).filter(role = 'O' ).count() + 1
 
     def get_upcoming_events(self):
-        return Event.objects.filter(deadline__gt = date.today())
+        return Event.objects.filter(deadline__gte = date.today())
 
     def get_past_events(self):
-        return Event.objects.filter(club=self)
+        start_date = datetime.date(2021, 3, 13)
+        end_date = datetime.date.today() - timedelta(days = 1)
+        return Event.objects.filter(deadline__range = (start_date,end_date))
 
 # Create the user's Roles model
 ROLES= (
@@ -239,3 +242,6 @@ class Event(models.Model):
 
     def add_memeber_to_event(self,user):
         self.participants.add(user)
+
+    def check_past_event(self):
+        return date.today()
