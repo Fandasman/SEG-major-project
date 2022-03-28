@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'clubs',
     'widget_tweaks',
     'bootstrap_pagination',
+    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [

@@ -1,75 +1,88 @@
 {% extends 'base_content.html' %}
 {% block content %}
 {% load posts_extra %}
-  {% include 'partials/club_page_jumbotron.html' with members=members club=club userrole=userrole%}
+{% load humanize %}
+{% include 'partials/club_page_jumbotron.html' with members=members club=club userrole=userrole%}
 
 <style>
-
 .card {
      box-shadow: 0 0 10px 0 rgba(100, 100, 100, 0.26);
    }
-
-body{
-  background-color: #f1f2f5;
-}
-
 </style>
 
+<div class="container">
+  <div class="card my-2">
+    <div class="card-body">
 
-
-<div class="col d-flex justify-content-center">
-  <div class="card" style="width: 50rem;">
-  <div class="card-body">
-    <h5 class="card-title">Club Feed</h5>
-
-      {% for instance in posts %}
-          {% if instance|model_type == 'Event' %}
-          <div class="post">
-            <div class="row">
-              <div class="col-md-2">
-                <div style="width: 8rem;">
-                  <img src="{{ instance.book.imgURLMedium }}">
-                </div>
-                </div>
-                <div class="col-md-9">
-                <div>
-                <p> </p>
-                <div class = "row">
-                <p class="card-text" style="color:red; font-size:12px;">{{instance.deadline}}</p>
-                </div>
-                <div class="row">
-                <p class="card-text">{{instance.name}}</p>
-              </div>              </a>
-
-               <div class="row">
-                <p class="card-text">{{instance.book.title}}</p>
-              </div>
-            </div>
-            </div>
-            </div>
-            </div>
-          {% elif instance|model_type == 'UserPost' %}
-          <div class="post">
-            <div class="row">
-              <div class="col-md-2">
-                <div style="width: 8rem;">
-                  <img src="{{ instance.gravatar }}" alt="Gravatar of {{ instance.user.username }}" class="rounded-circle profile-image" >
-                </div>
-                </div>
-                <div class="col-md-9">
-                <div>
-                <p> </p>
-               <div class="row">
-                <p class="card-text">{{instance.user.username}} {{instance.description}}</p>
-              </div>
-            </div>
-            </div>
-            </div>
-            </div>
-          {% endif %}
-      {% endfor %}
+      <form action="{% url 'new_post' club.id%}" method="post">
+      {% csrf_token %}
+      {% include 'partials/bootstrap_form.html' with form=form %}
+      <input type="submit" value="Post" class="btn btn-primary">
+      </form>
+    </div>
   </div>
 
+  <div class="card my-2">
+    <div class="card-body">
+      <h2 class="card-title">Club Feed</h2>
+
+{% for instance in posts %}
+      {% if instance|model_type == 'EventPost' %}
+      <div class="card m-2">
+        <div class="row no-gutters">
+          <div class="col-md-2">
+            <img src="{{ instance.event.book.imgURLMedium}}" class="card-img" alt="Picture of {{instance.event.title}}">
+          </div>
+          <div class="col-md-6">
+            <div class="card-body">
+              <h5 class="card-title">{{instance.event.name}}</h5>
+              <p class="card-text">{{instance.user.username}} has schedualed {{instance.event.name}}</p>
+              <p class="card-text">Book: {{instance.event.book.title}}</p>
+              <p class="card-text"><small class="text-muted">Apply before: {{instance.event.deadline}}</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% elif instance|model_type == 'MembershipPost' %}
+      <div class="card m-2">
+        <div class="card-body">
+          <img src="{{ instance.user.mini_gravatar }}" alt="Gravatar of {{ instance.user.username }}" class="rounded-circle profile-image" >
+          {{instance.user.username}} {{instance.description}}
+        </div>
+      </div>
+
+      {% endif %}
+      {% if instance|model_type == 'UserPost' %}
+      <div class="card m-2">
+        <div class="card-body">
+          <img src="{{ instance.author.mini_gravatar }}" alt="Gravatar of {{ instance.user.username }}" class="rounded-circle profile-image" > {{ post.author.username }}
+         {{ instance.author.username }}  ·  {{ instance.created_at|naturaltime}}
+         <hr>
+            {{instance.text}}
+        <hr>
+        {% if instance|has_liked_filter:user%}
+        <a class="bi bi-hand-thumbs-up-fill" href="{% url 'like_post' instance.club.id instance.id %}">Unlike</a>  <p style="font-size:12px">{{instance.number_of_likes}} Likes</p>
+        {% else %}
+         <a class="bi bi-hand-thumbs-up" href="{% url 'like_post' instance.club.id instance.id %}">Like</a>  <p style="font-size:12px">{{instance.number_of_likes}} Likes</p>
+        {%endif%}
+         <form action="{% url 'add_comment' instance.club.id instance.id%}" method="post">
+           {% csrf_token %}
+           {% include 'partials/bootstrap_form.html' with form=comment_form %}
+           <input type="submit" value="Comment" class="bi bi-chat">
+           {% for comment in comments %}
+              {% if instance.id == comment.post.id %}
+              <hr>
+                   {{comment.user.username}} . {{comment.created_at|naturaltime}}<br>
+                   {{comment.body}}
+              {%endif%}
+           {%endfor%}
+         </form>
+      </div>
+      </div>
+      {%endif%}
+  {% endfor %}
+</div>
+</div>
 </div>
 
 {% endblock content %}
