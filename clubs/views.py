@@ -1,15 +1,16 @@
 from django import template
 from django.conf import settings
 from django.contrib import messages
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from itertools import chain
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.http.response import HttpResponse, HttpResponseForbidden
-from django.shortcuts import redirect, render
+from django.http.response import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
+from django.views.generic.edit import CreateView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -17,10 +18,14 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm
-from .models import Book, Club, Role, User, Invitation,Event, UserPost
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm, UserPostForm, CommentForm
+from .models import Book, Club, Role, User, Invitation, Event, EventPost, UserPost, MembershipPost, Comment
 
-
+from datetime import datetime
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.views import generic
+from django.utils.safestring import mark_safe
 # Create your views here.
 
 def feed(request):
@@ -242,6 +247,7 @@ def create_club(request):
             form = ClubForm(request.POST)
             if form.is_valid():
                 newClub = form.save()
+                MembershipPost.objects.create(club = newClub, user = current_user)
                 role = Role.objects.create(user = current_user, club = newClub, role = 'CO')
                 return redirect('club_list')
         else:
@@ -393,7 +399,7 @@ def leave_club(request, club_id):
             redirect_url = reverse('member_list', kwargs={'club_id':club_id})
             members = Role.objects.filter(club=current_club)
             userrole.delete()
-            post = UserPost.objects.create(user = user, club = current_club)
+            post = MembershipPost.objects.create(user = user, club = current_club)
             post.join = False
             post.save()
             return redirect('feed')
@@ -416,6 +422,7 @@ def accept_applicant_to_club_as_Owner(request,club_id,member_id):
             newMember = Role.objects.get(club = club, user = member)
             newMember.role = 'M'
             newMember.save()
+            MembershipPost.objects.create(user = member, club = club)
             members = Role.objects.filter(club=club)
             return redirect(redirect_url,members = members,
                                                 userrole = userrole,
@@ -439,6 +446,7 @@ def accept_applicant_to_club_as_officer(request,club_id,member_id):
             newMember = Role.objects.get(club = club, user = member)
             newMember.role = 'M'
             newMember.save()
+            MembershipPost.objects.create(user = member, club = club)
             members = Role.objects.filter(club=club)
             return redirect(redirect_url,members = members,
                                                 userrole = userrole,
@@ -636,12 +644,14 @@ def accept_invitation(request, inv_id):
         invitation = Invitation.objects.get(id=inv_id)
         club = invitation.club
         new_role = Role.objects.create(user=user, club=club, role="M")
-        post = UserPost.objects.create(user = user, club = current_club)
+        MembershipPost.objects.create(user = user, club = club)
         old_invitation = Invitation.objects.filter(id=inv_id).delete()
         messages.add_message(request, messages.INFO, "join successful")
         return redirect('invitation_list', user.id)
     else:
         return HttpResponseForbidden()
+
+
 
 
 """This function allows users to reject the invitation from the club"""
@@ -672,6 +682,9 @@ class InvitationlistView(LoginRequiredMixin, ListView):
             return redirect('feed')
 
 def club_feed(request,club_id):
+    user=request.user
+    form = UserPostForm()
+    comment_form = CommentForm
     club = Club.objects.get(id=club_id)
     members = Role.objects.filter(club=club)
     try:
@@ -684,13 +697,21 @@ def club_feed(request,club_id):
             messages.add_message(request,messages.ERROR,"You are the applicant in this club, so you don't have authority to view the member list!")
             return redirect('club_list')
         else:
-            events = Event.objects.filter(club=club)
-            userposts = UserPost.objects.filter(club=club)
-            posts = sorted(chain(events,userposts),key=lambda instance: instance.created_at,reverse=True)
+            event_posts = EventPost.objects.filter(event__club=club)
+            comments = Comment.objects.filter(club=club)
+            membership_posts = MembershipPost.objects.filter(club=club)
+            user_posts = UserPost.objects.filter(club=club)
+            posts = sorted(chain(event_posts,membership_posts, user_posts),key=lambda instance: instance.created_at,reverse=True)
             return render(request, 'club_feed.html', {'members': members,
                                                        'userrole': userrole,
                                                        'posts':posts,
-                                                       'club' : club})
+                                                       'club' : club,
+                                                       'form' : form,
+                                                       'comment_form' : comment_form,
+                                                       'comments' : comments,
+                                                       'user':user})
+
+
 
 def create_event(request, club_id):
     club = Club.objects.get(id=club_id)
@@ -702,6 +723,7 @@ def create_event(request, club_id):
         current_user = request.user
         if form.is_valid():
             this_event = form.save(club_id)
+            EventPost.objects.create(event = this_event, user=request.user)
             return redirect('club_list')
         else:
             messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
@@ -724,3 +746,46 @@ def event_list(request,club_id):
                                                       'userrole': userrole,
                                                       'club' : club,
                                                       'events' : events})
+
+class NewPostView(LoginRequiredMixin, CreateView):
+    """Class-based generic view for new post handling."""
+
+    model = UserPost
+    template_name = 'club_feed.html'
+    form_class = UserPostForm
+    http_method_names = ['post']
+
+    def form_valid(self, form):
+        """Process a valid form."""
+        form.instance.author = self.request.user
+        form.instance.club = Club.objects.get(id=(self.kwargs['club_id']))
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Return URL to redirect the user too after valid form handling."""
+
+        return reverse('club_feed',kwargs={'club_id':self.kwargs['club_id']})
+
+    def handle_no_permission(self):
+        return redirect('log_in')
+
+def like_post(request, club_id, post_id):
+    post = UserPost.objects.get(id=post_id)
+    if post.likes.filter(id=request.user.id).exists():
+        post.likes.remove(request.user)
+    else:
+
+        post.likes.add(request.user)
+
+    return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
+
+
+def add_comment_to_post(request, club_id, post_id):
+    post = UserPost.objects.get(id=post_id)
+    club = Club.objects.get(id=club_id)
+    if request.method == "POST":
+        comment = Comment.objects.create(club=club,post=post,user=request.user)
+        form = CommentForm(request.POST, instance = comment)
+        if form.is_valid():
+            comment = form.save()
+    return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
