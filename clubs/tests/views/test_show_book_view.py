@@ -31,6 +31,6 @@ class ShowBookTest(TestCase,LogInTester):
         self.client.login(username=self.user.username, password="Password123")
         self.url = reverse('show_book', kwargs={'book_id': 99999999999999})
         response = self.client.get(self.url,follow=True)
-        redirect_url = reverse('search_books')
+        redirect_url = reverse('book_list')
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)

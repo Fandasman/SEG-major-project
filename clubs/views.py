@@ -18,7 +18,7 @@ from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm
-from .models import Book, Club, Role, User, Invitation,Event, UserPost
+from .models import Book, Club, Role, User, Invitation, Event, UserPost
 
 
 # Create your views here.
@@ -33,16 +33,6 @@ class LoginProhibitedMixin:
             return redirect('feed')
         return super().dispatch(*args, **kwargs)
 
-# @login_required
-def show_book(request, book_id):
-    try:
-        book = Book.objects.get(id=book_id)
-    except ObjectDoesNotExist:
-        return redirect('search_books')
-    else:
-        return render(request, 'show_book.html',
-            {'book': book}
-        )
 
 # @login_required
 def profile(request):
@@ -50,15 +40,6 @@ def profile(request):
     return render(request, 'profile.html',
             {'user': current_user}
         )
-
-# @login_required
-def search_books(request):
-    search_book = request.GET.get('book_searchbar')
-    if search_book:
-        books= Book.objects.filter(name__icontains=search_book)
-    else:
-        books = Book.objects.all()
-    return render(request, 'search_books.html', {'books': books})
 
 
 # class FeedView(LoginRequiredMixin, ListView):
@@ -94,23 +75,37 @@ class HomeView(LoginProhibitedMixin,View):
     def render(self):
         return render(self.request, 'home.html')
 
+# classBookListView(LoginRequiredMixin, ListView):
+class BookListView(ListView):
+    model= Book
+    template_name= 'book_list.html'
+    context_object_name= 'books'
+    paginate_by = 30
+
+    def get_context_data(self, *args, **kwargs):
+        context= super().get_context_data(*args, **kwargs)
+        book= Book.objects.all()
+        return context
+
 # class MemberListView(LoginRequiredMixin, ListView):
 class MemberListView(ListView):
     model= User
     template_name= 'member_list.html'
     context_object_name= 'users'
+    paginate_by = settings.MEMBERS_PER_PAGE
 
-    # def get_context_data(self, *args, **kwargs):
-    #     context= super().get_context_data(*args, **kwargs)
-    #     user= User.objects.all()
-    #     context['members']= Role.objects.all().filter(role= "M")
-    #     return context
+    def get_context_data(self, *args, **kwargs):
+        context= super().get_context_data(*args, **kwargs)
+        user= User.objects.all()
+        context['roles']= Role.objects.all().filter(role= "M")
+        return context
 
 # class ClubListView(LoginRequiredMixin, ListView):
 class ClubListView(ListView):
     model= Club
     template_name= 'club_list.html'
     context_object_name= 'clubs'
+    paginate_by = settings.CLUBS_PER_PAGE
 
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
@@ -123,6 +118,7 @@ class OwnerClubListView(ListView):
     model= Club
     template_name= 'owner_club_list.html'
     context_object_name= 'user'
+    paginate_by = settings.CLUBS_PER_PAGE
 
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
@@ -135,6 +131,7 @@ class MemberClubListView(ListView):
     model= Club
     template_name= 'member_club_list.html'
     context_object_name= 'user'
+    paginate_by = settings.MEMBERS_PER_PAGE
 
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
@@ -142,6 +139,10 @@ class MemberClubListView(ListView):
         context['roles']= Role.objects.all().filter(user= current_user, role= "M")
         return context
 
+class ShowBookView(DetailView):
+    model = Book
+    template_name = 'show_book.html'
+    pk_url_kwarg = "book_id"
 
 class ShowUserView(DetailView):
     model = User
@@ -319,7 +320,6 @@ def promote_officer_to_ClubOwner(request, club_id, member_id):
         if request.user.is_authenticated:
             user = request.user
             club = Club.objects.get(id = club_id)
-            userrole = Role.objects.get(club=club,user=user)
             userrole = Role.objects.get(club=club,user=user)
             redirect_url = reverse('member_list', kwargs={'club_id':club_id})
             member = User.objects.get(id = member_id)
@@ -547,7 +547,7 @@ def wish(request, book_id):
         return redirect('show_book', book.id)
 
     except ObjectDoesNotExist:
-        return redirect('search_books')
+        return redirect('book_list')
 
 def unwish(request, book_id):
     user = request.user
@@ -558,7 +558,7 @@ def unwish(request, book_id):
         return redirect('wishlist', user.id)
 
     except ObjectDoesNotExist:
-        return redirect('search_books')
+        return redirect('book_list')
 
 
 """This function is for club owner/officer to set the book for
@@ -636,7 +636,7 @@ def accept_invitation(request, inv_id):
         invitation = Invitation.objects.get(id=inv_id)
         club = invitation.club
         new_role = Role.objects.create(user=user, club=club, role="M")
-        post = UserPost.objects.create(user = user, club = current_club)
+        post = UserPost.objects.create(user = user, club = club)
         old_invitation = Invitation.objects.filter(id=inv_id).delete()
         messages.add_message(request, messages.INFO, "join successful")
         return redirect('invitation_list', user.id)

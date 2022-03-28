@@ -106,6 +106,9 @@ class Role(models.Model):
     def get_club_name(self):
         return self.club.name
 
+    def get_role(self):
+        return self.role
+
 
     def __str__(self):
         return self.user.full_name + " is " + self.role
