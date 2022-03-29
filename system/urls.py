@@ -42,7 +42,7 @@ urlpatterns = [
     path('user/<int:user_id>/wishlist', views.WishlistView.as_view(), name = 'wishlist'),
     path('login/', views.LogInView.as_view(), name='login'),
     path('member_club_list', views.MemberClubListView.as_view(), name = 'member_club_list'),
-    path('member_list', views.MemberListView.as_view(), name = 'member_list'),
+    path('user_list', views.UserListView.as_view(), name = 'user_list'),
     path('owner_club_list', views.OwnerClubListView.as_view(), name = 'owner_club_list'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('book/<int:book_id>', views.ShowBookView.as_view(), name='show_book'),
@@ -65,5 +65,5 @@ urlpatterns = [
     path('user/<int:user_id>/invitation_list/', views.InvitationlistView.as_view(), name='invitation_list'),
     path('accept_invitation/<int:inv_id>', views.accept_invitation, name='accept_invitation'),
     path('reject_invitation/<int:inv_id>', views.reject_invitation, name='reject_invitation'),
-
+    path('calendar/', views.calendar, name='calendar'),
 ]

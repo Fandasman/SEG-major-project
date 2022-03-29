@@ -18,9 +18,10 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm, UserPostForm, CommentForm
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm, EventForm, UserPostForm, CommentForm
 from .models import Book, Club, Role, User, Invitation, Event, EventPost, UserPost, MembershipPost, Comment
-
+import calendar
+from calendar import HTMLCalendar
 from datetime import datetime
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -30,7 +31,11 @@ from django.utils.safestring import mark_safe
 
 def feed(request):
     current_user = request.user
-    return render(request, 'feed.html', {'user': current_user})
+    now= datetime.now()
+    current_year= now.year
+    current_month= now.month
+    cal= HTMLCalendar().formatmonth(current_year, current_month)
+    return render(request, 'feed.html', {'user': current_user, 'cal': cal})
 
 class LoginProhibitedMixin:
     def dispatch(self, *args, **kwargs):
@@ -92,12 +97,12 @@ class BookListView(ListView):
         book= Book.objects.all()
         return context
 
-# class MemberListView(LoginRequiredMixin, ListView):
-class MemberListView(ListView):
+# class UserListView(LoginRequiredMixin, ListView):
+class UserListView(ListView):
     model= User
-    template_name= 'member_list.html'
+    template_name= 'user_list.html'
     context_object_name= 'users'
-    paginate_by = settings.MEMBERS_PER_PAGE
+    paginate_by = settings.USERS_PER_PAGE
 
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
@@ -122,7 +127,7 @@ class ClubListView(ListView):
 class OwnerClubListView(ListView):
     model= Club
     template_name= 'owner_club_list.html'
-    context_object_name= 'user'
+    context_object_name= 'users'
     paginate_by = settings.CLUBS_PER_PAGE
 
     def get_context_data(self, *args, **kwargs):
@@ -135,8 +140,8 @@ class OwnerClubListView(ListView):
 class MemberClubListView(ListView):
     model= Club
     template_name= 'member_club_list.html'
-    context_object_name= 'user'
-    paginate_by = settings.MEMBERS_PER_PAGE
+    context_object_name= 'users'
+    paginate_by = settings.USERS_PER_PAGE
 
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
@@ -223,7 +228,7 @@ class SignUpView(FormView):
 
     form_class = SignUpForm
     template_name = "sign_up.html"
-    #redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
+    redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
 
     def form_valid(self, form):
         self.object = form.save()
@@ -231,8 +236,7 @@ class SignUpView(FormView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        pass
-        #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+        return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
 """This function standardize the requirements for
     creating clubs, if club is successfully created,
@@ -701,7 +705,8 @@ def club_feed(request,club_id):
             comments = Comment.objects.filter(club=club)
             membership_posts = MembershipPost.objects.filter(club=club)
             user_posts = UserPost.objects.filter(club=club)
-            posts = sorted(chain(event_posts,membership_posts, user_posts),key=lambda instance: instance.created_at,reverse=True)
+            posts = sorted( chain(event_posts, membership_posts, user_posts),
+                    key=lambda instance: instance.created_at,reverse=True)
             return render(request, 'club_feed.html', {'members': members,
                                                        'userrole': userrole,
                                                        'posts':posts,
@@ -789,3 +794,11 @@ def add_comment_to_post(request, club_id, post_id):
         if form.is_valid():
             comment = form.save()
     return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
+
+
+def calendar(request):
+    now= datetime.now()
+    current_year= now.year
+    current_month= now.month
+    cal= HTMLCalendar().formatmonth(current_year, current_month)
+    return render(request, 'feed.html', {"cal": cal})

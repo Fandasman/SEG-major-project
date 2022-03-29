@@ -131,6 +131,9 @@ STATIC_URL = '/static/'
 # Login URL to redirect logged in users
 LOGIN_URL = 'login'
 
+#URL where @login_prohibited redirects to
+REDIRECT_URL_WHEN_LOGGED_IN= 'feed'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -147,5 +150,5 @@ MESSAGE_TAGS = {
 
 # page lengths
 
-MEMBERS_PER_PAGE= 25
+USERS_PER_PAGE= 25
 CLUBS_PER_PAGE= 15

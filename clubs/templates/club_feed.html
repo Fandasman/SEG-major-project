@@ -65,18 +65,21 @@
         {% else %}
          <a class="bi bi-hand-thumbs-up" href="{% url 'like_post' instance.club.id instance.id %}">Like</a>  <p style="font-size:12px">{{instance.number_of_likes}} Likes</p>
         {%endif%}
-         <form action="{% url 'add_comment' instance.club.id instance.id%}" method="post">
+        {% for comment in comments %}
+           {% if instance.id == comment.post.id %}
+           <hr>
+                {{comment.user.username}} . {{comment.created_at|naturaltime}}<br>
+                {{comment.body}}
+           {%endif%}
+        {%endfor%}
+        <br></br>
+        <hr>
+        <br></br>
+        <form action="{% url 'add_comment' instance.club.id instance.id%}" method="post">
            {% csrf_token %}
            {% include 'partials/bootstrap_form.html' with form=comment_form %}
            <input type="submit" value="Comment" class="bi bi-chat">
-           {% for comment in comments %}
-              {% if instance.id == comment.post.id %}
-              <hr>
-                   {{comment.user.username}} . {{comment.created_at|naturaltime}}<br>
-                   {{comment.body}}
-              {%endif%}
-           {%endfor%}
-         </form>
+        </form>
       </div>
       </div>
       {%endif%}
