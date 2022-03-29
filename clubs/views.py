@@ -17,7 +17,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
+from .forms import GenreForm, SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
 from .models import Book, Club, Role, User, Invitation, BooksRatings
 from collections import Counter
 from surprise import dump
@@ -30,7 +30,7 @@ if "runserver" in sys.argv:
 
 
 # Create your views here.
-
+@login_required
 def feed(request):
     current_user = request.user
 
@@ -238,34 +238,6 @@ class ShowClubView(DetailView):
     template_name = 'show_club.html'
     pk_url_kwarg = "club_id"
 
-
-# class LoginProhibitedMixin:
-
-#          """Mixin that redirects when a user is logged in."""
-
-#          redirect_when_logged_in_url = None
-
-#          def dispatch(self, *args, **kwargs):
-#             """Redirect when logged in, or dispatch as normal otherwise."""
-#             if self.request.user.is_authenticated:
-#                 return self.handle_already_logged_in(*args, **kwargs)
-#             return super().dispatch(*args, **kwargs)
-
-#          def handle_already_logged_in(self, *args, **kwargs):
-#              url = self.get_redirect_when_logged_in_url()
-#              return redirect('feed')
-
-#          def get_redirect_when_logged_in_url(self):
-#              """Returns the url to redirect to when not logged in."""
-#              if self.redirect_when_logged_in_url is None:
-#                 raise ImproperlyConfigured(
-#                  "LoginProhibitedMixin requires either a value for "
-#                  "'redirect_when_logged_in_url', or an implementation for "
-#                  "'get_redirect_when_logged_in_url()'."
-#                  )
-#              else:
-#                  return self.redirect_when_logged_in_url
-
 class LogInView(View):
     """Log-in handling view"""
     def get(self,request):
@@ -307,11 +279,32 @@ class SignUpView(FormView):
     def form_valid(self, form):
         self.object = form.save()
         login(self.request, self.object)
-        return super().form_valid(form)
+        super().form_valid(form)
+        return redirect('select_genres')
 
     def get_success_url(self):
         pass
         #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
+"""This function allows the user to select prefered genres upon sign up."""
+@login_required
+def select_genres(request):
+
+    genres = Book.objects.values_list('genre',flat=True).distinct
+    current_user = request.user
+
+    if request.method=='POST':
+            form = GenreForm(request.POST)
+            if form.is_valid():
+                    current_user.genres_preferences = form.save()
+                    current_user.save()
+                    messages.add_message(request, messages.SUCCESS, "Preferences updated!")
+                    return redirect('feed')
+            else:
+                messages.add_message(request, messages.ERROR, "You must select a maximum of 5 choices!")
+    else:
+        form = GenreForm(instance = current_user)
+    return render(request, "select_genres.html", {'genres': genres, 'form': form})
 
 
 """This function standardize the requirements for
@@ -620,6 +613,9 @@ def apply(request, club_id):
     else:
         return HttpResponseForbidden()
 
+
+"""These functions are for adding/removing
+    books from a user's wishlist."""
 def wish(request, book_id):
     user = request.user
     try:
@@ -641,7 +637,6 @@ def unwish(request, book_id):
 
     except ObjectDoesNotExist:
         return redirect('search_books')
-
 
 """This function is for club owner/officer to set the book for
     club to read"""

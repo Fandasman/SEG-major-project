@@ -4,7 +4,66 @@ from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
 
-from .models import Club, User, Book
+from .models import GENRE_CHOICES, Club, User, Book
+
+
+
+GENRE_CHOICES = [
+    ('Fiction','Fiction'),
+    ('Food and Drink','Food and Drink'),
+    ('Science Fiction','Science Fiction'),
+    ('Classics','Classics'),
+    ('Nonfiction','Nonfiction'),
+    ('Horror','Horror'),
+    ('Mystery','Mystery'),
+    ('Philosophy','Philosophy'),
+    ('Business','Business'),
+    ('Historical','Historical'),
+    ('Romance','Romance'),
+    ('Crime','Crime'),
+    ('Womens Fiction','Womens Fiction'),
+    ('Fantasy','Fantasy'),
+    ('Young Adult','Young Adult'),
+    ('Sequential Art','Sequential Art'),
+    ('Politics','Politics'),
+    ('Childrens','Childrens'),
+    ('History','History'),
+    ('Self Help','Self Help'),
+    ('Humor','Humor'),
+    ('Thriller','Thriller'),
+    ('Autobiography','Autobiography'),
+    ('Poetry','Poetry'),
+    ('Short Stories','Short Stories'),
+    ('Language','Language'),
+    ('Science','Science'),
+    ('Travel','Travel'),
+    ('Parenting','Parenting'),
+    ('Paranormal','Paranormal'),
+    ('Biography','Biography'),
+    ('Christian','Christian'),
+    ('European Literature','European Literature'),
+    ('Psychology','Psychology'),
+    ('Adventure','Adventure'),
+    ('Religion','Religion'),
+    ('Holiday','Holiday'),
+    ('Animals','Animals'),
+    ('Christian Fiction','Christian Fiction'),
+    ('Reference','Reference'),
+    ('Spirituality','Spirituality'),
+    ('Feminism','Feminism'),
+    ('Health','Health'),
+    ('Cultural','Cultural'),
+    ('Adult Fiction','Adult Fiction'),
+    ('Writing','Writing'),
+    ('Realistic Fiction','Realistic Fiction'),
+    ('Law','Law'),
+    ('Art','Art'),
+    ('Plays','Plays'),
+    ('Relationships','Relationships'),
+    ('Westerns','Westerns'),
+    ('Sports','Sports')
+]
+
 
 
 class SignUpForm(forms.ModelForm):
@@ -12,6 +71,7 @@ class SignUpForm(forms.ModelForm):
         model = User
         fields = ['username','first_name','last_name', 'email','bio']
         widgets = { 'bio': forms.Textarea()}
+        
     new_password = forms.CharField(
         label='Password',
         widget=forms.PasswordInput(),
@@ -131,3 +191,23 @@ class InviteForm(forms.Form):
             return True
         except ObjectDoesNotExist:
             return False
+
+
+    
+class GenreForm(forms.ModelForm):
+
+    class Meta:
+        model = User
+        fields = ["genres_preferences"]
+        genres_preferences = forms.MultipleChoiceField(
+            choices=GENRE_CHOICES, 
+            widget=forms.CheckboxInput(),
+        )
+        error_messages={'genres_preferences': 
+            {'max_choices': 'Try selecting just a few of your favourites. Keep it nice and simple!'}
+        }
+
+    def save(self):
+        super().save(commit=False)
+        genres_preferences = self.cleaned_data.get('genres_preferences')
+        return genres_preferences
