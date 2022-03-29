@@ -4,17 +4,13 @@
   <div class="row">
     <div class="col-12">
       <h1>Owned Club List</h1>
-      <form action="{% url 'owner_club_list' %}" method="post">
-        {% csrf_token %}
-        {% include 'partials/bootstrap_form.html' with form=form %}
-        {% if role.size == none %}
-          <h3> You do not own any clubs yet :( </h3>
-          <p> Create your club and come back! </p>
-        {% endif %}
-      {% for role in roles %}
-          {% include 'partials/club_page.html' with clubs=clubs roles=roles %}
-      {% endfor %}
-      </form>
+        {%if roles%}
+        {% for role in roles %}
+          {{role.club.name}}
+        {%endfor%}
+        {%else%}
+          Sorry you don't own any clubs
+        {%endif%}
     </div>
   </div>
 </div>
