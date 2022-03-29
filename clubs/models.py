@@ -106,6 +106,9 @@ class Role(models.Model):
     def get_club_name(self):
         return self.club.name
 
+    def get_role(self):
+        return self.role
+
 
     def __str__(self):
         return self.user.full_name + " is " + self.role
@@ -130,6 +133,7 @@ class Invitation(models.Model):
     def get_club_name(self):
         return self.club.name
 
+# Create the Event model
 class Event(models.Model):
 
     name = models.CharField(
@@ -161,9 +165,7 @@ class Event(models.Model):
     )
 
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
-
     club = models.ForeignKey(Club, on_delete=models.CASCADE, blank = False, null = False)
-
     participants = models.ManyToManyField(User, blank = True)
 
 
@@ -182,6 +184,7 @@ class Event(models.Model):
     def add_memeber_to_event(self,user):
         self.participants.add(user)
 
+# Create the Event's Posts model
 class EventPost(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -192,7 +195,7 @@ class EventPost(models.Model):
 
         ordering = ['-created_at']
 
-
+# Create the Membership's Posts model
 class MembershipPost(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
@@ -212,7 +215,7 @@ class MembershipPost(models.Model):
         ordering = ['-created_at']
 
 
-
+# Create User made Posts model
 class UserPost(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.CharField(max_length=280)
@@ -235,12 +238,12 @@ class UserPost(models.Model):
 
         ordering = ['-created_at']
 
-
+# Create the Comment model
 class Comment(models.Model):
     post = models.ForeignKey(UserPost,
                              on_delete=models.CASCADE,
                              related_name='comments')
-    body = models.TextField()
+    body = models.CharField(max_length=100)
     user= models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
@@ -251,12 +254,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return 'Comment by {} on {}'.format(self.user.username, self.post)
-
-
-# class LikedPost(models.Model):
-#     user = models.ForeignKey(User,on_delete=models.CASCADE)
-#     post = models.ForeignKey(UserPost, on_delete=models.CASCADE)
-#     liked_date = models.DateTimeField(auto_now_add=True)
-#
-#     def __str__(self):
-#         return self.post.title + " liked by " + self.user.username

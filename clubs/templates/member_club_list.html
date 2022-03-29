@@ -11,9 +11,9 @@
           <h3> You do not have any memberships yet :( </h3>
           <p> Apply to any club you like and come back! </p>
         {% endif %}
-      {% for role in roles %}
-          {% include 'partials/club_page.html' with clubs=clubs roles=roles %}
-      {% endfor %}
+        {% for role in roles %}
+          {% include 'club_page.html' with clubs=clubs roles=roles %}
+        {% endfor %}
       </form>
     </div>
   </div>

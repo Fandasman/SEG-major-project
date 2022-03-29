@@ -33,7 +33,11 @@ from calendar import HTMLCalendar
 
 def feed(request):
     current_user = request.user
-    return render(request, 'feed.html', {'user': current_user})
+    now= datetime.now()
+    current_year= now.year
+    current_month= now.month
+    cal= HTMLCalendar().formatmonth(current_year, current_month)
+    return render(request, 'feed.html', {'user': current_user, 'cal': cal})
 
 class LoginProhibitedMixin:
     def dispatch(self, *args, **kwargs):
@@ -41,16 +45,6 @@ class LoginProhibitedMixin:
             return redirect('feed')
         return super().dispatch(*args, **kwargs)
 
-# @login_required
-def show_book(request, book_id):
-    try:
-        book = Book.objects.get(id=book_id)
-    except ObjectDoesNotExist:
-        return redirect('search_books')
-    else:
-        return render(request, 'show_book.html',
-            {'book': book}
-        )
 
 # @login_required
 def profile(request):
@@ -58,15 +52,6 @@ def profile(request):
     return render(request, 'profile.html',
             {'user': current_user}
         )
-
-# @login_required
-def search_books(request):
-    search_book = request.GET.get('book_searchbar')
-    if search_book:
-        books= Book.objects.filter(name__icontains=search_book)
-    else:
-        books = Book.objects.all()
-    return render(request, 'search_books.html', {'books': books})
 
 
 # class FeedView(LoginRequiredMixin, ListView):
@@ -102,23 +87,37 @@ class HomeView(LoginProhibitedMixin,View):
     def render(self):
         return render(self.request, 'home.html')
 
-# class MemberListView(LoginRequiredMixin, ListView):
-class MemberListView(ListView):
-    model= User
-    template_name= 'member_list.html'
-    context_object_name= 'users'
+# classBookListView(LoginRequiredMixin, ListView):
+class BookListView(ListView):
+    model= Book
+    template_name= 'book_list.html'
+    context_object_name= 'books'
+    paginate_by = 30
 
-    # def get_context_data(self, *args, **kwargs):
-    #     context= super().get_context_data(*args, **kwargs)
-    #     user= User.objects.all()
-    #     context['members']= Role.objects.all().filter(role= "M")
-    #     return context
+    def get_context_data(self, *args, **kwargs):
+        context= super().get_context_data(*args, **kwargs)
+        book= Book.objects.all()
+        return context
+
+# class UserListView(LoginRequiredMixin, ListView):
+class UserListView(ListView):
+    model= User
+    template_name= 'user_list.html'
+    context_object_name= 'users'
+    paginate_by = settings.USERS_PER_PAGE
+
+    def get_context_data(self, *args, **kwargs):
+        context= super().get_context_data(*args, **kwargs)
+        user= User.objects.all()
+        context['roles']= Role.objects.all().filter(role= "M")
+        return context
 
 # class ClubListView(LoginRequiredMixin, ListView):
 class ClubListView(ListView):
     model= Club
     template_name= 'club_list.html'
     context_object_name= 'clubs'
+    paginate_by = settings.CLUBS_PER_PAGE
 
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
@@ -130,7 +129,8 @@ class ClubListView(ListView):
 class OwnerClubListView(ListView):
     model= Club
     template_name= 'owner_club_list.html'
-    context_object_name= 'user'
+    context_object_name= 'users'
+    paginate_by = settings.CLUBS_PER_PAGE
 
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
@@ -142,7 +142,8 @@ class OwnerClubListView(ListView):
 class MemberClubListView(ListView):
     model= Club
     template_name= 'member_club_list.html'
-    context_object_name= 'user'
+    context_object_name= 'users'
+    paginate_by = settings.USERS_PER_PAGE
 
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
@@ -150,6 +151,10 @@ class MemberClubListView(ListView):
         context['roles']= Role.objects.all().filter(user= current_user, role= "M")
         return context
 
+class ShowBookView(DetailView):
+    model = Book
+    template_name = 'show_book.html'
+    pk_url_kwarg = "book_id"
 
 class ShowUserView(DetailView):
     model = User
@@ -225,7 +230,7 @@ class SignUpView(FormView):
 
     form_class = SignUpForm
     template_name = "sign_up.html"
-    #redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
+    redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
 
     def form_valid(self, form):
         self.object = form.save()
@@ -233,8 +238,7 @@ class SignUpView(FormView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        pass
-        #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+        return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
 """This function standardize the requirements for
     creating clubs, if club is successfully created,
@@ -328,7 +332,6 @@ def promote_officer_to_ClubOwner(request, club_id, member_id):
         if request.user.is_authenticated:
             user = request.user
             club = Club.objects.get(id = club_id)
-            userrole = Role.objects.get(club=club,user=user)
             userrole = Role.objects.get(club=club,user=user)
             redirect_url = reverse('member_list', kwargs={'club_id':club_id})
             member = User.objects.get(id = member_id)
@@ -558,7 +561,7 @@ def wish(request, book_id):
         return redirect('show_book', book.id)
 
     except ObjectDoesNotExist:
-        return redirect('search_books')
+        return redirect('book_list')
 
 def unwish(request, book_id):
     user = request.user
@@ -569,7 +572,7 @@ def unwish(request, book_id):
         return redirect('wishlist', user.id)
 
     except ObjectDoesNotExist:
-        return redirect('search_books')
+        return redirect('book_list')
 
 
 """This function is for club owner/officer to set the book for
@@ -704,7 +707,8 @@ def club_feed(request,club_id):
             comments = Comment.objects.filter(club=club)
             membership_posts = MembershipPost.objects.filter(club=club)
             user_posts = UserPost.objects.filter(club=club)
-            posts = sorted(chain(event_posts,membership_posts, user_posts),key=lambda instance: instance.created_at,reverse=True)
+            posts = sorted( chain(event_posts, membership_posts, user_posts),
+                    key=lambda instance: instance.created_at,reverse=True)
             return render(request, 'club_feed.html', {'members': members,
                                                        'userrole': userrole,
                                                        'posts':posts,
@@ -792,16 +796,6 @@ def add_comment_to_post(request, club_id, post_id):
         if form.is_valid():
             comment = form.save()
     return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
-
-class EmployeeScheduleCalendar(HTMLCalendar):
-    def formatday(self, day, weekday):
-        """
-          Return a day as a table cell.
-        """
-        if day == 0:
-            return '<td class="noday">&nbsp;</td>' # day outside month
-        else:
-            return '<td class="%s"><a href="%s">%d</a></td>' % (self.cssclasses[weekday], weekday, day)
 
 def calendar(request):
     now = datetime.now()
