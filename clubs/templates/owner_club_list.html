@@ -7,14 +7,11 @@
       <form action="{% url 'owner_club_list' %}" method="post">
         {% csrf_token %}
         {% include 'partials/bootstrap_form.html' with form=form %}
-        {% if roles== "O" %}
           {% for role in roles %}
               {% include 'club_page.html' with clubs=clubs roles=roles %}
           {% endfor %}
-        {% elif %}
           <h3> You do not own any clubs yet :( </h3>
           <p> Create your club and come back! </p>
-        {% endif %}
       </form>
     </div>
   </div>

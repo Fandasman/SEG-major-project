@@ -120,7 +120,7 @@ class ClubListView(ListView):
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
         club= Club.objects.all()
-        context['roles']= Role.objects.all().filter(role= "O")
+        context['roles']= Role.objects.all().filter(role= "CO")
         return context
 
 # class OwnerClubListView(LoginRequiredMixin, ListView):
@@ -133,7 +133,7 @@ class OwnerClubListView(ListView):
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
         current_user= self.request.user
-        context['roles']= Role.objects.all().filter(user= current_user, role= "O")
+        context['roles']= Role.objects.all().filter(user= current_user, role= "CO")
         return context
 
 # class MemberClubListView(LoginRequiredMixin, ListView):
