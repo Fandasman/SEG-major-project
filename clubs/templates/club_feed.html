@@ -25,67 +25,25 @@
   <div class="card my-2">
     <div class="card-body">
       <h2 class="card-title">Club Feed</h2>
+      <br>
 
-{% for instance in posts %}
-      {% if instance|model_type == 'EventPost' %}
-      <div class="card m-2">
-        <div class="row no-gutters">
-          <div class="col-md-2">
-            <img src="{{ instance.event.book.imgURLMedium}}" class="card-img" alt="Picture of {{instance.event.title}}">
-          </div>
-          <div class="col-md-6">
-            <div class="card-body">
-              <h5 class="card-title">{{instance.event.name}}</h5>
-              <p class="card-text">{{instance.user.username}} has schedualed {{instance.event.name}}</p>
-              <p class="card-text">Book: {{instance.event.book.title}}</p>
-              <p class="card-text"><small class="text-muted">Apply before: {{instance.event.deadline}}</small></p>
-            </div>
-          </div>
-        </div>
-      </div>
-      {% elif instance|model_type == 'MembershipPost' %}
-      <div class="card m-2">
-        <div class="card-body">
-          <img src="{{ instance.user.mini_gravatar }}" alt="Gravatar of {{ instance.user.username }}" class="rounded-circle profile-image" >
-          {{instance.user.username}} {{instance.description}}
-        </div>
-      </div>
+  {% for instance in posts %}
 
-      {% endif %}
-      {% if instance|model_type == 'UserPost' %}
-      <div class="card m-2">
-        <div class="card-body">
-          <img src="{{ instance.author.mini_gravatar }}" alt="Gravatar of {{ instance.user.username }}" class="rounded-circle profile-image" > {{ post.author.username }}
-         {{ instance.author.username }}  ·  {{ instance.created_at|naturaltime}}
-         <hr>
-            {{instance.text}}
-        <hr>
-        {% if instance|has_liked_filter:user%}
-        <a class="bi bi-hand-thumbs-up-fill" href="{% url 'like_post' instance.club.id instance.id %}">Unlike</a>  <p style="font-size:12px">{{instance.number_of_likes}} Likes</p>
-        {% else %}
-         <a class="bi bi-hand-thumbs-up" href="{% url 'like_post' instance.club.id instance.id %}">Like</a>  <p style="font-size:12px">{{instance.number_of_likes}} Likes</p>
-        {%endif%}
-        {% for comment in comments %}
-           {% if instance.id == comment.post.id %}
-           <hr>
-                {{comment.user.username}} . {{comment.created_at|naturaltime}}<br>
-                {{comment.body}}
-           {%endif%}
-        {%endfor%}
-        <br></br>
-        <hr>
-        <br></br>
-        <form action="{% url 'add_comment' instance.club.id instance.id%}" method="post">
-           {% csrf_token %}
-           {% include 'partials/bootstrap_form.html' with form=comment_form %}
-           <input type="submit" value="Comment" class="bi bi-chat">
-        </form>
-      </div>
-      </div>
-      {%endif%}
+    {% if instance|model_type == 'EventPost' %}
+      {% include 'partials/event_post.html' %}
+
+    {% elif instance|model_type == 'MembershipPost' %}
+      {% include 'partials/membership_post.html' %}
+
+      {% elif instance|model_type == 'UserPost' %}
+        {% include 'partials/user_post.html' %}
+
+    {% endif %}
+
   {% endfor %}
-</div>
-</div>
+
+    </div>
+  </div>
 </div>
 
 {% endblock content %}

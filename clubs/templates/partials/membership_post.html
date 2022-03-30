@@ -1,0 +1,10 @@
+{% load posts_extra %}
+{% load humanize %}
+{% block content %}
+<div class="card m-2">
+  <div class="card-body">
+    <img src="{{ instance.user.mini_gravatar }}" alt="Gravatar of {{ instance.user.username }}" class="rounded-circle profile-image" >
+      {{instance.user.username}} {{instance.description}}
+  </div>
+</div>
+{% endblock content %}

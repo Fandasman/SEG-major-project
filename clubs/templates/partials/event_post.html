@@ -1,0 +1,19 @@
+{% load posts_extra %}
+{% load humanize %}
+{% block content %}
+<div class="card m-2">
+  <div class="row no-gutters">
+    <div class="col-md-2">
+      <img src="{{ instance.event.book.imgURLMedium}}" class="card-img" alt="Picture of {{instance.event.title}}">
+    </div>
+    <div class="col-md-6">
+      <div class="card-body">
+        <h5 class="card-title">{{instance.event.name}}</h5>
+          <p class="card-text">{{instance.user.username}} has schedualed {{instance.event.name}}</p>
+          <p class="card-text">Book: {{instance.event.book.title}}</p>
+          <p class="card-text"><small class="text-muted">Apply before: {{instance.event.deadline}}</small></p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

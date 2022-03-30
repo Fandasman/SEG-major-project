@@ -250,6 +250,12 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
 
+    def has_commented(self,user):
+        if self.post.filter(id=user.id).exists():
+            return True
+        else:
+            return False
+
 
     class Meta:
         ordering = ('created_at',)

@@ -1,0 +1,98 @@
+{% load posts_extra %}
+{% load static %}
+{% load humanize %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="{% static 'user-post.css' %}">
+
+    <style>
+      #minus{
+      display:inline;
+      }
+      .collapsed #minus{
+      display:none;
+      }
+      #plus{
+      display:none;
+      }
+      .collapsed #plus{
+      display:inline;
+      }
+      div.ex1 {
+      width: 1100px;
+      margin: auto;
+      }
+    </style>
+
+  </head>
+</html>
+
+{% block content %}
+
+<div class="card m-2">
+  <div class="card-body">
+    <img src="{{ instance.author.mini_gravatar }}" alt="Gravatar of {{ instance.user.username }}" class="rounded-circle profile-image" >
+     {{ instance.author.username }} &nbsp;&middot;&nbsp; {{ instance.created_at | naturaltime}}
+     <br>
+      {{instance.text}}
+     <br>
+    {% if instance|has_liked_filter:user%}
+      <a class="bi bi-hand-thumbs-up-fill" href="{% url 'like_post' instance.club.id instance.id %}"> {{instance.number_of_likes}} Likes
+      </a>
+
+    {% else %}
+      <a class="bi bi-hand-thumbs-up" href="{% url 'like_post' instance.club.id instance.id %}"> {{instance.number_of_likes}} Likes
+      </a>
+
+    {%endif%}
+
+      <div class="ex1">
+        <div class="wrapper">
+          <div class="row" style="margin:20px auto;">
+            <ul class="list-group">
+              <li class="list-group-item">
+                <button onclick="showComments()" type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#demo"><span id="plus">► Show comments</span><span id="minus">▼ Hide comments</span></button>
+                <div id="demo" class="collapse">
+
+
+                      {% for comment in comments %}
+
+                        {% if instance.id == comment.post.id %}
+                          <hr>
+                          <img src="{{ comment.user.mini_gravatar }}" alt="Gravatar of {{ comment.user.username }}" class="rounded-circle profile-image" >
+                          {{comment.user.username}} &nbsp;&middot;&nbsp; {{comment.created_at | naturaltime}}
+                          <br>
+                          {{comment.body}}
+                        {% endif %}
+
+                      {% endfor %}
+
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+  <script>
+  function showComments() {
+    var com = document.getElementById("demo");
+    if (com.style.display === "none") {
+      com.style.display = "block";
+    }
+    else {
+      com.style.display = "none";
+    }
+  }
+  </script>
+
+  <form action="{% url 'add_comment' instance.club.id instance.id%}" method="post">
+    {% csrf_token %}
+    {% include 'partials/bootstrap_form.html' with form=comment_form %}
+    <input type="submit" value="Comment" class="bi bi-chat">
+  </form>
+
+  </div>
+</div>
+{% endblock content %}
