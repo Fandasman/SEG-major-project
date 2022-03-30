@@ -57,15 +57,15 @@ def show_book(request, book_id):
     except ObjectDoesNotExist:
         return redirect('search_books')
     else:
-        form = RatingForm
+        book_form = RatingForm
         if(request.method == 'POST'):
-            if form.is_valid():
-                rating = form.cleaned_data.get('rating')
+            if book_form.is_valid():
+                rating = book_form.cleaned_data.get('rating')
                 BooksRatings._add_rating(rating)
                 
 
             return render(request, 'show_book.html',
-                {'book': book}, {'form':form}
+                {'book': book}, {'form2':book_form}, {'book_id':book_id}
             )
     
     return render(request, 'show_book.html',
