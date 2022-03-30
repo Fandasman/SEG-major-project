@@ -23,7 +23,7 @@ from django.conf.urls import url
 urlpatterns = [
     path('all_members/<int:club_id>', views.member_list, name = "member_list"),
     path('club_feed/<int:club_id>/', views.club_feed, name = "club_feed"),
-    path('calendar/', views.calendar,name='calendar'),
+    path('calendar/', views.CalendarView.as_view(),name="calendar"),
     path('club_event_creation/<int:club_id>', views.create_event,name = "create_event"),
     path('add_comment/<int:club_id>/<int:post_id>', views.add_comment_to_post,name = "add_comment"),
     path('club_events_list/<int:club_id>',views.event_list,name = "events_list"),
@@ -66,5 +66,4 @@ urlpatterns = [
     path('user/<int:user_id>/invitation_list/', views.InvitationlistView.as_view(), name='invitation_list'),
     path('accept_invitation/<int:inv_id>', views.accept_invitation, name='accept_invitation'),
     path('reject_invitation/<int:inv_id>', views.reject_invitation, name='reject_invitation'),
-    path('calendar/', views.calendar, name='calendar'),
 ]

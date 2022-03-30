@@ -797,14 +797,86 @@ def add_comment_to_post(request, club_id, post_id):
             comment = form.save()
     return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
-def calendar(request):
-    now = datetime.now()
-    year = now.year
-    month = now.month
 
-    cal = HTMLCalendar().formatmonth(year,month)
-    events = Event.objects.filter(deadline__year=year,
-                                      deadline__month=month,
-                                      )
+from datetime import datetime, timedelta
+from calendar import HTMLCalendar
+from .models import Event
 
-    return render(request, 'calendar.html', {'cal':cal, 'events' : events})
+class Calendar(HTMLCalendar):
+    def __init__(self, year=None, month=None):
+        self.year = year
+        self.month = month
+        super(Calendar, self).__init__()
+
+    def formatday(self, day, user, month, year):
+        roles = Role.objects.filter(user=user)
+        events_per_day = []
+        for role in roles:
+            events_per_day+=(Event.objects.filter(deadline__day=day,club=role.club, deadline__month=month, deadline__year = year))
+
+        d = ''
+        for event in events_per_day:
+            d += f'<li> {event.name} </li>'
+
+        if day != 0:
+            if not events_per_day :
+                return f"<td><span class='date'>{day}</span></td>"
+            else:
+                return f"<td><mark style='background-color:#0275d8'>{day}</mark></td>"
+
+        return '<td></td>'
+
+    def formatweek(self, theweek, user, month, year):
+        week = ''
+        for d, weekday in theweek:
+            week += self.formatday(d, user, month, year)
+        return f'<tr> {week} </tr>'
+
+    def formatmonth(self, user, withyear=True):
+        user=user
+        month=self.month
+        year=self.year
+
+        cal = f'<table>\n'
+        cal += f'{self.formatmonthname(self.year, self.month, withyear=withyear)}\n'
+        cal += f'{self.formatweekheader()}\n'
+        for week in self.monthdays2calendar(self.year, self.month):
+            cal += f'{self.formatweek(week, user, month, year)}\n'
+        cal += f'</table>\n'
+        return cal
+
+
+class CalendarView(generic.ListView):
+    model = Event
+    template_name = 'calendar.html'
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # use today's date for the calendar
+        d = get_date(self.request.GET.get('day', None))
+
+        # Instantiate our calendar class with today's year and date
+        cal = Calendar(d.year, d.month)
+
+
+        user=self.request.user
+
+        roles = Role.objects.filter(user=user)
+        events= []
+        for role in roles:
+            events+=(Event.objects.filter(club=role.club, deadline__month=d.month, deadline__year =d.year))
+
+        # Call the formatmonth method, which returns our calendar as a table
+        html_cal = cal.formatmonth(withyear=True, user=user)
+        context['calendar'] = mark_safe(html_cal)
+        context['events'] = events
+
+        return context
+
+def get_date(req_day):
+    if req_day:
+        year, month = (int(x) for x in req_day.split('-'))
+        return date(year, month, day=1)
+    return datetime.today()

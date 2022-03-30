@@ -110,6 +110,8 @@ class Role(models.Model):
         return self.role
 
 
+
+
     def __str__(self):
         return self.user.full_name + " is " + self.role
 
