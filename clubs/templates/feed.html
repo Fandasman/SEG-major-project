@@ -45,26 +45,6 @@
           <span class="visually-hidden">Next</span>
         </button>
       </div>
-{% comment %} 
-          {% for book in favourites %}
-        <tr>
-          <td class="text-center"><b>#{{ forloop.counter }}</b></td>
-          <td>
-              <img src="{{ book.imgURLSmall }}" alt="Cover of {{ book.title }}">
-          </td>
-          <td>{{ book.title }}</td>
-          <td>{{ book.author }}</td>
-          <td>{{ book.publisher }}</td>
-          <td>{{ book.published }}</td>
-          <td>
-              <a class="btn btn-primary" href="{% url 'show_book' book.id %}">See book</a>
-          </td>
-          {% endfor %}
-      </tr> {% endcomment %}
-
-      </table>
-
-      <br>
 
       <h2>Top picks</h2>
         <p>This is where recommendations based on genre preference will be displayed.</p>
@@ -78,7 +58,7 @@
             <th scope="col">Year of publishing</th>
             <th scope="col">Rating</th>
           </thead>
-        {% for book in recommended %}
+        {% for book in recommended_books %}
         <tr>
           <td class="text-center"><b>#{{ forloop.counter }}</b></td>
           <td>

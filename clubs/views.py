@@ -28,56 +28,57 @@ if "runserver" in sys.argv:
     print("Loading the model!")
     _, model = dump.load('./model.pkl')
 
+THRESHOLD = 25
+
 
 # Create your views here.
 @login_required
 def feed(request):
     current_user = request.user
 
-    """Generate a query for books with the most positive ratings"""
+    user_books = Book.objects.filter(isbn__in = current_user.users.values('isbn')).values_list('isbn', flat=True)
 
-    good_isbns = list(BooksRatings.objects.filter(rating__gte = 4).values_list('isbn'))
+    recommended_books = []
 
-    good_sorted = [rating for ratings, c in Counter(good_isbns).most_common()
-              for rating in [ratings] * c]
+    if len(user_books) < THRESHOLD:
 
-    good_ratings = list(dict.fromkeys(good_sorted))[:30]
+        """Generate a query for books with the most positive ratings based on genre preferences"""
 
-    favourites = []
+        user_genres = list(current_user.genres_preferences)
+        filtered_user_books = Book.objects.exclude(isbn__in = user_books)
+        filtered_user_genres = filtered_user_books.filter(genre__in = user_genres).values_list('isbn', flat=True)
+        filtered_user_genres = BooksRatings.objects.filter(isbn__in = filtered_user_genres)
 
-    for rating in good_ratings:
-        book = Book.objects.get(isbn = rating[0])
-        favourites.append(book)
+        good_isbns = list(filtered_user_genres.filter(rating__gte = 4).values_list('isbn'))
+        good_sorted = [rating for ratings, c in Counter(good_isbns).most_common()
+                  for rating in [ratings] * c]
+        good_ratings = list(dict.fromkeys(good_sorted))[:30]
 
+        for rating in good_ratings:
+            book = Book.objects.get(isbn = rating[0])
+            recommended_books.append(book)
 
-    """Generate a query for the recommended books"""
+    else:
+        """Generate a query for the recommended books"""
 
-    user_books = Book.objects.filter(isbn__in = current_user.users.values('isbn'))
+        user_genres = Book.objects.filter(isbn__in = current_user.users.values('isbn')).values_list('genre', flat=True)
+        filtered_user_books = Book.objects.exclude(isbn__in = user_books)
+        filtered_user_genres = filtered_user_books.filter(genre__in = user_genres)
 
-    user_genres = user_books.values_list('genre', flat=True)
+        recommendations = {}
 
-    filtered_user_books = Book.objects.exclude(isbn__in = user_books)
+        for book in filtered_user_genres:
+            predicted_rating = model.predict(uid=current_user.id, iid=book.isbn).est
+            recommendations[book.isbn] = predicted_rating
 
-    filtered_user_genres = filtered_user_books.filter(genre__in = user_genres)
+        sorted_ratings = list(recommendations.items())
+        sorted_ratings.sort(key=lambda k: k[1], reverse=True)
 
-    recommended_books = {}
+        for pair in sorted_ratings[:30]:
+            book = Book.objects.get(isbn = pair[0])
+            recommended_books.append(book)
 
-    for book in filtered_user_genres:
-        predicted_rating = model.predict(uid=current_user.id, iid=book.isbn).est
-        recommended_books[book.isbn] = predicted_rating
-
-    sorted_ratings = list(recommended_books.items())
-    sorted_ratings.sort(key=lambda k: k[1], reverse=True)
-
-    recommended = []
-
-    for pair in sorted_ratings[:30]:
-        book = Book.objects.get(isbn = pair[0])
-        recommended.append(book)
-
-
-
-    return render(request, 'feed.html', {'user': current_user, 'favourites': favourites, 'recommended': recommended})
+    return render(request, 'feed.html', {'user': current_user, 'recommended_books': recommended_books})
 
 class LoginProhibitedMixin:
     def dispatch(self, *args, **kwargs):
@@ -290,7 +291,7 @@ class SignUpView(FormView):
 @login_required
 def select_genres(request):
 
-    genres = Book.objects.values_list('genre',flat=True).distinct
+    genres = Book.objects.values_list('genre',flat=True).distinct()
     current_user = request.user
 
     if request.method=='POST':

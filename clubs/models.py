@@ -7,62 +7,6 @@ from libgravatar import Gravatar
 from multiselectfield import MultiSelectField
 
 
-GENRE_CHOICES = [
-    ('Fiction','Fiction'),
-    ('Food and Drink','Food and Drink'),
-    ('Science Fiction','Science Fiction'),
-    ('Classics','Classics'),
-    ('Nonfiction','Nonfiction'),
-    ('Horror','Horror'),
-    ('Mystery','Mystery'),
-    ('Philosophy','Philosophy'),
-    ('Business','Business'),
-    ('Historical','Historical'),
-    ('Romance','Romance'),
-    ('Crime','Crime'),
-    ('Womens Fiction','Womens Fiction'),
-    ('Fantasy','Fantasy'),
-    ('Young Adult','Young Adult'),
-    ('Sequential Art','Sequential Art'),
-    ('Politics','Politics'),
-    ('Childrens','Childrens'),
-    ('History','History'),
-    ('Self Help','Self Help'),
-    ('Humor','Humor'),
-    ('Thriller','Thriller'),
-    ('Autobiography','Autobiography'),
-    ('Poetry','Poetry'),
-    ('Short Stories','Short Stories'),
-    ('Language','Language'),
-    ('Science','Science'),
-    ('Travel','Travel'),
-    ('Parenting','Parenting'),
-    ('Paranormal','Paranormal'),
-    ('Biography','Biography'),
-    ('Christian','Christian'),
-    ('European Literature','European Literature'),
-    ('Psychology','Psychology'),
-    ('Adventure','Adventure'),
-    ('Religion','Religion'),
-    ('Holiday','Holiday'),
-    ('Animals','Animals'),
-    ('Christian Fiction','Christian Fiction'),
-    ('Reference','Reference'),
-    ('Spirituality','Spirituality'),
-    ('Feminism','Feminism'),
-    ('Health','Health'),
-    ('Cultural','Cultural'),
-    ('Adult Fiction','Adult Fiction'),
-    ('Writing','Writing'),
-    ('Realistic Fiction','Realistic Fiction'),
-    ('Law','Law'),
-    ('Art','Art'),
-    ('Plays','Plays'),
-    ('Relationships','Relationships'),
-    ('Westerns','Westerns'),
-    ('Sports','Sports')
-]
-
 # Create the Book model
 class Book(models.Model):
     isbn = models.CharField(max_length = 13, unique = True, blank = False)
@@ -99,12 +43,10 @@ class User(AbstractUser):
     bio = models.CharField(max_length = 500, blank = True)
     wishlist = models.ManyToManyField(Book, related_name="wishlist", blank=True)
     genres_preferences = MultiSelectField(
-        choices=GENRE_CHOICES,
+        choices=[(genre, genre) for genre in sorted(Book.objects.values_list('genre', flat=True).distinct())],
         max_choices=5,
         blank=True,
     )
-
-    
 
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
