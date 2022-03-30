@@ -6,7 +6,8 @@ from clubs.models import User, Book
 class WishViewTestCase(TestCase):
 
     fixtures = ["clubs/tests/fixtures/default_user.json",
-                "clubs/tests/fixtures/default_book.json"]
+                "clubs/tests/fixtures/default_book.json",
+                "clubs/tests/fixtures/default_club.json"]
 
     def setUp(self):
         self.user = User.objects.get(username = 'johndoe')
@@ -43,5 +44,5 @@ class WishViewTestCase(TestCase):
         response = self.client.get(url, follow = True)
         redirect_url = reverse('book_list')
         self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
-        self.assertTemplateUsed(response, 'book_list.html')
+        self.assertTemplateUsed(response, 'book_templates/search_books.html')
         self.assertEqual(self.user.wishlist.count(), 0)

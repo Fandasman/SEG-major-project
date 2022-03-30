@@ -14,6 +14,7 @@ from django.contrib.messages import constants as message_constants
 from pathlib import Path
 import os
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'bootstrap_pagination',
     'django.contrib.humanize',
+    'location_field.apps.DefaultConfig',
 ]
 
 MIDDLEWARE = [

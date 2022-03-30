@@ -1,0 +1,33 @@
+{%extends 'base_content.html'%}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Owned Club List</h1>
+      <br>
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Location</th>
+          </tr>
+        </thead>
+        {% if roles %}
+          {% for role in roles %}
+          <tr>
+            <td> {{role.club.name}} </td>
+            <td> {{role.club.location}} </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+        <div class="alert alert-info" role="alert">
+          Sorry you don't own any clubs...
+          <a href = "{% url 'create_club' %}" class = "alert-link">Create your own club </a>
+          and come back!
+        </div>
+        {% endif %}
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

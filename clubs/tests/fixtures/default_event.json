@@ -1,0 +1,15 @@
+[
+    {
+        "model": "clubs.Event",
+        "pk": 1,
+        "fields": {
+            "name": "Test Event",
+            "description": "An ordinary event. ",
+            "maxNumberOfParticipants": "16",
+            "deadline": "",
+            "book": "1",
+            "club": "1",
+            "participants": None,
+        }
+    }
+]

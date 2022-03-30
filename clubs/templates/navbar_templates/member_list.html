@@ -1,27 +1,19 @@
-{% extends 'base_content.html' %}
-{% block title %}
-| MemberList
-{% endblock %}
+{%extends 'base_content.html'%}
+{% load bootstrap_pagination %}
 {% block content %}
-
-{% include 'partials/club_page_jumbotron.html' with members=members club=club %}
-<style>
-card {
-
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-
-}
-</style>
-
-<div class="container" style="padding-left:100px">
+<div class="container">
   <div class="row">
     <div class="col-12">
-      <div class="card" style="max-width: 90rem;">
-        <div class="card">
-          <div class="card-body">
-
+      <h1>Users</h1>
       <table class="table table-striped table-hover">
-        {% for member in members %}
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Username</th>
+            <th scope="col">Name</th>
+          </tr>
+        </thead>
+        {% for user in users %}
           <tr>
             <td>
               <img src="{{ user.mini_gravatar }}" alt="Gravatar of {{ user.first_name }}" class="rounded-circle" >
@@ -36,22 +28,10 @@ card {
                 <input type = "submit" value = "See profile" class="btn btn-primary">
               </form>
             </td>
-            {%if userrole.role == 'O'%}
-              <td>
-                {% include 'partials/officer_operation.html' with members=members userrole=userrole%}
-              </td>
-          {%endif%}
-          {%if userrole.role == "CO"%}
-              <td>
-                 {% include 'partials/club_owner_operation.html' with members=members userrole=userrole%}
-              </td>
-          {%endif%}
           </tr>
         {% endfor %}
       </table>
-    </div>
- </div>
-</div>
+      {% bootstrap_paginate page_obj range=6 previous_label="Previous" next_label="Next" show_first_last="true" %}
     </div>
   </div>
 </div>
