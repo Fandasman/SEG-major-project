@@ -124,8 +124,8 @@ class BooksRatings(models.Model):
     )
     user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE)
 
-    def _add_rating(self):
-        BooksRatings.rating.add(self)
+    def _add_rating(input_rating):
+        BooksRatings.rating.add(input_rating)
 
 
 
