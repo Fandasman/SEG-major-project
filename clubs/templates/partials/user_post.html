@@ -4,10 +4,7 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{% static 'user-post.css' %}">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <style>
       #minus{
@@ -55,7 +52,7 @@
           <div class="row" style="margin:20px auto;">
             <ul class="list-group">
               <li class="list-group-item">
-                <button type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#demo"><span id="plus">► Show comments</span><span id="minus">▼ Hide comments</span></button>
+                <button onclick="showComments()" type="button" class="btn btn-primary collapsed" data-toggle="collapse" data-target="#demo"><span id="plus">► Show comments</span><span id="minus">▼ Hide comments</span></button>
                 <div id="demo" class="collapse">
 
 
@@ -70,7 +67,7 @@
                         {% endif %}
 
                       {% endfor %}
-                      
+
                 </div>
               </li>
             </ul>
@@ -78,7 +75,17 @@
         </div>
       </div>
 
-
+  <script>
+  function showComments() {
+    var com = document.getElementById("demo");
+    if (com.style.display === "none") {
+      com.style.display = "block";
+    }
+    else {
+      com.style.display = "none";
+    }
+  }
+  </script>
 
   <form action="{% url 'add_comment' instance.club.id instance.id%}" method="post">
     {% csrf_token %}
