@@ -4,7 +4,7 @@ from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
 
-from .models import GENRE_CHOICES, Club, User, Book
+from .models import GENRE_CHOICES, BooksRatings, Club, User, Book
 
 
 
@@ -205,6 +205,20 @@ class GenreForm(forms.ModelForm):
         model = User
         fields = ["genres_preferences"]
 
+
+class RatingForm(forms.ModelForm):
+
+    forms.ChoiceField(
+        choices = [1,2,3,4,5]
+    )
+
+    class Meta:
+        model = BooksRatings
+        fields = ["rating"]
+
+    # def clean(self):
+    #     super().clean()
+    #     rating = self.cleaned_data.get('rating')
 
   
 

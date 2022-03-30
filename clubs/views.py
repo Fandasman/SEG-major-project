@@ -16,7 +16,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import GenreForm, SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
+from .forms import GenreForm, RatingForm, SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
 from .models import Book, Club, Role, User, Invitation, BooksRatings
 from collections import Counter
 
@@ -57,7 +57,18 @@ def show_book(request, book_id):
     except ObjectDoesNotExist:
         return redirect('search_books')
     else:
-        return render(request, 'show_book.html',
+        form = RatingForm
+        if(request.method == 'POST'):
+            if form.is_valid():
+                rating = form.cleaned_data.get('rating')
+                BooksRatings._add_rating(rating)
+                
+
+            return render(request, 'show_book.html',
+                {'book': book}, {'form':form}
+            )
+    
+    return render(request, 'show_book.html',
             {'book': book}
         )
 
