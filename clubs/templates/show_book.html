@@ -6,9 +6,9 @@
 <div class="container">
   <div class="row content">
     <div class="col-xs-12 col-lg-6 col-xl-4">
-        {% include 'partials/book_details.html' with form=form%}
+        {% include 'partials/book_details.html' with form=form2%}
       <form action="{% url 'show_book' book.id %}" method="get">
-        {{ form2.as_table }}
+        {{ form.as_table }}
         <input type='submit' value="Save" class="btn btn-primary">
       </form>
     </div>

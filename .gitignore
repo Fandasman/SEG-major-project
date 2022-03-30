@@ -4,6 +4,10 @@
 # CSV data
 *.csv
 
+# Ignore pickles
+*.pkl
+**/*.pkl
+
 ### Django ###
 *.log
 *.pot

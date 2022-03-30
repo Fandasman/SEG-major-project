@@ -65,12 +65,12 @@ def show_book(request, book_id):
                 
 
             return render(request, 'show_book.html',
-                {'book': book}, {'form2':book_form}, {'book_id':book_id}
+                {'book': book, 'form':book_form, 'book_id':book_id}
             )
     
     return render(request, 'show_book.html',
-            {'book': book}
-        )
+            {'book': book,'form':book_form,'book_id':book_id}
+    )
 
 # @login_required
 def profile(request):
