@@ -18,9 +18,9 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm, UserPostForm, CommentForm
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm, UserPostForm, CommentForm, SearchForm
 from .models import Book, Club, Role, User, Invitation, Event, EventPost, UserPost, MembershipPost, Comment
-
+from itertools import chain
 from datetime import datetime
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -29,7 +29,33 @@ from django.utils.safestring import mark_safe
 import calendar
 from calendar import HTMLCalendar
 
+import csv
+from django.http import StreamingHttpResponse
+
 # Create your views here.
+
+
+class Echo(View):
+    """An object that implements just the write method of the file-like
+    interface.
+    """
+    def write(self, value):
+        """Write the value by returning it, instead of storing in a buffer."""
+        return value
+
+def some_streaming_csv_view(request):
+    """A view that streams a large CSV file."""
+    # Generate a sequence of rows. The range is based on the maximum number of
+    # rows that can be handled by a single sheet in most spreadsheet
+    # applications.
+    rows = (["Row {}".format(idx), str(idx)] for idx in range(271380))
+    book_buffer = Echo()
+    writer = csv.writer(book_buffer)
+    return StreamingHttpResponse(
+        (writer.writerow(row) for row in rows),
+        content_type="text/csv",
+        headers={'Content-Disposition': 'attachment; filename="BX_Books.csv"'},
+    )
 
 def feed(request):
     current_user = request.user
@@ -108,6 +134,12 @@ class BookListView(ListView):
     template_name= 'book_list.html'
     context_object_name= 'books'
     paginate_by = 30
+
+# classBookListView(LoginRequiredMixin, ListView):
+class BookListView(ListView):
+    model= Book
+    template_name= 'book_list.html'
+    context_object_name= 'books'
 
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
@@ -944,3 +976,47 @@ def leave_club(request,club_id):
     club = Club.objects.get(id = club_id)
     role = Role.objects.filter(club= club).get(user = request.user).delete()
     return redirect('feed')
+
+
+class SearchView(ListView):
+    template_name = 'search_view.html'
+    count = 0
+
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['count'] = self.count or 0
+        context['form'] = SearchForm(initial={
+            'search' : self.request.GET.get('search',''),
+            'filter_field' : self.request.GET.get('filter_field', ''),
+        })
+        return context
+
+    def get_queryset(self):
+        request = self.request
+        query = request.GET.get('search')
+        filter_field = self.request.GET.get('filter_field')
+
+        if query is not None:
+            queryset = []
+            book_results= Book.objects.search(query)
+            club_results= Club.objects.search(query)
+            user_results= User.objects.search(query)
+            if filter_field == 'books':
+                queryset = book_results
+            elif filter_field == 'clubs':
+                queryset =  club_results
+            elif filter_field == 'users':
+                queryset = user_results
+            elif filter_field == 'all':
+                queryset = chain(
+                    book_results,
+                    club_results,
+                    user_results
+                    )
+            qs_sorted = sorted(queryset,
+                        key=lambda instance: instance.pk,
+                        reverse=True)
+            self.count = len(qs_sorted) # since qs is actually a list
+            return qs_sorted
+        return query

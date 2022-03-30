@@ -1,14 +1,66 @@
 import datetime
 from django.db import models
+from django.db.models import Q
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from libgravatar import Gravatar
 from datetime import date
 from datetime import timedelta
-
+from django.urls import reverse
 
 
 # Create the Book model
+
+class UserAccountManager(BaseUserManager):
+    def create_user(self, email, first_name, last_name, password=None):
+        if not email:
+            raise ValueError('Email must be set!')
+        user = self.model(email=email, first_name=first_name, last_name=last_name)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, first_name, last_name, password):
+        user = self.create_user(email, first_name, last_name, password)
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
+
+    def get_by_natural_key(self, email_):
+        return self.get(code_number=email_)
+
+
+class BookManager(models.Manager):
+    def search(self, query=None):
+        qs = self.get_queryset()
+        if query is not None:
+            or_lookup = (Q(title__icontains=query) |
+                         Q(author__icontains=query)
+                        )
+            qs = qs.filter(or_lookup).distinct()
+        return qs
+
+class ClubManager(models.Manager):
+    def search(self, query=None):
+        qs = self.get_queryset()
+        if query is not None:
+            lookup = Q(name__icontains=query)
+            qs = qs.filter(lookup).distinct()
+        return qs
+
+
+class UserManager(models.Manager):
+    def search(self, query=None):
+        qs = self.get_queryset()
+        if query is not None:
+            or_lookup = (Q(username__icontains=query) |
+                         Q(first_name__icontains=query) |
+                         Q(last_name__icontains=query)
+                        )
+            qs = qs.filter(or_lookup).distinct()
+        return qs
+
+
 class Book(models.Model):
     isbn = models.CharField(max_length = 13, unique = True, blank = False)
     title = models.CharField(max_length = 100, blank = False)
@@ -22,6 +74,10 @@ class Book(models.Model):
     imgURLSmall = models.URLField(blank = True)
     imgURLMedium = models.URLField(blank = True)
     imgURLLarge = models.URLField(blank = True)
+    objects= BookManager()
+
+    def get_absolute_url(self):
+        return reverse('show_book', args=[str(self.id)])
 
     def get_title(self):
         return self.title
@@ -45,6 +101,7 @@ class User(AbstractUser):
     email = models.EmailField(unique = True, blank = False)
     bio = models.CharField(max_length = 500, blank = True)
     wishlist = models.ManyToManyField(Book, related_name="wishlist", blank=True)
+    objects= UserManager()
 
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
@@ -70,6 +127,9 @@ class BooksRatings(models.Model):
         validators = [MaxValueValidator(5), MinValueValidator(1)]
     )
     user = models.ForeignKey(User, related_name='books', on_delete=models.CASCADE)
+
+    def get_absolute_url(self):
+        return reverse('show_user', args=[str(self.id)])
 
 
 # Create the book Club model

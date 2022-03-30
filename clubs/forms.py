@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
-
+from django.forms import Form,ChoiceField, CharField
 from .models import Club, User, Book, Event, UserPost, Comment
 
 
@@ -202,3 +202,12 @@ class CommentForm(forms.ModelForm):
         widgets = {
             'Comment': forms.Textarea(attrs={'rows':1, 'cols':1, 'style':'resize:none;'})
         }
+class SearchForm(Form):
+    FILTER_CHOICES = (
+        ('books', 'Books'),
+        ('users', 'Users'),
+        ('clubs', 'Clubs'),
+        ('all', 'All')
+    )
+    search = CharField(required=True)
+    filter_field = ChoiceField(choices=FILTER_CHOICES)
