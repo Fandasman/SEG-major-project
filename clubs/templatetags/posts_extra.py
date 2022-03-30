@@ -11,3 +11,7 @@ def model_type(value):
 @register.filter
 def has_liked_filter(value,user):
     return value.has_liked(user)
+
+@register.filter
+def has_commented_filter(value,user):
+    return value.has_commented(user)
