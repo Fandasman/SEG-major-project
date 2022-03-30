@@ -9,9 +9,17 @@
       <h1>Log in</h1>
       <form action ="{%url 'login' %}" method="post">
         {%csrf_token%}
-        {{form.as_p}}
-        <input type="submit"  class="btn btn-primary" value = "Log in">
-        <a class="btn btn-secondary" href="{% url 'sign_up' %}">Sign up</a>
+        {% for message in messages %}
+        <div class="container-fluid p-0">
+          <div class="alert {{ message.tags }} alert-danger" role="alert" >
+              <span aria-hidden="true">×</span>
+            </button>
+            {{ message }}
+          </div>
+        </div>
+        {% endfor %}
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <input type = "submit" value = "Log in" class="btn btn-primary" name="login">
       </form>
     </div>
   </div>

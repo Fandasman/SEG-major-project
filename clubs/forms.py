@@ -46,11 +46,6 @@ class SignUpForm(forms.ModelForm):
 
 class LogInForm(forms.Form):
     username = forms.CharField(required=True, label = "Username")
-
-    # Tried to make email not case senstive.
-    # def clean_email(self):
-    #     data = self.cleaned_data['email']
-    #     return data.lower()
     password = forms.CharField(label = "Password", widget = forms.PasswordInput())
 
     def get_user(self):
