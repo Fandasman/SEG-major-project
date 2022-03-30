@@ -11,6 +11,12 @@ class SelectGenreViewTestCase(TestCase, LogInTester):
 
     def setUp(self):
         self.url = reverse('select_genres')
+        self.form_input = {
+            'genres_preferences': [('Fiction'), ('Romance'), ('Horror'), ('Mystery'), ('Politics')]
+        }
+        self.invalid_form_input = {
+            'genres_preferences': [('Fiction'), ('Romance'), ('Horror'), ('Mystery'), ('Politics'), ('Nonfiction', 'Nonfiction')]
+        }
         self.user = User.objects.get(username='johndoe')
 
     def test_select_genre_url(self):
@@ -26,3 +32,25 @@ class SelectGenreViewTestCase(TestCase, LogInTester):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed("select_genres.html")
+
+    def test_successful_select_genre_update(self):
+        self.client.login(username=self.user.username, password="Password123")
+        user_before_count = User.objects.count
+        self.assertEqual(self.user.genres_preferences, [])
+        response = self.client.post(self.url, self.form_input, follow = True)
+        response_url = reverse('feed')
+        self.assertRedirects(response, response_url, status_code = 302, target_status_code = 200)
+        self.assertTemplateUsed(response, 'feed.html')
+        user_after_count = User.objects.count
+        self.assertEqual(user_before_count, user_after_count)
+        #self.assertEqual(self.user.genres_preferences, [('Fiction'), ('Romance'), ('Horror'), ('Mystery'), ('Politics')])
+
+    def test_unsuccessful_select_genres(self):
+        self.client.login(username=self.user.username, password="Password123")
+        user_before_count = User.objects.count
+        self.assertEqual(self.user.genres_preferences, [])
+        response = self.client.post(self.url, self.invalid_form_input, follow = True)
+        self.assertEqual(response.status_code, 200)
+        user_after_count = User.objects.count
+        self.assertEqual(user_before_count, user_after_count)
+        self.assertEqual(self.user.genres_preferences, [])
