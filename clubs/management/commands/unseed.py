@@ -8,7 +8,11 @@ class Command(BaseCommand):
         print("Starting unseed...")
 
         Command.delete_books(self)
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> 6bf38f008536159240ca90d962348b5f96c45bef
         Command.delete_users(self)
 
         Command.delete_clubs(self)
