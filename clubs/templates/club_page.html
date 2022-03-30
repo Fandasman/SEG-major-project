@@ -24,15 +24,12 @@
             </form>
           {% endif %}
 
-          <form action="{% url 'club_chat' club.id %}">
-                {% csrf_token %}
-                <input type="submit" value="chat" class="btn btn-primary">
-            </form>
       {% endif %}
       
       {% include 'partials/member_information.html' with members=members %}
       {% include 'partials/officer_operation.html' with members=members userrole=userrole%}
       {% include 'partials/club_owner_operation.html' with members=members userrole=userrole%}
+        {% include 'club_chat.html' with club=club %}
     </div>
   </div>
 </div>

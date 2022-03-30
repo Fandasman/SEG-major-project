@@ -90,9 +90,9 @@ ROLES= (
 )
 
 class Role(models.Model):
-    user= models.ForeignKey(User, on_delete=models.CASCADE)
-    club= models.ForeignKey(Club, on_delete=models.CASCADE)
-    role= models.CharField(
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    role = models.CharField(
         max_length=2,
         choices=ROLES,
         default='A'
@@ -128,9 +128,10 @@ class Invitation(models.Model):
 
 # Create the Chat model
 class Message(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    club = models.ForeignKey(Club, on_delete=models.CASCADE)
-    text = models.CharField(max_length = 200, blank = False)
+    user = models.ForeignKey(User, related_name='user', on_delete=models.CASCADE)
+    receiver = models.ForeignKey(User, null=True, related_name='receiver', on_delete=models.CASCADE)
+    club = models.ForeignKey(Club, null=True, on_delete=models.CASCADE)
+    text = models.CharField(max_length=200, blank=False)
 
     def get_username(self):
         return self.user.username

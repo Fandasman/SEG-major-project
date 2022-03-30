@@ -667,9 +667,44 @@ class InvitationlistView(LoginRequiredMixin, ListView):
             return redirect('feed')
 
 
-def user_chat(request, user_id):
+def user_chat(request, receiver_id):
     user = request.user
-    receiver = User.objects.get(id=user_id)
+    receiver = User.objects.get(id=receiver_id)
+    return render(request, 'user_chat.html',{
+        'user':user,
+        'receiver':receiver
+    })
+
+
+def send_user_message(request):
+    user = request.user
+    if request.method == "POST":
+        text = request.POST.get('text')
+        user_id = user.id
+        receiver_id = request.POST.get('receiver_id')
+        user = User.objects.get(id=user_id)
+        receiver = User.objects.get(id=receiver_id)
+        new_message = Message.objects.create(text=text, user=user, receiver=receiver)
+        new_message.save()
+        return render(request, 'user_chat.html')
+    else:
+        return HttpResponseForbidden()
+
+
+def get_user_messages(request, receiver_id):
+    user = request.user
+    receiver = User.objects.get(id=receiver_id)
+    messages = Message.objects.filter(user=user, receiver=receiver) | \
+               Message.objects.filter(user=receiver, receiver=user)
+    order_messages = messages.order_by("id")
+    message_list = []
+    for message in order_messages:
+        message_list.append({
+            "username": message.get_username(),
+            "text":message.text
+            })
+
+    return JsonResponse({"messages":message_list})
 
 
 def club_chat(request, club_id):

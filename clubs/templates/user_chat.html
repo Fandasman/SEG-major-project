@@ -1,5 +1,6 @@
 
 {% block title %}
+chat
 {% endblock %}
 {% block content %}
     <style>
@@ -79,7 +80,7 @@
         setInterval(function(){
             $.ajax({
                 type: 'GET',
-                url : "/get_club_messages/{{ club.id }}/",
+                url : "/get_user_messages/{{ receiver.id }}/",
                 success: function(response){
                     console.log(response);
                     $("#chatbox").empty();
@@ -103,6 +104,7 @@
 
                 error: function(response){
                     alert('An error occured')
+
                 }
             });
         },1000);
@@ -116,10 +118,10 @@
                 e.preventDefault();
                 $.ajax({
                     method: 'POST',
-                    url: '/send_club_message/',
+                    url: '/send_user_message/',
                     data: {
                         user_id: $('#user_id').val(),
-                        club_id: $('#club_id').val(),
+                        receiver_id: $('#receiver_id').val(),
                         text: $('#text').val(),
                         csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
                     },
@@ -132,16 +134,16 @@
         });
     </script>
 
-    <button class="openChatBtn" onclick="openBox()">Club Chat</button>
+    <button class="openChatBtn" onclick="openBox()">Chat</button>
     <div class="openChat">
-    <h4 >{{ club.name }} Chat</h4>
+    <h4 >Chat</h4>
     <div id="chatbox" class="chatbox">
 
     </div>
      <form id="chat" class="chat-input">
             {% csrf_token %}
-            <input type="hidden" name="user_id" id="user_id" value="{{user.id}}"/>
-            <input type="hidden" name="club_id" id="club_id" value="{{club.id}}"/>
+
+            <input type="hidden" name="receiver_id" id="receiver_id" value="{{receiver.id}}"/>
             <input type="text" name="text" id="text" class="input"/>
             <input type="submit" value="Send">
         </form>

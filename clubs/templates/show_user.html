@@ -8,6 +8,10 @@
     <div class="col-xs-12 col-lg-6 col-xl-4">
       {% include 'partials/user_profile.html' %}
     </div>
+      <div>
+          {% include 'user_chat.html' with receiver=user %}
+
+      </div>
   </div>
 </div>
 {% endblock %}
