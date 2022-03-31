@@ -958,6 +958,8 @@ def leave_club(request,club_id):
 class SearchView(ListView):
     template_name = 'search_view.html'
     count = 0
+    query = ' '
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['count'] = self.count or 0
@@ -965,6 +967,7 @@ class SearchView(ListView):
             'search' : self.request.GET.get('search',''),
             'filter_field' : self.request.GET.get('filter_field', ''),
         })
+        context['query'] = self.query
         return context
 
     def get_queryset(self):
@@ -990,9 +993,11 @@ class SearchView(ListView):
                     club_results,
                     user_results
                     )
+
             qs_sorted = sorted(queryset,
                         key=lambda instance: instance.pk,
                         reverse=True)
-            self.count = len(qs_sorted) # since qs is actually a list
+            self.count = len(qs_sorted)
+            self.query = query
             return qs_sorted
         return query

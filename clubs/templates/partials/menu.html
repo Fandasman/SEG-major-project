@@ -1,3 +1,10 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="https://kit.fontawesome.com/9a416a1cca.js" crossorigin="anonymous"></script>
+</head>
+
 <div class="collapse navbar-collapse" id="navbarSupportedContent">
   <ul class="navbar-nav me-auto mb-2 mb-lg-0">
     <li class="nav-item">
@@ -25,6 +32,20 @@
       <a class="nav-link" href="{% url 'invitation_list' current_user.id %}">Invitations</a>
     </li>
   </ul>
+
+  <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+    <li class="nav-item">
+      <form action="{% url 'search_view' %}" method="GET">
+          {% csrf_token %}
+          {{search_form.search}}
+          <button>
+                  <i class="fas fa-search"></i>
+          </button>
+          {{ search_form.filter_field }}
+      </form>
+    </li>
+  </ul>
+
   <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" href="#" id="user-account-dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
