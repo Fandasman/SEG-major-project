@@ -67,16 +67,6 @@ class LoginProhibitedMixin:
             return redirect('feed')
         return super().dispatch(*args, **kwargs)
 
-# @login_required
-def show_book(request, book_id):
-    try:
-        book = Book.objects.get(id=book_id)
-    except ObjectDoesNotExist:
-        return redirect('search_books')
-    else:
-        return render(request, 'book_templates/show_book.html',
-            {'book': book}
-        )
 
 # @login_required
 def profile(request):
@@ -119,24 +109,24 @@ class HomeView(LoginProhibitedMixin,View):
         return render(self.request, 'home.html')
 
 
-# classBookListView(LoginRequiredMixin, ListView):
-class BookListView(ListView):
+class BookListView(LoginRequiredMixin, ListView):
     model= Book
     template_name= 'book_templates/book_list.html'
     context_object_name= 'books'
-    paginate_by = 30
+    paginate_by = settings.BOOKS_PER_PAGE
+    ordering = ['title']
 
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
         book= Book.objects.all()
         return context
 
-# class UserListView(LoginRequiredMixin, ListView):
-class UserListView(ListView):
+class UserListView(LoginRequiredMixin, ListView):
     model= User
     template_name= 'user_templates/user_list.html'
     context_object_name= 'users'
     paginate_by = settings.USERS_PER_PAGE
+    ordering = ['username']
 
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
@@ -144,12 +134,12 @@ class UserListView(ListView):
         context['roles']= Role.objects.all().filter(role= "M")
         return context
 
-# class ClubListView(LoginRequiredMixin, ListView):
-class ClubListView(ListView):
+class ClubListView(LoginRequiredMixin, ListView):
     model= Club
     template_name= 'club_templates/club_list.html'
     context_object_name= 'clubs'
     paginate_by = settings.CLUBS_PER_PAGE
+    ordering = ['name']
 
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
@@ -157,12 +147,12 @@ class ClubListView(ListView):
         context['roles']= Role.objects.all().filter(role= "O")
         return context
 
-# class OwnerClubListView(LoginRequiredMixin, ListView):
-class OwnerClubListView(ListView):
+class OwnerClubListView(LoginRequiredMixin, ListView):
     model= Club
     template_name= 'club_templates/owner_club_list.html'
-    context_object_name= 'users'
+    context_object_name= 'clubs'
     paginate_by = settings.CLUBS_PER_PAGE
+    ordering = ['name']
 
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
@@ -170,12 +160,12 @@ class OwnerClubListView(ListView):
         context['roles']= Role.objects.all().filter(user= current_user, role= "CO")
         return context
 
-# class MemberClubListView(LoginRequiredMixin, ListView):
-class MemberClubListView(ListView):
+class MemberClubListView(LoginRequiredMixin, ListView):
     model= Club
     template_name= 'club_templates/member_club_list.html'
-    context_object_name= 'users'
-    paginate_by = settings.USERS_PER_PAGE
+    context_object_name= 'clubs'
+    paginate_by = settings.CLUBS_PER_PAGE
+    ordering = ['name']
 
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
@@ -319,8 +309,10 @@ class EditProfileView(View):
         form = EditProfileForm(instance=current_user)
         return render(self.request,'user_templates/edit_profile.html', {'form': form})
 
+
 """Includes the view for a user's wishlist."""
 class WishlistView(LoginRequiredMixin, ListView):
+
     def get(self, request, user_id):
         return self.render(user_id)
 

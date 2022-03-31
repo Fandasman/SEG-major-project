@@ -1,52 +1,59 @@
 {% extends 'base_content.html' %}
-{% block title %}
-| Wishlist
-{% endblock %}
 {% block content %}
 <div class="container">
-    <div class="row">
-        <div class="col-12">
-            <h1>Wishlist</h1>
-            <br>
+  <div class="row">
+    <div class="col-12">
+      <h1>Wishlist</h1>
+        <br>
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th scope="col"></th>
+                <th scope="col">Title</th>
+                <th scope="col">Author</th>
+                <th scope="col">Publisher</th>
+                <th scope="col">Date</th>
+              </tr>
+            </thead>
             {% if user.wishlist.all.count > 0 %}
-            <table class="table table-striped table-hover">
-                <thead>
-                    <th scope="col"></th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Author</th>
-                    <th scope="col">Publisher</th>
-                    <th scope="col">Date</th>
-                </thead>
-            {% endif %}
-                {% for book in user.wishlist.all %}
+
+              {% for book in user.wishlist.all %}
                 <tr>
+                  <td>
+                    <img src="{{ book.imgURLSmall }}" alt="Cover of {{ book.title }}">
+                  </td>
+                  <td>{{ book.title }}</td>
+                  <td>{{ book.author }}</td>
+                  <td>{{ book.publisher }}</td>
+                  <td>{{ book.published }}</td>
+                  <td>
+                    <a class="btn btn-primary" href="{% url 'show_book' book.id %}">See details</a>
+                  </td>
+
+                  {% if user == current_user %}
                     <td>
-                        <img src="{{ book.imgURLSmall }}" alt="Cover of {{ book.title }}">
+                      <a class="btn btn-danger" href="{% url 'unwish' book.id %}">Remove from wishlist</a>
                     </td>
-                    <td>{{ book.title }}</td>
-                    <td>{{ book.author }}</td>
-                    <td>{{ book.publisher }}</td>
-                    <td>{{ book.published }}</td>
-                    <td>
-                        <a class="btn btn-primary" href="{% url 'show_book' book.id %}">See book</a>
-                    </td>
-                    {% if user == current_user %}
-                    <td>
-                        <a class="btn btn-danger" href="{% url 'unwish' book.id %}">Remove from wishlist</a>
-                    </td>
-                    {% endif %}
+                  {% endif %}
+
                 </tr>
+              {% endfor %}
 
-                {% empty %}
+            {% else %}
 
-                {% if user == current_user %}
-                <h3>Your wishlist is empty. Maybe fill it with some books? :)</h3>
+              {% if user == current_user %}
+              <div class="alert alert-info" role="alert">
+                Your wishlist is empty...
+                <a href = "{% url 'book_list' %}" class = "alert-link">Add some books </a>
+                and come back!
+              </div>
+              {% else %}
+              <div class="alert alert-info" role="alert">
+                <b>{{user.username}}'s</b> wishlist is empty!
+              </div>
+              {% endif %}
 
-                {% else %}
-                <h3><b>{{user.username}}'s</b> wishlist is empty.</h3>
-                {% endif %}
-
-                {% endfor %}
+            {% endif %}
             </table>
         </div>
     </div>
