@@ -20,11 +20,11 @@ class WishViewTestCase(TestCase):
     def test_valid_remove_book_from_wishlist(self):
         self.client.login(username=self.user.username, password="Password123")
         before_count = self.user.wishlist.count()
-        url = reverse('unwish', args=(self.book.id,))
-        response = self.client.get(url, follow = True)
-        redirect_url = reverse('wishlist', args=(self.user.id,))
+        unwish_url = reverse('unwish', args=(self.book.id,))
+        response = self.client.get(unwish_url, follow = True)
+        redirect_url = reverse('show_book', args=(self.book.id,))
         self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
-        self.assertTemplateUsed(response, 'wishlist.html')
+        self.assertTemplateUsed(response, 'show_book.html')
         after_count = self.user.wishlist.count()
         self.assertEqual(after_count, before_count - 1)
 
@@ -34,13 +34,13 @@ class WishViewTestCase(TestCase):
         url = reverse('unwish', args=(self.book.id,))
         self.client.get(url)
         response = self.client.get(url, follow = True)
-        redirect_url = reverse('wishlist', args=(self.user.id,))
+        redirect_url = reverse('show_book', args=(self.book.id,))
         self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
-        self.assertTemplateUsed(response, 'wishlist.html')
+        self.assertTemplateUsed(response, 'show_book.html')
         after_count = self.user.wishlist.count()
         self.assertEqual(after_count, before_count - 1)
 
-    def test_remove_nonexisting_book_from_wishlist(self):
+    def test_remove_invalid_book_from_wishlist(self):
         self.client.login(username=self.user.username, password="Password123")
         url = reverse('unwish', args=(self.book.id + 9999999,))
         response = self.client.get(url, follow = True)

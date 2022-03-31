@@ -2,7 +2,7 @@ import sys
 from django import template
 from django.conf import settings
 from django.contrib import messages
-from django.urls import reverse
+from django.urls import reverse, resolve
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -632,9 +632,12 @@ def unwish(request, book_id):
     user = request.user
     try:
         book = Book.objects.get(pk = book_id)
+        previous_url = request.META.get('HTTP_REFERER')
         if user.wishlist.filter(isbn=book.isbn).exists():
             user.wishlist.remove(book)
-        return redirect('wishlist', user.id)
+            if previous_url != None and 'wishlist' in previous_url:
+                return redirect('wishlist', user.id)
+        return redirect('show_book', book.id)
 
     except ObjectDoesNotExist:
         return redirect('search_books')
