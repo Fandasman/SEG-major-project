@@ -21,7 +21,7 @@ class ShowBookTest(TestCase,LogInTester):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'show_book.html')
+        self.assertTemplateUsed(response, 'book_templates/show_book.html')
         self.assertContains(response, self.target_book.title)
         self.assertContains(response, self.target_book.author)
         self.assertContains(response, self.target_book.imgURLMedium)

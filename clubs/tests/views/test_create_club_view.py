@@ -6,16 +6,11 @@ from clubs.models import Club, User, Role
 
 class CreateClubViewTestCase(TestCase):
 
+    fixtures = ['clubs/tests/fixtures/default_user.json']
+
     def setUp(self):
         self.url = reverse('create_club')
-        self.user = User.objects.create_user(
-            '@johndoe',
-            first_name='John',
-            last_name='Doe',
-            email='johndoe@example.org',
-            password='Password123',
-            bio='Hi, my name is John.'
-        )
+        self.user = User.objects.get(email='johndoe@example.org')
         self.form_input = {
             'name': 'test_club',
             'location': 'London',
@@ -29,7 +24,7 @@ class CreateClubViewTestCase(TestCase):
         self.client.login(username = self.user.username, password = "Password123")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'create_club.html')
+        self.assertTemplateUsed(response, 'navbar_templates/create_club.html')
 
     def test_unsuccessful_create_club(self):
         self.form_input['name'] = ''

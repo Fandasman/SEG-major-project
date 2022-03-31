@@ -14,6 +14,7 @@ from django.contrib.messages import constants as message_constants
 from pathlib import Path
 import os
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -41,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'clubs',
     'widget_tweaks',
+    'location_field.apps.DefaultConfig',
+
 ]
 
 MIDDLEWARE = [
@@ -128,6 +131,9 @@ STATIC_URL = '/static/'
 
 # Login URL to redirect logged in users
 LOGIN_URL = 'login'
+
+
+REDIRECT_URL_WHEN_LOGGED_IN = 'feed'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
