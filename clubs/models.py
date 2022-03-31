@@ -63,6 +63,9 @@ GENRE_CHOICES = [
     ('Sports','Sports')
 ]
 
+
+RATING_CHOICES = [(i,i) for i in range(1,6)]
+
 # Create the Book model
 class Book(models.Model):
     isbn = models.CharField(max_length = 13, unique = True, blank = False)
@@ -120,6 +123,7 @@ class User(AbstractUser):
 class BooksRatings(models.Model):
     isbn = models.CharField(max_length = 13, blank = False)
     rating = models.IntegerField(
+        choices = RATING_CHOICES,  
         validators = [MaxValueValidator(5), MinValueValidator(1)]
     )
     user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE)

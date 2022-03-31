@@ -1,8 +1,10 @@
+
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
+from bootstrap5.widgets import RadioSelectButtonGroup
 
 from .models import GENRE_CHOICES, BooksRatings, Club, User, Book
 
@@ -62,6 +64,14 @@ GENRE_CHOICES = [
     ('Relationships','Relationships'),
     ('Westerns','Westerns'),
     ('Sports','Sports')
+]
+
+RATING_STARS = [
+    ('1','1'),
+    ('2','2'),
+    ('3','3'),
+    ('4','4'),
+    ('5','5')
 ]
 
 
@@ -207,18 +217,15 @@ class GenreForm(forms.ModelForm):
 
 
 class RatingForm(forms.ModelForm):
-
     forms.ChoiceField(
-        choices = [1,2,3,4,5]
-    )
+        choices=RATING_STARS,
+        widget=RadioSelectButtonGroup,
+        initial=1)
 
     class Meta:
         model = BooksRatings
         fields = ["rating"]
 
-    # def clean(self):
-    #     super().clean()
-    #     rating = self.cleaned_data.get('rating')
 
   
 
