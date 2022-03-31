@@ -126,10 +126,9 @@ class BooksRatings(models.Model):
         choices = RATING_CHOICES,  
         validators = [MaxValueValidator(5), MinValueValidator(1)]
     )
-    user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE, null=True, blank=True)
 
-    def _add_rating(input_rating):
-        BooksRatings.rating.add(input_rating)
+
 
 
 

@@ -1,3 +1,4 @@
+from distutils.bcppcompiler import BCPPCompiler
 from django import template
 from django.conf import settings
 from django.contrib import messages
@@ -57,18 +58,19 @@ def show_book(request, book_id):
     except ObjectDoesNotExist:
         return redirect('search_books')
     else:
-        book_form = RatingForm
-        if(request.method == 'POST'):
+        book_form = RatingForm(request.POST)
+        book_rating = BooksRatings()
+        if request.method=='POST':
             if book_form.is_valid():
-                rating = book_form.cleaned_data.get('rating')
-                BooksRatings._add_rating(rating)
-                
+                    book_form.save(commit=False)
+                    book_form.instance.user= request.user
+                    BooksRatings.isbn = book.isbn
+                    print("isbn:" + book.isbn)
+                    BooksRatings.rating = book_form.cleaned_data.get('rating')
+                    book_form.save()
 
-            return render(request, 'show_book.html',
-                {'book': book, 'form':book_form, 'book_id':book_id}
-            )
-    
-    return render(request, 'show_book.html',
+
+        return render(request, 'show_book.html',
             {'book': book,'form':book_form,'book_id':book_id}
     )
 

@@ -208,7 +208,7 @@ class GenreForm(forms.ModelForm):
 
     genre_preferences = forms.MultipleChoiceField(
         choices=GENRE_CHOICES, 
-        widget=forms.CheckboxInput()
+        widget=forms.CheckboxInput(), 
     )
 
     class Meta:
