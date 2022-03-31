@@ -11,7 +11,7 @@
 </style>
 
 <div class="container">
-  <div class="card my-2">
+  <div class="card my-2" style="max-width: 8rem;">
     <div class="card-body">
 
       <form action="{% url 'new_post' club.id%}" method="post">
@@ -24,7 +24,7 @@
 
   <div class="card my-2">
     <div class="card-body">
-      <h2 class="card-title">Club Feed</h2>
+      <h2 class="card-title">Club Feeds</h2>
       <br>
 
   {% for instance in posts %}
@@ -45,5 +45,6 @@
     </div>
   </div>
 </div>
+
 
 {% endblock content %}

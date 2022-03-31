@@ -11,13 +11,13 @@
 <body>
   <input type="checkbox" checked name="" id="side-menu-switch">
 <div class="side-menu">
-  <form action="">
-      <input type="text" placeholder="Search For">
-      {{form.search}}
+  <form action="{% url 'search_view' %}" method="GET">
+      {% csrf_token %}
+      {{search_form.search}}
       <button>
               <i class="fas fa-search"></i>
       </button>
-      {{ form.filter_field }}
+      {{ search_form.filter_field }}
   </form>
 
     <label for="side-menu-switch">

@@ -22,7 +22,7 @@ from django.conf.urls import url
 
 urlpatterns = [
 
-    path('calendar/', views.CalendarView.as_view(),name="calendar"),
+    path('feed/', views.CalendarView.as_view(),name="feed"),
     path('add_comment/<int:club_id>/<int:post_id>', views.add_comment_to_post,name = "add_comment"),
     path('all_members/<int:club_id>/', views.club_members, name = "club_members"),
     path('club_feed/<int:club_id>/', views.club_feed, name = "club_feed"),
@@ -40,7 +40,7 @@ urlpatterns = [
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
     path('like_post/<int:club_id>/<int:post_id>', views.like_post, name='like_post'),
     path('new_post/<int:club_id>/', views.NewPostView.as_view(), name='new_post'),
-    path('feed/', views.feed, name='feed'),
+    #path('feed/', views.feed, name='feed'),
     path('profile/', views.profile, name='profile'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('logout/', views.log_out, name='log_out'),
@@ -72,5 +72,4 @@ urlpatterns = [
     path('accept_invitation/<int:inv_id>', views.accept_invitation, name='accept_invitation'),
     path('reject_invitation/<int:inv_id>', views.reject_invitation, name='reject_invitation'),
     path('search_view/', views.SearchView.as_view(), name='search_view'),
-    path('echo/', views.Echo.as_view(), name='echo'),
 ]

@@ -73,6 +73,7 @@ TEMPLATES = [
 
                 # Custom context processors
                 'clubs.context_processors.get_current_user',
+                'clubs.context_processors.inject_form',
             ],
         },
     },

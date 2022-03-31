@@ -200,7 +200,7 @@ class MemberClubListView(ListView):
 
 class ShowBookView(DetailView):
     model = Book
-    template_name = 'show_book.html'
+    template_name = 'book_templates/show_book.html'
     pk_url_kwarg = "book_id"
 
 class ShowUserView(DetailView):
@@ -792,7 +792,7 @@ def event_list(request,club_id):
     members = Role.objects.filter(club=club)
     userrole = Role.objects.get(club = club, user=request.user)
     try:
-        events = Event.objects.filter(club = club)
+        events = Event.objects.filter(club=club)
     except ObjectDoesNotExist:
         messages.add_message(request,messages.ERROR,"There are no events")
         return redirect('club_list')
@@ -981,12 +981,10 @@ def leave_club(request,club_id):
 class SearchView(ListView):
     template_name = 'search_view.html'
     count = 0
-
-
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['count'] = self.count or 0
-        context['form'] = SearchForm(initial={
+        context['search_form'] = SearchForm(initial={
             'search' : self.request.GET.get('search',''),
             'filter_field' : self.request.GET.get('filter_field', ''),
         })
@@ -1002,6 +1000,7 @@ class SearchView(ListView):
             book_results= Book.objects.search(query)
             club_results= Club.objects.search(query)
             user_results= User.objects.search(query)
+
             if filter_field == 'books':
                 queryset = book_results
             elif filter_field == 'clubs':

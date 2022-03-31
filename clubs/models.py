@@ -2,7 +2,8 @@ import datetime
 from django.db import models
 from django.db.models import Q
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser, UserManager as AbstractUserManager
+from django.contrib.auth.models import BaseUserManager
 from libgravatar import Gravatar
 from datetime import date
 from datetime import timedelta
@@ -49,7 +50,7 @@ class ClubManager(models.Manager):
         return qs
 
 
-class UserManager(models.Manager):
+class UserManager(AbstractUserManager):
     def search(self, query=None):
         qs = self.get_queryset()
         if query is not None:
@@ -120,6 +121,10 @@ class User(AbstractUser):
     def get_current_user_role(self):
         return Role.objects.filter(user = self)
 
+    def get_absolute_url(self):
+        return reverse('show_user', args=[str(self.id)])
+
+
 # Create the Books and Ratings model
 class BooksRatings(models.Model):
     isbn = models.CharField(max_length = 13, blank = False)
@@ -147,6 +152,7 @@ class Club(models.Model):
     location = models.CharField(max_length = 100, blank = False)
     description = models.CharField(max_length = 500, blank = False)
     club_book = models.ForeignKey(Book, related_name="club_book", blank = True, null = True, on_delete=models.CASCADE)
+    objects= ClubManager()
 
     def _add_book(self, club):
         club.club_book.add(self)
@@ -173,6 +179,10 @@ class Club(models.Model):
         start_date = datetime.date(2021, 3, 13)
         end_date = datetime.date.today() - timedelta(days = 1)
         return Event.objects.filter(deadline__range = (start_date,end_date))
+
+    def get_absolute_url(self):
+        return reverse('club_feed', args=[str(self.id)])
+
 
 # Create the user's Roles model
 ROLES= (

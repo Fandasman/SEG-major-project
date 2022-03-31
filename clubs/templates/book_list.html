@@ -18,7 +18,7 @@
             <td>{{ book.author }}</td>
             <td>{{ book.published }}</td>
             <td>
-              <form action = "{% url 'show_book' book.id %}" method = "get">
+              <form action = "{{book.get_absolute_url}}" method = "get">
                 {% csrf_token %}
                 <input type = "hidden" name = "next" value = "{{ next }}">
                 {% include 'partials/bootstrap_form.html' with form=form %}

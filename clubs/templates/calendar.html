@@ -2,15 +2,23 @@
 {% block content %}
 <div class="container">
   <div class="row">
-  <div class = 'events_calendar'>
+    <div class= "col">
+    </div>
+    <div class= "col">
+    </div>
+
+
+  <div class = 'col'>
+    <h2> Calendar</h2>
+    <hr>
       {{ calendar }}
       <br>
-
-      <h2>Monthly Events</h2>
+      <hr>
+      <h4>Monthly Events</h4>
       {%if events%}
       <ul class="list-group list-group-flush">
         {%for event in events%}
-          <li class="list-group-item">{{event.deadline}} : <a href = '/club_events_list/{{event.club.id}}' event.club.id>{{event.name}}</a></li>
+          <li class="list-group-item">{{event.deadline}} : <a href = '/event_page/{{event.club.id}}/{{event.id}}' event.club.id>{{event.name}}</a></li>
         {%endfor%}
       </ul>
       {%else%}
