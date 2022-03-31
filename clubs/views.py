@@ -79,10 +79,22 @@ def show_book(request, book_id):
                     past_rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
                     past_rating.rating = book_form.cleaned_data.get('rating')
                     past_rating.save()
-                    
+
         return render(request, 'show_book.html',
             {'book': book,'form':book_form,'book_id':book_id, 'average_rating': average_rating, 'exist_ratings': exist_ratings}
     )
+
+@login_required
+def remove_rating(request, book_id):
+    book = Book.objects.get(id = book_id)
+    exist_ratings = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) != 0
+    if exist_ratings:
+        rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
+        rating.delete()
+
+    return redirect('show_book', book_id)
+    # except ObjectDoesNotExist:
+    #     return redirect('show_book', book_id)
 
 @login_required
 def profile(request):

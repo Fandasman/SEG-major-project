@@ -40,6 +40,7 @@ urlpatterns = [
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('select_genres/', views.select_genres, name='select_genres'),
     path('book/<int:book_id>', views.show_book, name='show_book'),
+    path('remove_rating/<int:book_id>', views.remove_rating, name='remove_rating'),
     path('user/<int:user_id>', views.ShowUserView.as_view(), name='show_user'),
     path('promoted/<int:club_id>/<int:member_id>', views.promote_member_to_officer, name = "promotion"),
     path('promote/<int:club_id>/<int:member_id>', views.promote_officer_to_ClubOwner, name = "promotionOfficer"),

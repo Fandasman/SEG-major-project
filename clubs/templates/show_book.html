@@ -11,7 +11,6 @@
         {% if exist_ratings %}
         <p> You already rated this book. Update your rating?</p>
         {% else %}
-          
           <p>Share your own rating:</p>
         {% endif %}
       <form method = "post" action = "" role = "form">
@@ -19,6 +18,10 @@
         {{ form }}
         <input type='submit' value="Save" class="btn btn-primary">
       </form>
+      {% if exist_ratings %}
+        <br>
+        <a href="{% url 'remove_rating' book.id %}" class="btn btn-danger">Remove past rating</a>
+      {% endif %}
     </div>
   </div>
 </div>
