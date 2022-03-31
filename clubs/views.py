@@ -62,14 +62,13 @@ def show_book(request, book_id):
         book_rating = BooksRatings()
         if request.method=='POST':
             if book_form.is_valid():
-                    book_form.save(commit=False)
-                    book_form.instance.user= request.user
-                    BooksRatings.isbn = book.isbn 
-                    book_form.isbn = book.isbn
-                    book_form.save()
-                
+                new_rating = BooksRatings.objects.create(
+                    isbn = book.isbn,
+                    rating = book_form.cleaned_data.get('rating'),
+                    user = request.user
+                )
+                new_rating.save()
 
-        print("isbn:" + book.isbn)
         return render(request, 'show_book.html',
             {'book': book,'form':book_form,'book_id':book_id}
     )
