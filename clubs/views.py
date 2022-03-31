@@ -67,12 +67,17 @@ def show_book(request, book_id):
 
         if request.method=='POST':
             if book_form.is_valid() and book_form.cleaned_data.get('rating') != '':
-                new_rating = BooksRatings.objects.create(
-                    isbn = book.isbn,
-                    rating = book_form.cleaned_data.get('rating'),
-                    user = request.user
-                )
-                new_rating.save()
+                if len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) == 0:
+                    new_rating = BooksRatings.objects.create(
+                        isbn = book.isbn,
+                        rating = book_form.cleaned_data.get('rating'),
+                        user = request.user
+                    )
+                    new_rating.save()
+                else:
+                    past_rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
+                    past_rating.rating = book_form.cleaned_data.get('rating')
+                    past_rating.save()
 
         return render(request, 'show_book.html',
             {'book': book,'form':book_form,'book_id':book_id, 'average_rating': average_rating}
