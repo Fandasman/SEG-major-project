@@ -59,6 +59,10 @@ def show_book(request, book_id):
         return redirect('search_books')
     else:
         book_form = RatingForm(request.POST)
+        ratings = list(BooksRatings.objects.filter(isbn = book.isbn).values_list('rating', flat = True))
+                
+        average_rating = round(sum(ratings)/len(ratings))
+
         book_rating = BooksRatings()
         if request.method=='POST':
             if book_form.is_valid():
@@ -70,7 +74,7 @@ def show_book(request, book_id):
                 new_rating.save()
 
         return render(request, 'show_book.html',
-            {'book': book,'form':book_form,'book_id':book_id}
+            {'book': book,'form':book_form,'book_id':book_id, 'average_rating': average_rating}
     )
 
 # @login_required

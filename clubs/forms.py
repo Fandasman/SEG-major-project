@@ -228,8 +228,3 @@ class RatingForm(forms.ModelForm):
     class Meta:
         model = BooksRatings
         fields = ["rating"]
-
-
-
-  
-
