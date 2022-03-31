@@ -217,17 +217,17 @@ class GenreForm(forms.ModelForm):
 
 
 class RatingForm(forms.ModelForm):
-    forms.ChoiceField(
+
+    rating = forms.ChoiceField(
         choices=RATING_STARS,
         widget=RadioSelectButtonGroup,
-        initial=1)
-        
+        initial=1,
+    )
 
 
     class Meta:
         model = BooksRatings
         fields = ["rating"]
-        # isbn = forms.IntegerField(widget=forms.HiddenInput()) 
 
 
 
