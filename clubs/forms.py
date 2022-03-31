@@ -221,10 +221,14 @@ class RatingForm(forms.ModelForm):
         choices=RATING_STARS,
         widget=RadioSelectButtonGroup,
         initial=1)
+        
+
 
     class Meta:
         model = BooksRatings
         fields = ["rating"]
+        # isbn = forms.IntegerField(widget=forms.HiddenInput()) 
+
 
 
   

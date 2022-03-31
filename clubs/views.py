@@ -64,12 +64,12 @@ def show_book(request, book_id):
             if book_form.is_valid():
                     book_form.save(commit=False)
                     book_form.instance.user= request.user
-                    BooksRatings.isbn = book.isbn
-                    print("isbn:" + book.isbn)
-                    BooksRatings.rating = book_form.cleaned_data.get('rating')
+                    BooksRatings.isbn = book.isbn 
+                    book_form.isbn = book.isbn
                     book_form.save()
+                
 
-
+        print("isbn:" + book.isbn)
         return render(request, 'show_book.html',
             {'book': book,'form':book_form,'book_id':book_id}
     )
