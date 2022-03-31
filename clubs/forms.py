@@ -218,10 +218,15 @@ class GenreForm(forms.ModelForm):
 
 class RatingForm(forms.ModelForm):
 
+    def __init__(self, *args, **kwargs):
+        super(forms.ModelForm, self).__init__(*args, **kwargs)
+        self.fields['rating'].label = ""
+
     rating = forms.ChoiceField(
         choices=RATING_STARS,
         widget=RadioSelectButtonGroup,
         initial=1,
+        required = False
     )
 
 

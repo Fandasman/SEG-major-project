@@ -4,7 +4,7 @@
     <div class="book-text">
       <h3 class="book-title">{{ book.title }}</h3>
       <p class="book-username">{{ book.author }}</p>
-      <p>Average rating: <b>{{ average_rating }}</b></p>
+      <p>Average rating: <b>{{ average_rating }}/5</b></p>
     </div>
     {% if book in current_user.wishlist.all %}
     <a class="btn btn-danger" href="{% url 'unwish' book.id %}">Remove from wishlist</a>
