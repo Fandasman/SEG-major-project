@@ -79,8 +79,7 @@ def show_book(request, book_id):
                     past_rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
                     past_rating.rating = book_form.cleaned_data.get('rating')
                     past_rating.save()
-
-        print(exist_ratings)
+                    
         return render(request, 'show_book.html',
             {'book': book,'form':book_form,'book_id':book_id, 'average_rating': average_rating, 'exist_ratings': exist_ratings}
     )
