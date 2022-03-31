@@ -53,6 +53,7 @@ urlpatterns = [
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('book/<int:book_id>', views.ShowBookView.as_view(), name='show_book'),
     path('user/<int:user_id>', views.ShowUserView.as_view(), name='show_user'),
+    path('club/<int:club_id>', views.ShowClubView.as_view(), name='show_club'),
     path('promoted/<int:club_id>/<int:member_id>', views.promote_member_to_officer, name = "promotion"),
     path('promote/<int:club_id>/<int:member_id>', views.promote_officer_to_ClubOwner, name = "promotionOfficer"),
     path('demoted/<int:club_id>/<int:member_id>', views.demote_officer_to_member, name = "demotion"),

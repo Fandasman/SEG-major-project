@@ -43,23 +43,23 @@ class Echo(View):
         """Write the value by returning it, instead of storing in a buffer."""
         return value
 
-def some_streaming_csv_view(request):
-    """A view that streams a large CSV file."""
-    # Generate a sequence of rows. The range is based on the maximum number of
-    # rows that can be handled by a single sheet in most spreadsheet
-    # applications.
-    rows = (["Row {}".format(idx), str(idx)] for idx in range(271380))
-    book_buffer = Echo()
-    writer = csv.writer(book_buffer)
-    return StreamingHttpResponse(
-        (writer.writerow(row) for row in rows),
-        content_type="text/csv",
-        headers={'Content-Disposition': 'attachment; filename="BX_Books.csv"'},
-    )
+    def some_streaming_csv_view(request):
+        """A view that streams a large CSV file."""
+        # Generate a sequence of rows. The range is based on the maximum number of
+        # rows that can be handled by a single sheet in most spreadsheet
+        # applications.
+        rows = (["Row {}".format(idx), str(idx)] for idx in range(271380))
+        book_buffer = Echo()
+        writer = csv.writer(book_buffer)
+        return StreamingHttpResponse(
+            (writer.writerow(row) for row in rows),
+            content_type="text/csv",
+            headers={'Content-Disposition': 'attachment; filename="BX_Books.csv"'},
+        )
 
 def feed(request):
     current_user = request.user
-    return render(request, 'navbar_templates/feed.html', {'user': current_user})
+    return render(request, 'feed.html', {'user': current_user})
 
 class LoginProhibitedMixin:
     def dispatch(self, *args, **kwargs):
@@ -85,16 +85,6 @@ def profile(request):
             {'user': current_user}
         )
 
-# @login_required
-def search_books(request):
-    search_book = request.GET.get('book_searchbar')
-    if search_book:
-        books= Book.objects.filter(name__icontains=search_book)
-    else:
-        books = Book.objects.all()
-    return render(request, 'book_templates/search_books.html', {'books': books})
-
-
 # class FeedView(LoginRequiredMixin, ListView):
 #     """Class-based generic view for displaying a view."""
 #
@@ -117,7 +107,7 @@ def search_books(request):
 #         return context
 
 class HomeView(LoginProhibitedMixin,View):
-    template_name = 'main_templates/home.html'
+    template_name = 'home.html'
 
     def get(self,request):
         return self.render()
@@ -126,20 +116,15 @@ class HomeView(LoginProhibitedMixin,View):
         return self.render()
 
     def render(self):
-        return render(self.request, 'main_templates/home.html')
+        return render(self.request, 'home.html')
+
 
 # classBookListView(LoginRequiredMixin, ListView):
 class BookListView(ListView):
     model= Book
-    template_name= 'book_list.html'
+    template_name= 'book_templates/book_list.html'
     context_object_name= 'books'
     paginate_by = 30
-
-# classBookListView(LoginRequiredMixin, ListView):
-class BookListView(ListView):
-    model= Book
-    template_name= 'book_list.html'
-    context_object_name= 'books'
 
     def get_context_data(self, *args, **kwargs):
         context= super().get_context_data(*args, **kwargs)
@@ -149,7 +134,7 @@ class BookListView(ListView):
 # class UserListView(LoginRequiredMixin, ListView):
 class UserListView(ListView):
     model= User
-    template_name= 'navbar_templates/member_list.html'
+    template_name= 'user_templates/user_list.html'
     context_object_name= 'users'
     paginate_by = settings.USERS_PER_PAGE
 
@@ -162,7 +147,7 @@ class UserListView(ListView):
 # class ClubListView(LoginRequiredMixin, ListView):
 class ClubListView(ListView):
     model= Club
-    template_name= 'navbar_templates/club_list.html'
+    template_name= 'club_templates/club_list.html'
     context_object_name= 'clubs'
     paginate_by = settings.CLUBS_PER_PAGE
 
@@ -175,7 +160,7 @@ class ClubListView(ListView):
 # class OwnerClubListView(LoginRequiredMixin, ListView):
 class OwnerClubListView(ListView):
     model= Club
-    template_name= 'navbar_templates/owner_club_list.html'
+    template_name= 'club_templates/owner_club_list.html'
     context_object_name= 'users'
     paginate_by = settings.CLUBS_PER_PAGE
 
@@ -188,7 +173,7 @@ class OwnerClubListView(ListView):
 # class MemberClubListView(LoginRequiredMixin, ListView):
 class MemberClubListView(ListView):
     model= Club
-    template_name= 'navbar_templates/member_club_list.html'
+    template_name= 'club_templates/member_club_list.html'
     context_object_name= 'users'
     paginate_by = settings.USERS_PER_PAGE
 
@@ -208,11 +193,11 @@ class ShowUserView(DetailView):
     template_name = 'user_templates/show_user.html'
     pk_url_kwarg = "user_id"
 
-# class ShowClubView(DetailView):
-#     model = Club
-#     template_name = 'show_club.html'
-#     pk_url_kwarg = "club_id"
-#
+class ShowClubView(DetailView):
+    model = Club
+    template_name = 'club_templates/show_club.html'
+    pk_url_kwarg = "club_id"
+
 
 # class LoginProhibitedMixin:
 
@@ -261,7 +246,7 @@ class LogInView(View):
 
     def render(self):
         form = LogInForm()
-        return render(self.request, 'main_templates/login.html', {'form': form, 'next' : self.next})
+        return render(self.request, 'login.html', {'form': form, 'next' : self.next})
 
 """View used for logging out."""
 def log_out(request):
@@ -276,7 +261,7 @@ class SignUpView(FormView):
     """View that signs up user."""
 
     form_class = SignUpForm
-    template_name = "main_templates/sign_up.html"
+    template_name = "sign_up.html"
     #redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
 
     def form_valid(self, form):
@@ -307,11 +292,11 @@ def create_club(request):
         else:
             messages.add_message(request, messages.ERROR, "You already own too many clubs!")
             form = ClubForm()
-        return render(request, 'navbar_templates/create_club.html' , {'form': form})
+        return render(request, 'club_templates/create_club.html' , {'form': form})
 
     else:
         form = ClubForm()
-        return render(request, 'navbar_templates/create_club.html' , {'form': form})
+        return render(request, 'club_templates/create_club.html' , {'form': form})
 
 
 
@@ -342,7 +327,7 @@ class WishlistView(LoginRequiredMixin, ListView):
     def render(self, user_id):
         try:
             user = User.objects.get(id = user_id)
-            return render(self.request, 'wishlist.html', {'user': user})
+            return render(self.request, 'user_templates/wishlist.html', {'user': user})
 
         except ObjectDoesNotExist:
             return redirect('feed')
@@ -730,7 +715,7 @@ class InvitationlistView(LoginRequiredMixin, ListView):
         try:
             user = User.objects.get(id = user_id)
             invitations = Invitation.objects.filter(user=user, status="P")
-            return render(self.request, 'navbar_templates/invitation_list.html', {'invitations': invitations})
+            return render(self.request, 'invitation_list.html', {'invitations': invitations})
 
         except ObjectDoesNotExist:
             return redirect('feed')
@@ -744,11 +729,11 @@ def club_feed(request,club_id):
     try:
         userrole = Role.objects.get(club = club, user=request.user)
     except ObjectDoesNotExist:
-        messages.add_message(request,messages.ERROR,"It seem you don't belong to this club!")
+        messages.add_message(request, messages.ERROR, "It seems you don't belong to this club!")
         return redirect('club_list')
     else:
         if userrole.role == "A":
-            messages.add_message(request,messages.ERROR,"You are the applicant in this club, so you don't have authority to view the member list!")
+            messages.add_message(request, messages.ERROR, "You are an applicant in this club, you don't have authority to view the member list!")
             return redirect('club_list')
         else:
             event_posts = EventPost.objects.filter(event__club=club)
@@ -870,7 +855,7 @@ class Calendar(HTMLCalendar):
             if not events_per_day :
                 return f"<td><span class='date'>{day}</span></td>"
             else:
-                return f"<td><mark style='background-color:#0275d8'>{day}</mark></td>"
+                return f"<td><mark style='background-color:#ced4da'>{day}</mark></td>"
 
         return '<td></td>'
 

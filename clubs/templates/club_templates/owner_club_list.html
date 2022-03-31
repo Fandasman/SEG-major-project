@@ -17,6 +17,16 @@
           <tr>
             <td> {{role.club.name}} </td>
             <td> {{role.club.location}} </td>
+            <td>
+              <p>
+              <form action = "{% url 'club_feed' role.club.id %}" method = "get">
+                {% csrf_token %}
+                <input type = "hidden" name = "next" value = "{{ next }}">
+                {% include 'partials/bootstrap_form.html' with form=form %}
+                <input type = "submit" value = "View page" class="btn btn-primary">
+              </form>
+              </p>
+            </td>
           </tr>
           {% endfor %}
         {% else %}
