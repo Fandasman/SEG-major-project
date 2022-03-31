@@ -1,3 +1,4 @@
+
 """Test for approve the application as clubowner view"""
 from django.test import TestCase
 from clubs.models import Club, Role, User
