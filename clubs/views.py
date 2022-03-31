@@ -61,14 +61,19 @@ def show_book(request, book_id):
         book_form = RatingForm(request.POST)
         ratings = list(BooksRatings.objects.filter(isbn = book.isbn).values_list('rating', flat = True))
         average_rating = "Not rated"
-        exist_ratings = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) != 0
+        exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) != 0
+        past_rating_value = ''
+
+        if exist_rating:
+            past_rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
+            past_rating_value = past_rating.rating
 
         if len(ratings) > 0:
             average_rating = round(sum(ratings)/len(ratings))
         
         if request.method=='POST':
             if book_form.is_valid() and book_form.cleaned_data.get('rating') != '':
-                if exist_ratings == False:
+                if exist_rating == False:
                     new_rating = BooksRatings.objects.create(
                         isbn = book.isbn,
                         rating = book_form.cleaned_data.get('rating'),
@@ -76,19 +81,18 @@ def show_book(request, book_id):
                     )
                     new_rating.save()
                 else:
-                    past_rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
                     past_rating.rating = book_form.cleaned_data.get('rating')
                     past_rating.save()
 
         return render(request, 'show_book.html',
-            {'book': book,'form':book_form,'book_id':book_id, 'average_rating': average_rating, 'exist_ratings': exist_ratings}
+            {'book': book,'form':book_form,'book_id':book_id, 'average_rating': average_rating, 'exist_rating': exist_rating, 'past_rating_value': past_rating_value}
     )
 
 @login_required
 def remove_rating(request, book_id):
     book = Book.objects.get(id = book_id)
-    exist_ratings = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) != 0
-    if exist_ratings:
+    exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) != 0
+    if exist_rating:
         rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
         rating.delete()
 

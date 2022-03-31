@@ -8,8 +8,9 @@
     <div class="col-xs-12 col-lg-6 col-xl-4">
         {% include 'partials/book_details.html' with form=form average_rating=average_rating%}
         <hr>
-        {% if exist_ratings %}
+        {% if exist_rating %}
         <p> You already rated this book. Update your rating?</p>
+        <p>You rated this book <b>{{past_rating_value}}/5</b></p>
         {% else %}
           <p>Share your own rating:</p>
         {% endif %}
@@ -18,7 +19,7 @@
         {{ form }}
         <input type='submit' value="Save" class="btn btn-primary">
       </form>
-      {% if exist_ratings %}
+      {% if exist_rating %}
         <br>
         <a href="{% url 'remove_rating' book.id %}" class="btn btn-danger">Remove past rating</a>
       {% endif %}
