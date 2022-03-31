@@ -27,10 +27,12 @@ def feed(request):
     return render(request, 'navbar_templates/feed.html', {'user': current_user})
 
 class LoginProhibitedMixin:
-    def dispatch(self, *args, **kwargs):
+
+ def dispatch(self, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return redirect('feed')
+            return redirect('home')
         return super().dispatch(*args, **kwargs)
+
 
 # @login_required
 def show_book(request, book_id):
@@ -211,12 +213,12 @@ def log_out(request):
     user registration, if the user successfully
     registers, it will be created in the system,
     and will be redirected to the profile page """
-class SignUpView(FormView):
+class SignUpView(LoginProhibitedMixin,FormView):
     """View that signs up user."""
 
     form_class = SignUpForm
     template_name = "main_templates/sign_up.html"
-    #redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
+    redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
 
     def form_valid(self, form):
         self.object = form.save()
@@ -224,8 +226,7 @@ class SignUpView(FormView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        pass
-        #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+        return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
 """This function standardize the requirements for
     creating clubs, if club is successfully created,
@@ -317,7 +318,6 @@ def promote_officer_to_ClubOwner(request, club_id, member_id):
         if request.user.is_authenticated:
             user = request.user
             club = Club.objects.get(id = club_id)
-            userrole = Role.objects.get(club=club,user=user)
             userrole = Role.objects.get(club=club,user=user)
             redirect_url = reverse('club_members', kwargs={'club_id':club_id})
             member = User.objects.get(id = member_id)
@@ -441,6 +441,7 @@ def accept_applicant_to_club_as_officer(request,club_id,member_id):
         return redirect('login')
     else:
         return HttpResponseForbidden()
+
 
 """This function allows the club owner of the club to
     reject the application the applicant, it means
@@ -654,6 +655,7 @@ def reject_invitation(request, inv_id):
 
 """This view class allows users to see all the pending invitation from the club"""
 class InvitationlistView(LoginRequiredMixin, ListView):
+
     def get(self, request, user_id):
         return self.render(user_id)
 
@@ -715,6 +717,7 @@ def event_list(request,club_id):
                                                       'userrole': userrole,
                                                       'club' : club,
                                                       'events' : events})
+
 def join_event(request,event_id,club_id):
      club = Club.objects.get(id=club_id)
      members = Role.objects.filter(club=club)

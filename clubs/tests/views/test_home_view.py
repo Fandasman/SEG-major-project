@@ -16,6 +16,7 @@ class HomeViewTestCase(TestCase):
         self.assertEqual(self.url,'/')
 
     def test_get_home(self):
+        self.client.login(username = self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'main_templates/home.html')

@@ -87,7 +87,6 @@
         </form>
       </ul>
    </div>
-   {# <button type="button" class="event_list_button"><i class="bi bi-star"> Interested</i></button> #}
        {%else%}
        <form action = "{% url 'join_event_from_event_page' club.id event.id %}" method="post">
                 {% csrf_token %}

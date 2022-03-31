@@ -1,0 +1,16 @@
+[
+    {
+        "model": "clubs.event",
+        "pk":2,
+        "fields": {
+            "name":"NewEvent",
+            "description":"New event for testing",
+            "maxNumberOfParticipants":16,
+            "deadline":"2022-03-29",
+            "book" :1,
+            "location":"London",
+            "club" :1,
+            "organiser":3
+        }
+    }
+]

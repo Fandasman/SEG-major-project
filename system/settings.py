@@ -132,6 +132,9 @@ STATIC_URL = '/static/'
 # Login URL to redirect logged in users
 LOGIN_URL = 'login'
 
+
+REDIRECT_URL_WHEN_LOGGED_IN = 'feed'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 

@@ -27,16 +27,13 @@ class ApproveTheApplicationAsCOTestCase(TestCase):
         self.assertEqual(self.url,f'/accept_applicant/{self.club.id}/{self.member_user.id}')
 
     def test_get_approve_application_as_CO_is_forbidden(self):
-        self.client.login(username = self.user.email, password='Password123')
+        self.client.login(username = self.user.username, password='Password123')
         role_count_before = Role.objects.count()
         response = self.client.get(self.url, follow = True)
         role_count_after = Role.objects.count()
         self.assertEqual(role_count_after, role_count_before)
         self.assertEqual(response.status_code, 403)
-    #
-    # def test_unsuccessful_approve_the_application(self):
-    #     pass
-    #
+
     def test_successful_application_approval(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = Role.objects.count()

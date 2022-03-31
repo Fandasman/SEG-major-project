@@ -171,6 +171,7 @@ class EventForm(forms.ModelForm):
             book = self.cleaned_data.get('book'),
             club = Club.objects.get(id = club_id),
             organiser = current_user,
+            location = self.cleaned_data.get('location')
 
         )
         event.save()

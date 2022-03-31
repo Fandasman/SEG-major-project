@@ -5,14 +5,14 @@
 
 .container_guests
 {
- text-align: center
+  text-align: center
 }
 
 .test_button
 {
   height:200px;
-    width:50px;
-    padding: 150px 100px;
+  width:50px;
+  padding: 150px 100px;
 }
 
 .top-buffer
@@ -20,7 +20,7 @@
   margin-top:10px;
   margin-bottom: 10px;
 
- }
+}
 
 </style>
 
@@ -28,80 +28,80 @@
 
 <div class="col d-flex justify-content-center">
 
-<div class="container">
-<div class="row">
-  <div class="col-sm-1">
-  </div>
-  <div class="col-sm-5">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Details</h5>
-        <p class="card-text"><i class="bi bi-people-fill"> {{event.get_people_that_responded_to_event}} responded</i></p>
-        <p class="card-text"><i class="bi bi-flag-fill"> Event by</i> {{event.organiser.username}}</p>
-        <p class="card-text"><i class="bi bi-geo-alt-fill"> {{event.location}}</i></p>
-        <p class="card-text"><i class="bi bi-globe"></i></p>
-        <p class="card-text">{{event.description}}</p>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-4">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Guests</h5>
-
-
-
-        <div class="container_guests">
+  <div class="container">
     <div class="row">
-      <div class="col-md-3">
+      <div class="col-sm-1">
       </div>
-      <div class="col col-md-2">
-        {{event.get_number_of_users_going_to_event}}
+      <div class="col-sm-5">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Details</h5>
+            <p class="card-text"><i class="bi bi-people-fill"> {{event.get_people_that_responded_to_event}} responded</i></p>
+            <p class="card-text"><i class="bi bi-flag-fill"> Event by</i> {{event.organiser.username}}</p>
+            <p class="card-text"><i class="bi bi-geo-alt-fill"> {{event.location}}</i></p>
+            <p class="card-text"><i class="bi bi-globe"></i></p>
+            <p class="card-text">{{event.description}}</p>
+          </div>
+        </div>
       </div>
+      <div class="col-sm-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Guests</h5>
 
-      <div class="col col-md-3">
-        {{event.get_number_of_users_interested_in_event}}
+
+
+            <div class="container_guests">
+              <div class="row">
+                <div class="col-md-3">
+                </div>
+                <div class="col col-md-2">
+                  {{event.get_number_of_users_going_to_event}}
+                </div>
+
+                <div class="col col-md-3">
+                  {{event.get_number_of_users_interested_in_event}}
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-3">
+                </div>
+                <div class="col-md-2">
+                  <p class="card-text">Going</p>
+                </div>
+
+                <div class="col-md-3">
+                  <p class="card-text">Interested</p>
+                </div>
+              </div>
+            </div>
+            <hr class="my-4">
+
+          </div>
+        </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-3">
-      </div>
-      <div class="col-md-2">
-        <p class="card-text">Going</p>
+    <div class="row top-buffer">
+      <div class="col-sm-1">
       </div>
 
-      <div class="col-md-3">
-        <p class="card-text">Interested</p>
+      <div class="col-sm-5">
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Book</h5>
+            <p class="card-text"><i class="bi bi-book-fill"> {{event.book.title}}</i></p>
+            <p class="card-text"><i class="bi bi-vector-pen"> {{event.book.author}}</i></p>
+            <p class="card-text"> <i class="bi bi-easel-fill"> {{event.book.publisher}}</i></p>
+            <p class="card-text"><i class="bi bi-funnel"> {{event.book.genre}}</i></p>
+          </div>
+        </div>
+
       </div>
+
+
     </div>
   </div>
-   <hr class="my-4">
-
-      </div>
-    </div>
-  </div>
-</div>
-<div class="row top-buffer">
-  <div class="col-sm-1">
-  </div>
-
-<div class="col-sm-5">
-
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title">Book</h5>
-      <p class="card-text"><i class="bi bi-book-fill"> {{event.book.title}}</i></p>
-      <p class="card-text"><i class="bi bi-vector-pen"> {{event.book.author}}</i></p>
-      <p class="card-text"> <i class="bi bi-easel-fill"> {{event.book.publisher}}</i></p>
-      <p class="card-text"><i class="bi bi-funnel"> {{event.book.genre}}</i></p>
-    </div>
-  </div>
-
-</div>
-
-
-</div>
-</div>
 </div>
 
 {%endblock%}

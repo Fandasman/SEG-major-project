@@ -2,9 +2,12 @@ import datetime
 from django.db import models
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 from libgravatar import Gravatar
 from datetime import date
 from datetime import timedelta
+from .validators import validate_date
 
 
 
@@ -186,7 +189,8 @@ class Event(models.Model):
     deadline = models.DateField(
         verbose_name = "Sign Up Deadline (YYYY-MM-DD)",
         blank = False,
-        default=datetime.date.today
+        default=datetime.date.today,
+        validators = [validate_date]
     )
 
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
