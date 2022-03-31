@@ -128,10 +128,6 @@ class BooksRatings(models.Model):
     )
     user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE, null=True, blank=True)
 
-
-
-
-
 # Create the book Club model
 class Club(models.Model):
     name = models.CharField(

@@ -8,7 +8,12 @@
     <div class="col-xs-12 col-lg-6 col-xl-4">
         {% include 'partials/book_details.html' with form=form average_rating=average_rating%}
         <hr>
-        <p>Share your own rating:</p>
+        {% if exist_ratings %}
+        <p> You already rated this book. Update your rating?</p>
+        {% else %}
+          
+          <p>Share your own rating:</p>
+        {% endif %}
       <form method = "post" action = "" role = "form">
         {% csrf_token %}
         {{ form }}

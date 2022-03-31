@@ -51,7 +51,7 @@ class LoginProhibitedMixin:
             return redirect('feed')
         return super().dispatch(*args, **kwargs)
 
-# @login_required
+@login_required
 def show_book(request, book_id):
     try:
         book = Book.objects.get(id=book_id)
@@ -61,13 +61,14 @@ def show_book(request, book_id):
         book_form = RatingForm(request.POST)
         ratings = list(BooksRatings.objects.filter(isbn = book.isbn).values_list('rating', flat = True))
         average_rating = "Not rated"
+        exist_ratings = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) != 0
 
         if len(ratings) > 0:
             average_rating = round(sum(ratings)/len(ratings))
-
+        
         if request.method=='POST':
             if book_form.is_valid() and book_form.cleaned_data.get('rating') != '':
-                if len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) == 0:
+                if exist_ratings == False:
                     new_rating = BooksRatings.objects.create(
                         isbn = book.isbn,
                         rating = book_form.cleaned_data.get('rating'),
@@ -79,11 +80,12 @@ def show_book(request, book_id):
                     past_rating.rating = book_form.cleaned_data.get('rating')
                     past_rating.save()
 
+        print(exist_ratings)
         return render(request, 'show_book.html',
-            {'book': book,'form':book_form,'book_id':book_id, 'average_rating': average_rating}
+            {'book': book,'form':book_form,'book_id':book_id, 'average_rating': average_rating, 'exist_ratings': exist_ratings}
     )
 
-# @login_required
+@login_required
 def profile(request):
     current_user = request.user
     return render(request, 'profile.html',
