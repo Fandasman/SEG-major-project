@@ -28,11 +28,10 @@ def feed(request):
 
 class LoginProhibitedMixin:
 
- def dispatch(self, *args, **kwargs):
+  def dispatch(self, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return redirect('home')
+            return redirect('feed')
         return super().dispatch(*args, **kwargs)
-
 
 # @login_required
 def show_book(request, book_id):
@@ -83,7 +82,7 @@ def search_books(request):
 #         context['form'] = ClubForm()
 #         return context
 
-class HomeView(LoginProhibitedMixin,View):
+class HomeView(View):
     template_name = 'main_templates/home.html'
 
     def get(self,request):
