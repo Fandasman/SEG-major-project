@@ -60,8 +60,10 @@ def show_book(request, book_id):
     else:
         book_form = RatingForm(request.POST)
         ratings = list(BooksRatings.objects.filter(isbn = book.isbn).values_list('rating', flat = True))
-                
-        average_rating = round(sum(ratings)/len(ratings))
+        average_rating = "Not rated"
+
+        if len(ratings) > 0:
+            average_rating = round(sum(ratings)/len(ratings))
 
         book_rating = BooksRatings()
         if request.method=='POST':
