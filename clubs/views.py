@@ -65,9 +65,8 @@ def show_book(request, book_id):
         if len(ratings) > 0:
             average_rating = round(sum(ratings)/len(ratings))
 
-        book_rating = BooksRatings()
         if request.method=='POST':
-            if book_form.is_valid():
+            if book_form.is_valid() and book_form.cleaned_data.get('rating') != '':
                 new_rating = BooksRatings.objects.create(
                     isbn = book.isbn,
                     rating = book_form.cleaned_data.get('rating'),
