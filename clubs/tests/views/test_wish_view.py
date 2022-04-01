@@ -42,7 +42,7 @@ class WishViewTestCase(TestCase):
         self.client.login(username=self.user.username, password="Password123")
         url = reverse('wish', args=(self.book.id + 9999999,))
         response = self.client.get(url, follow = True)
-        redirect_url = reverse('search_books')
+        redirect_url = reverse('book_list')
         self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
         self.assertTemplateUsed(response, 'book_templates/search_books.html')
         self.assertEqual(self.user.wishlist.count(), 0)

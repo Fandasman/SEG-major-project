@@ -1,0 +1,50 @@
+{% load posts_extra %}
+{% load static %}
+{% load humanize %}
+<!doctype html>
+{% block content %}
+
+<div class="card m-2">
+  <div class="card-body">
+    <img src="{{ instance.author.mini_gravatar }}" alt="Gravatar of {{ instance.user.username }}" class="rounded-circle profile-image" >
+     {{ instance.author.username }} &nbsp;&middot;&nbsp; {{ instance.created_at | naturaltime}}
+     <br>
+      {{instance.text}}
+     <br>
+    {% if instance|has_liked_filter:user%}
+      <a class="bi bi-hand-thumbs-up-fill" href="{% url 'like_post' instance.club.id instance.id %}"> {{instance.number_of_likes}} Likes
+      </a>
+
+    {% else %}
+      <a class="bi bi-hand-thumbs-up" href="{% url 'like_post' instance.club.id instance.id %}"> {{instance.number_of_likes}} Likes
+      </a>
+
+    {%endif%}
+
+    <p>
+
+        {% for comment in comments %}
+
+          {% if instance.id == comment.post.id %}
+            <hr>
+            <img src="{{ comment.user.mini_gravatar }}" alt="Gravatar of {{ comment.user.username }}" class="rounded-circle profile-image" >
+            {{comment.user.username}} &nbsp;&middot;&nbsp; {{comment.created_at | naturaltime}}
+            <br>
+            {{comment.body}}
+          {% endif %}
+
+        {% endfor %}
+
+                      <form action="{% url 'add_comment' instance.club.id instance.id%}" method="post">
+                        {% csrf_token %}
+                        {% include 'partials/bootstrap_form.html' with form=comment_form %}
+                        <input type="submit" value="Comment">
+                      </form>
+
+                </div>
+          </div>
+
+
+
+
+{% endblock content %}

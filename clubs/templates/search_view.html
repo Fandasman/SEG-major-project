@@ -1,0 +1,66 @@
+{% extends 'base_content.html' %}
+{% load search_class_name %}
+{% block content %}
+
+<html>
+  <head>
+    <style>
+    .content {
+      padding-top: 50px;
+      padding-right: 30px;
+      padding-bottom: 50px;
+      padding-left: 80px;
+    }
+    </style>
+  </head>
+</html>
+
+<div class="card m-2">
+  <div class="card-body" id=content>
+    <div class='row title-row my-4'>
+        <div class='col-12 py-0'>
+            <h3 class='my-0 py-0'>{{ count }} results for "<b>{{ query }}</b>"</h3>
+        </div>
+    </div>
+
+
+    {% for object in object_list %}
+      {% with object|class_name as c %}
+        {% if c == 'Book' %}
+             <div class='row'>
+               <div class='col-12'>
+                  Book: <a href='{{ object.get_absolute_url }}'>{{ object.title }}</a>
+              </div>
+            </div>
+
+        {% elif c == 'Club' %}
+             <div class='row'>
+               <div class='col-12'>
+                  Club: <a href='{{ object.get_absolute_url }}'>{{ object.name }}</a>
+                </div>
+              </div>
+
+        {% elif c == 'User' %}
+             <div class='row'>
+                  <div class='col-12'>
+                     User: <a href='{{ object.get_absolute_url }}'>{{ object.username }}</a>
+                  </div>
+              </div>
+        {% else %}
+             <div class='row'>
+               <div class='col-12 col-lg-8 offset-lg-4'>
+                  <a href='{{ object.get_absolute_url }}'>{{ object }} | {{ object|class_name }}</a>
+              </div>
+             </div>
+        {% endif %}
+
+      {% endwith %}
+
+    {% empty %}
+
+    {% endfor %}
+
+  </div>
+</div>
+
+{% endblock content %}

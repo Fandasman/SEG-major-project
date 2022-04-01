@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
+<<<<<<< HEAD
 from clubs.models import User, Club, Role
 
 class RoleModelTestCase(TestCase):
@@ -58,3 +59,19 @@ class RoleModelTestCase(TestCase):
     def _assert_role_is_invalid(self):
         with self.assertRaises(ValidationError):
             self.role.full_clean()
+=======
+from clubs.models import User, Club
+
+class RoleModelTestCase(TestCase):
+    """Unit tests of the club model."""
+
+    fixtures = ['clubs/tests/fixtures/default_user.json',
+                'clubs/tests/fixtures/default_club.json',
+                'clubs/tests/fixtures/other_users.json',
+                'clubs/tests/fixtures/other_clubs.json',]
+
+    def setUp(self):
+        super(TestCase, self).setUp()
+        self.user = User.objects.get(username='johndoe')
+        self.club = Club.objects.get(name="Booker")
+>>>>>>> calendar

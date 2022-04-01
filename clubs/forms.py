@@ -3,10 +3,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
-
-
-
-from .models import Club, User, Book,Event
+from django.forms import Form,ChoiceField, CharField
+from .models import Club, User, Book, Event, UserPost, Comment
 
 
 class SignUpForm(forms.ModelForm):
@@ -176,3 +174,41 @@ class EventForm(forms.ModelForm):
         )
         event.save()
         return event
+
+class UserPostForm(forms.ModelForm):
+    """Form to ask user for post text.
+
+    The post author must be by the post creator.
+    """
+
+    class Meta:
+        """Form options."""
+
+        model = UserPost
+        fields = ['text']
+        labels = {
+            'text': ('Add post'),
+        }
+        widgets = {
+            'Post': forms.Textarea(attrs={'rows':10, 'cols':10})
+        }
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['body']
+        labels = {
+            'body': ('Add comment'),
+        }
+        widgets = {
+            'Comment': forms.Textarea(attrs={'rows':1, 'cols':1, 'style':'resize:none;'})
+        }
+class SearchForm(Form):
+    FILTER_CHOICES = (
+        ('books', 'Books'),
+        ('users', 'Users'),
+        ('clubs', 'Clubs'),
+        ('all', 'All')
+    )
+    search = CharField(required=True)
+    filter_field = ChoiceField(choices=FILTER_CHOICES)
