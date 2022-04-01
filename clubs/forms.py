@@ -3,8 +3,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
-
-from .models import Club, User, Book
+from bootstrap5.widgets import RadioSelectButtonGroup
+from .models import BooksRatings, Club, User, Book
 
 
 class SignUpForm(forms.ModelForm):
@@ -148,3 +148,22 @@ class GenreForm(forms.ModelForm):
         super().save(commit=False)
         genres_preferences = self.cleaned_data.get('genres_preferences')
         return genres_preferences
+
+
+class RatingForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(forms.ModelForm, self).__init__(*args, **kwargs)
+        self.fields['rating'].label = ""
+
+    rating = forms.ChoiceField(
+        choices=[(rating, rating) for rating in range(1,6)],
+        widget=RadioSelectButtonGroup,
+        initial=1,
+        required = False
+    )
+
+
+    class Meta:
+        model = BooksRatings
+        fields = ["rating"]

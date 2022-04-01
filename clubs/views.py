@@ -1,4 +1,5 @@
 import sys
+from distutils.bcppcompiler import BCPPCompiler
 from django import template
 from django.conf import settings
 from django.contrib import messages
@@ -17,7 +18,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import GenreForm, SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
+from .forms import GenreForm, RatingForm, SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
 from .models import Book, Club, Role, User, Invitation, BooksRatings
 from collections import Counter
 from surprise import dump
@@ -44,11 +45,13 @@ def feed(request):
 
         """Generate a query for books with the most positive ratings based on genre preferences"""
 
-        user_genres = list(current_user.genres_preferences)
+        if len(user_books) != 0:
+            user_genres = user_books.values_list('genre', flat=True)
+        else:
+            user_genres = list(current_user.genres_preferences)
         filtered_user_books = Book.objects.exclude(isbn__in = user_books)
         filtered_user_genres = filtered_user_books.filter(genre__in = user_genres).values_list('isbn', flat=True)
         filtered_user_genres = BooksRatings.objects.filter(isbn__in = filtered_user_genres)
-
         good_isbns = list(filtered_user_genres.filter(rating__gte = 4).values_list('isbn'))
         good_sorted = [rating for ratings, c in Counter(good_isbns).most_common()
                   for rating in [ratings] * c]
@@ -86,18 +89,52 @@ class LoginProhibitedMixin:
             return redirect('feed')
         return super().dispatch(*args, **kwargs)
 
-# @login_required
+@login_required
 def show_book(request, book_id):
     try:
         book = Book.objects.get(id=book_id)
     except ObjectDoesNotExist:
         return redirect('search_books')
     else:
-        return render(request, 'show_book.html',
-            {'book': book}
-        )
+        book_form = RatingForm(request.POST)
+        ratings = list(BooksRatings.objects.filter(isbn = book.isbn).values_list('rating', flat = True))
+        exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) != 0
+        past_rating_value = ''
 
-# @login_required
+        if exist_rating:
+            past_rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
+            past_rating_value = past_rating.rating
+
+        if request.method=='POST':
+            if book_form.is_valid() and book_form.cleaned_data.get('rating') != '':
+                if exist_rating == False:
+                    new_rating = BooksRatings.objects.create(
+                        isbn = book.isbn,
+                        rating = book_form.cleaned_data.get('rating'),
+                        user = request.user
+                    )
+                    new_rating.save()
+                else:
+                    past_rating.rating = book_form.cleaned_data.get('rating')
+                    past_rating.save()
+
+        return render(request, 'show_book.html',
+            {'book': book,'form':book_form,'book_id':book_id, 'exist_rating': exist_rating, 'past_rating_value': past_rating_value}
+    )
+
+@login_required
+def remove_rating(request, book_id):
+    book = Book.objects.get(id = book_id)
+    exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) != 0
+    if exist_rating:
+        rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
+        rating.delete()
+
+    return redirect('show_book', book_id)
+    # except ObjectDoesNotExist:
+    #     return redirect('show_book', book_id)
+
+@login_required
 def profile(request):
     current_user = request.user
     return render(request, 'profile.html',
@@ -234,7 +271,6 @@ class RecommendedClubListView(ListView):
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset(*args, **kwargs)
         queryset = self.get_club_recommendations()
-        print(queryset)
         return queryset
 
     def get_context_data(self, *args, **kwargs):

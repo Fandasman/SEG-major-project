@@ -66,10 +66,10 @@ class User(AbstractUser):
 class BooksRatings(models.Model):
     isbn = models.CharField(max_length = 13, blank = False)
     rating = models.IntegerField(
+        choices = [(rating, rating) for rating in range(1,6)],
         validators = [MaxValueValidator(5), MinValueValidator(1)]
     )
-    user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE)
-
+    user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE, null=True, blank=True)
 
 # Create the book Club model
 class Club(models.Model):

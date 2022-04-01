@@ -9,7 +9,7 @@
 #
 #     fixtures = ['clubs/tests/fixtures/default_club.json',
 #                 'clubs/tests/fixtures/other_users.json',
-#                 # 'clubs/tests/fixtures/other_applicants.json',
+#                 'clubs/tests/fixtures/other_applicants.json',
 #                 'clubs/tests/fixtures/other_clubs.json']
 #
 #     def setUp(self):

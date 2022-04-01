@@ -1,9 +1,9 @@
 <div class="row content">
   <div class="col-12">
     <img src="{{ book.imgURLMedium }}" alt="Image of {{ book.title }}">
-    <div class="profile-text">
-      <h3 class="profile-title">{{ book.title }}</h3>
-      <p class="profile-username">{{ book.author }}</p>
+    <div class="book-text">
+      <h3 class="book-title">{{ book.title }}</h3>
+      <p class="book-username">{{ book.author }}</p>
     </div>
     {% if book in current_user.wishlist.all %}
     <a class="btn btn-danger" href="{% url 'unwish' book.id %}">Remove from wishlist</a>

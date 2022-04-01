@@ -20,7 +20,7 @@
 #         self.member_user = User.objects.get(email='johndoe@example.org')
 #         self.role_user = Role.objects.get(user=self.member_user)
 #         self.url = reverse('accept_applicant_as_owner',kwargs={'club_id':self.club.id,'member_id':self.member_user.id})
-# 
+#
 #
 #     def test_approve_applicatin_as_CO_url(self):
 #         self.assertEqual(self.url,f'/accept_applicant/{self.club.id}/{self.member_user.id}')
