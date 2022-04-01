@@ -4,7 +4,7 @@ from django.urls import reverse
 from clubs.models import User
 from clubs.tests.helpers import reverse_with_next
 
-class MemberListTest(TestCase):
+class UserListTest(TestCase):
 
     fixtures = ['clubs/tests/fixtures/default_user.json']
 
@@ -20,7 +20,7 @@ class MemberListTest(TestCase):
         self._create_test_users(settings.USERS_PER_PAGE-1)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'user_list.html')
+        self.assertTemplateUsed(response, 'user_templates/user_list.html')
         self.assertEqual(len(response.context['users']), settings.USERS_PER_PAGE)
         self.assertFalse(response.context['is_paginated'])
         for user_id in range(settings.USERS_PER_PAGE-1):
@@ -36,7 +36,7 @@ class MemberListTest(TestCase):
         self._create_test_users(settings.USERS_PER_PAGE*2+3-1)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'user_list.html')
+        self.assertTemplateUsed(response, 'user_templates/user_list.html')
         self.assertEqual(len(response.context['users']), settings.USERS_PER_PAGE)
         self.assertTrue(response.context['is_paginated'])
         page_obj = response.context['page_obj']
@@ -45,7 +45,7 @@ class MemberListTest(TestCase):
         page_one_url = reverse('user_list') + '?page=1'
         response = self.client.get(page_one_url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'user_list.html')
+        self.assertTemplateUsed(response, 'user_templates/user_list.html')
         self.assertEqual(len(response.context['users']), settings.USERS_PER_PAGE)
         page_obj = response.context['page_obj']
         self.assertFalse(page_obj.has_previous())
@@ -53,7 +53,7 @@ class MemberListTest(TestCase):
         page_two_url = reverse('user_list') + '?page=2'
         response = self.client.get(page_two_url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'user_list.html')
+        self.assertTemplateUsed(response, 'user_templates/user_list.html')
         self.assertEqual(len(response.context['users']), settings.USERS_PER_PAGE)
         page_obj = response.context['page_obj']
         self.assertTrue(page_obj.has_previous())
@@ -61,7 +61,7 @@ class MemberListTest(TestCase):
         page_three_url = reverse('user_list') + '?page=3'
         response = self.client.get(page_three_url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'user_list.html')
+        self.assertTemplateUsed(response, 'user_templates/user_list.html')
         self.assertEqual(len(response.context['users']), 3)
         page_obj = response.context['page_obj']
         self.assertTrue(page_obj.has_previous())

@@ -23,7 +23,7 @@ class ShowUserTest(TestCase):
         self.client.login(username=self.user.username, password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'show_user.html')
+        self.assertTemplateUsed(response, 'user_templates/show_user.html')
         self.assertContains(response, "Jane Doe")
         self.assertContains(response, "janedoe")
 
@@ -32,7 +32,7 @@ class ShowUserTest(TestCase):
         url = reverse('show_user', kwargs={'user_id': self.user.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'show_user.html')
+        self.assertTemplateUsed(response, 'user_templates/show_user.html')
         self.assertContains(response, "John Doe")
         self.assertContains(response, "johndoe")
 
@@ -40,9 +40,8 @@ class ShowUserTest(TestCase):
         self.client.login(username=self.user.username, password='Password123')
         url = reverse('show_user', kwargs={'user_id': self.user.id+9999})
         response = self.client.get(url)
-        response_url = reverse('member_list')
+        response_url = reverse('user_list')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'member_list.html')
 
     def test_get_show_user_redirects_when_not_logged_in(self):
         redirect_url = reverse_with_next('login', self.url)
