@@ -2,20 +2,20 @@
 from django import forms
 from django.test import TestCase
 from clubs.forms import GenreForm
-from django.contrib.auth.hashers import check_password
 from clubs.models import User
 
 class GenreFormTestCase(TestCase):
-    """Unit tests of the sign up form"""
+    """Unit tests of the GenreForm form"""
 
     fixtures = ["clubs/tests/fixtures/default_user.json"]
 
     def setUp(self):
+        self.user = User.objects.get(username = 'johndoe')
         self.form_input = {
             'genres_preferences': [('Fiction'), ('Romance'), ('Horror'), ('Mystery'), ('Politics')]
         }
 
-    def test_valid_sign_up(self):
+    def test_valid_genre_selection(self):
         form = GenreForm(data=self.form_input)
         self.assertTrue(form.is_valid())
 
@@ -37,4 +37,4 @@ class GenreFormTestCase(TestCase):
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count)
         self.assertTrue(form.is_valid())
-        # self.assertEqual(user.genres_preferences, [('Fiction'), ('Romance'), ('Horror'), ('Mystery'), ('Politics')])
+        #self.assertEqual(self.user.genres_preferences, [('Fiction'), ('Romance'), ('Horror'), ('Mystery'), ('Politics')])
