@@ -249,3 +249,15 @@ class Event(models.Model):
 
     def check_past_event(self):
         return date.today()
+
+
+
+# Create the Chat model
+class Message(models.Model):
+    user = models.ForeignKey(User, related_name='user', on_delete=models.CASCADE)
+    receiver = models.ForeignKey(User, null=True, related_name='receiver', on_delete=models.CASCADE)
+    club = models.ForeignKey(Club, null=True, on_delete=models.CASCADE)
+    text = models.CharField(max_length=20, blank=False)
+
+    def get_username(self):
+        return self.user.username

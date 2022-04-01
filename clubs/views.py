@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.http.response import HttpResponse, HttpResponseForbidden
+from django.http.response import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 from django.contrib.auth.decorators import login_required
@@ -16,8 +16,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm
-from .models import Book, Club, Role, User, Invitation,Event
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm, EventForm
+from .models import Book, Club, Role, User, Invitation, Message,Event
 
 
 # Create your views here.
@@ -764,3 +764,86 @@ def leave_club(request,club_id):
     club = Club.objects.get(id = club_id)
     role = Role.objects.filter(club= club).get(user = request.user).delete()
     return redirect('feed')
+
+
+def user_chat(request, receiver_id):
+    user = request.user
+    receiver = User.objects.get(id=receiver_id)
+    return render(request, 'user_templates/user_chat.html', {
+        'user':user,
+        'receiver':receiver
+    })
+
+
+def send_user_message(request):
+    user = request.user
+    if request.method == "POST":
+        text = request.POST.get('text')
+        user_id = user.id
+        receiver_id = request.POST.get('receiver_id')
+        user = User.objects.get(id=user_id)
+        receiver = User.objects.get(id=receiver_id)
+        new_message = Message.objects.create(text=text, user=user, receiver=receiver)
+        new_message.save()
+        return render(request, 'user_templates/user_chat.html')
+    else:
+        return HttpResponseForbidden()
+
+
+def get_user_messages(request, receiver_id):
+    user = request.user
+    receiver = User.objects.get(id=receiver_id)
+    messages = Message.objects.filter(user=user, receiver=receiver) | \
+               Message.objects.filter(user=receiver, receiver=user)
+    order_messages = messages.order_by("id")
+    message_list = []
+    for message in order_messages:
+        message_list.append({
+            "username": message.get_username(),
+            "text":message.text
+            })
+
+    return JsonResponse({"messages":message_list})
+
+
+def club_chat(request, club_id):
+    user = request.user
+    club = Club.objects.get(id=club_id)
+    return render(request, 'club_templates/club_chat.html', {
+        'user': user,
+        'club': club
+    })
+
+
+def send_club_message(request):
+    if request.method == "POST":
+        text = request.POST.get('text')
+        user_id = request.POST.get('user_id')
+        club_id = request.POST.get('club_id')
+        user = User.objects.get(id=user_id)
+        club = Club.objects.get(id=club_id)
+        try:
+            role = Role.objects.get(user=user, club=club)
+            if role.role == "O" or role.role == "CO" or role.role == "M":
+                new_message = Message.objects.create(text=text, user=user, club=club)
+                new_message.save()
+                return render(request, 'club_templates/club_chat.html')
+            else:
+                return redirect('club_list')
+        except ObjectDoesNotExist:
+            return HttpResponseForbidden()
+    else:
+        return HttpResponseForbidden()
+
+
+def get_club_messages(request, club_id):
+    club = Club.objects.get(id=club_id)
+    messages = Message.objects.filter(club=club)
+    message_list = []
+    for message in messages:
+        message_list.append({
+            "username": message.get_username(),
+            "text":message.text
+            })
+
+    return JsonResponse({"messages":message_list})

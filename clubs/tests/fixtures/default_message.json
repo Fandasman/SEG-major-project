@@ -1,0 +1,12 @@
+[
+  {
+    "model": "clubs.Message",
+    "pk": 1,
+    "fields": {
+      "user": "1",
+      "receiver": "2",
+      "club": "1",
+      "text": "hello"
+    }
+  }
+]
