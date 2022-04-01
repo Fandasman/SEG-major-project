@@ -1,13 +1,13 @@
 
 {% block title %}
-chat
 {% endblock %}
 {% block content %}
     <style>
         .chatbox{
             height: 400px;
             width: 300px;
-            border: 5px outset black;
+            border: 2px outset black;
+            border-radius: 10px 10px 0px 0px;
             background-color: white;
             overflow-y: scroll;
             box-shadow: 0 0 4px rgba(0,0,0,.14),0 4px 8px rgba(0,0,0,.28);
@@ -16,7 +16,8 @@ chat
         .messagebox{
             background: lightgray;
             padding: 10px 10px 0 10px;
-            border-radius: 0 6px 6px 0;
+            border-radius: 6px 6px 6px 6px;
+
             max-width: 80%;
             width: auto;
             box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 4px rgba(0,0,0,.24);
@@ -27,6 +28,7 @@ chat
             height: 60px;
             width: 300px;
             background: dimgray;
+            border-radius: 0px 0px 10px 10px;
             border-top: 1px solid lightblue;
             box-shadow: 0 0 4px rgba(0,0,0,.14),0 4px 8px rgba(0,0,0,.28);
         }
@@ -35,6 +37,7 @@ chat
             line-height: 60px;
             outline: 0 none;
             border: none;
+            border-radius: 10px 10px 10px 10px;
             width: calc(100% - 60px);
             color: white;
             text-indent: 10px;
@@ -46,17 +49,18 @@ chat
         .openChat {
           display: none;
           position: fixed;
-          bottom: 80px;
+          bottom: 85px;
           right: 15px;
-          border: 3px solid mediumpurple;
+          border: 0;
           z-index: 9;
        }
 
         .openChatBtn {
-          background-color: rgb(123, 28, 179);
-          color: white;
+          background-color: lightgray;
+          color: black;
           padding: 16px 20px;
           border: none;
+            border-radius: 10px 10px 10px 10px;
           font-weight: 500;
           font-size: 18px;
           cursor: pointer;
@@ -144,7 +148,7 @@ chat
             {% csrf_token %}
 
             <input type="hidden" name="receiver_id" id="receiver_id" value="{{receiver.id}}"/>
-            <input type="text" name="text" id="text" class="input"/>
+            <input type="text" name="text" id="text" maxlength="20" class="input"/>
             <input type="submit" value="Send">
         </form>
     <button type="button" class="openChatBtn" onclick="closeBox()">close</button>

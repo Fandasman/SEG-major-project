@@ -16,7 +16,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm, EventForm
 from .models import Book, Club, Role, User, Invitation, Message,Event
 
 
@@ -769,7 +769,7 @@ def leave_club(request,club_id):
 def user_chat(request, receiver_id):
     user = request.user
     receiver = User.objects.get(id=receiver_id)
-    return render(request, 'user_chat.html',{
+    return render(request, 'user_templates/user_chat.html', {
         'user':user,
         'receiver':receiver
     })
@@ -785,7 +785,7 @@ def send_user_message(request):
         receiver = User.objects.get(id=receiver_id)
         new_message = Message.objects.create(text=text, user=user, receiver=receiver)
         new_message.save()
-        return render(request, 'user_chat.html')
+        return render(request, 'user_templates/user_chat.html')
     else:
         return HttpResponseForbidden()
 
@@ -809,7 +809,7 @@ def get_user_messages(request, receiver_id):
 def club_chat(request, club_id):
     user = request.user
     club = Club.objects.get(id=club_id)
-    return render(request, 'club_chat.html', {
+    return render(request, 'club_templates/club_chat.html', {
         'user': user,
         'club': club
     })
@@ -822,9 +822,16 @@ def send_club_message(request):
         club_id = request.POST.get('club_id')
         user = User.objects.get(id=user_id)
         club = Club.objects.get(id=club_id)
-        new_message = Message.objects.create(text=text, user=user, club=club)
-        new_message.save()
-        return render(request, 'club_chat.html')
+        try:
+            role = Role.objects.get(user=user, club=club)
+            if role.role == "O" or role.role == "CO" or role.role == "M":
+                new_message = Message.objects.create(text=text, user=user, club=club)
+                new_message.save()
+                return render(request, 'club_templates/club_chat.html')
+            else:
+                return redirect('club_list')
+        except ObjectDoesNotExist:
+            return HttpResponseForbidden()
     else:
         return HttpResponseForbidden()
 
