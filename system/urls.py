@@ -37,6 +37,7 @@ urlpatterns = [
     path('member_club_list', views.MemberClubListView.as_view(), name = 'member_club_list'),
     path('member_list', views.MemberListView.as_view(), name = 'member_list'),
     path('owner_club_list', views.OwnerClubListView.as_view(), name = 'owner_club_list'),
+    path('recommended_club_list', views.RecommendedClubListView.as_view(), name = 'recommended_club_list'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
     path('select_genres/', views.select_genres, name='select_genres'),
     path('book/<int:book_id>', views.show_book, name='show_book'),

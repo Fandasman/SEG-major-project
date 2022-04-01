@@ -1,0 +1,42 @@
+{%extends 'base_content.html'%}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Clubs For You</h1>
+      {% if clubs.size == none %}
+        <h3> There are no clubs that you may be interested in yet :( </h3>
+        <p> Head over to the All Clubs section to see all the clubs! </p>
+        
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+            </tr>
+          </thead>
+          {% for club in clubs %}
+            <tr>
+              <td>{{ club.name }}</td>
+              <td>
+                <p>
+                <form action = "{% url 'member_list' club.id %}" method = "get">
+                  {% csrf_token %}
+                  <input type = "hidden" name = "next" value = "{{ next }}">
+                  {% include 'partials/bootstrap_form.html' with form=form %}
+                  <input type = "submit" value = "View page" class="btn btn-primary">
+                </form>
+                <br>
+                <form action="{% url 'apply' club.id%}" method="post">
+                {% csrf_token %}
+                <button type="submit", class='btn btn-success'>Apply</button>
+              </form>
+            </p>
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
