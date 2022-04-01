@@ -124,15 +124,17 @@ def show_book(request, book_id):
 
 @login_required
 def remove_rating(request, book_id):
-    book = Book.objects.get(id = book_id)
+    try:
+        book = Book.objects.get(id = book_id)
+    except ObjectDoesNotExist:
+        return redirect('search_books')
+
     exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) != 0
     if exist_rating:
         rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
         rating.delete()
 
     return redirect('show_book', book_id)
-    # except ObjectDoesNotExist:
-    #     return redirect('show_book', book_id)
 
 @login_required
 def profile(request):
@@ -141,7 +143,7 @@ def profile(request):
             {'user': current_user}
         )
 
-# @login_required
+@login_required
 def search_books(request):
     search_book = request.GET.get('book_searchbar')
     if search_book:
@@ -149,28 +151,6 @@ def search_books(request):
     else:
         books = Book.objects.all()
     return render(request, 'search_books.html', {'books': books})
-
-
-# class FeedView(LoginRequiredMixin, ListView):
-#     """Class-based generic view for displaying a view."""
-#
-#     model = Post
-#     template_name = "feed.html"
-#     context_object_name = 'posts'
-#
-#     def get_queryset(self):
-#         """Return the user's feed."""
-#         current_user = self.request.user
-#         authors = list(current_user.followees.all()) + [current_user]
-#         posts = Post.objects.filter(author__in=authors)
-#         return posts
-#
-#     def get_context_data(self, **kwargs):
-#         """Return context data, including new post form."""
-#         context = super().get_context_data(**kwargs)
-#         context['user'] = self.request.user
-#         context['form'] = ClubForm()
-#         return context
 
 class HomeView(LoginProhibitedMixin,View):
     template_name = 'home.html'

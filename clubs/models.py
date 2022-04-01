@@ -46,6 +46,7 @@ class User(AbstractUser):
         choices=[(genre, genre) for genre in sorted(Book.objects.values_list('genre', flat=True).distinct())],
         max_choices=5,
         blank=True,
+        default=None
     )
 
     def full_name(self):
