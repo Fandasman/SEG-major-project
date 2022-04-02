@@ -89,18 +89,20 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.assertEqual(len(messages_list), 1)
         self.assertEqual(messages_list[0].level, messages.ERROR)
 
-    def test_successful_login(self):
-        response_url = reverse('feed')
-        form_input = {'username': 'johndoe', 'password': 'Password123', 'next': response_url}
+    def test_succesful_login_with_redirect_to_select_genres(self):
+        redirect_url = reverse('login')
+        form_input = { 'username': 'johndoe', 'password': 'Password123', 'next': redirect_url }
         response = self.client.post(self.url, form_input, follow=True)
         self.assertTrue(self._is_logged_in())
-        self.assertRedirects(response, response_url, status_code = 302, target_status_code = 200)
-        self.assertTemplateUsed(response, 'feed.html')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'select_genres.html')
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 0)
 
-    def test_succesful_login_with_redirect(self):
+    def test_succesful_login_with_redirect_to_feed(self):
         redirect_url = reverse('login')
+        self.user.genres_preferences = ['Fiction']
+        self.user.save()
         form_input = { 'username': 'johndoe', 'password': 'Password123', 'next': redirect_url }
         response = self.client.post(self.url, form_input, follow=True)
         self.assertTrue(self._is_logged_in())

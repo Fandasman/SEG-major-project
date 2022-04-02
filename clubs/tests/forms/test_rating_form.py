@@ -13,7 +13,6 @@ class RatingFormTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.get(username = 'johndoe')
         self.book = Book.objects.get(id = 1)
-
         self.form_input = {
             'rating': 3
         }
@@ -42,13 +41,3 @@ class RatingFormTestCase(TestCase):
         self.form_input['rating'] = 0
         form = RatingForm(data=self.form_input)
         self.assertFalse(form.is_valid())
-
-    def test_form_must_save_correctly(self):
-        form = RatingForm(data=self.form_input)
-        before_count = BooksRatings.objects.count()
-        form.save()
-        after_count = BooksRatings.objects.count()
-        self.assertEqual(after_count, before_count + 1)
-        self.assertTrue(form.is_valid())
-        rating = BooksRatings.objects.get(rating = 3)
-        self.assertEqual(rating.rating, 3)
