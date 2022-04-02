@@ -46,6 +46,7 @@ class User(AbstractUser):
         choices=[(genre, genre) for genre in sorted(Book.objects.values_list('genre', flat=True).distinct())],
         max_choices=5,
         blank=True,
+        default=None
     )
 
     def full_name(self):
@@ -69,7 +70,10 @@ class BooksRatings(models.Model):
         choices = [(rating, rating) for rating in range(1,6)],
         validators = [MaxValueValidator(5), MinValueValidator(1)]
     )
-    user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE)
+
+    class Meta():
+        unique_together = ('user', 'isbn',)
 
 # Create the book Club model
 class Club(models.Model):
