@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
 from clubs.forms import EditProfileForm
-from clubs.models import User, Club
+from clubs.models import User
 from clubs.tests.helpers import reverse_with_next
 
 class TestEditProfileView(TestCase):
@@ -27,6 +27,11 @@ class TestEditProfileView(TestCase):
 
     def test_get_profile_url(self):
         self.assertEqual(self.url, '/edit_profile/')
+
+    def test_profile_redirects_when_logged_out(self):
+        redirect_url = reverse_with_next('login', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
 
     def test_get_edit_profile_for_users(self):
         self.client.login(username=self.user.username, password="Password123")
@@ -116,9 +121,3 @@ class TestEditProfileView(TestCase):
         self.assertEqual(self.user.last_name, 'Doe2')
         self.assertEqual(self.user.email, 'johndoe2@example.org')
         self.assertEqual(self.user.bio, 'New bio')
-
-#Need to add mixins
-#    def test_post_edit_profile_redirects_when_not_logged_in(self):
-#       redirect_url = reverse_with_next('login', self.url)
-#       response = self.client.post(self.url, self.form_input)
-#       self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
