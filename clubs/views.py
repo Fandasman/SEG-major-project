@@ -91,19 +91,18 @@ class LoginProhibitedMixin:
 
 @login_required
 def show_book(request, book_id):
+    current_user = request.user
     try:
         book = Book.objects.get(id=book_id)
+        in_wishlist = current_user.wishlist.filter(isbn=book.isbn).exists()
     except ObjectDoesNotExist:
         return redirect('search_books')
     else:
         book_form = RatingForm(request.POST)
-        ratings = list(BooksRatings.objects.filter(isbn = book.isbn).values_list('rating', flat = True))
-        exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) != 0
-        past_rating_value = ''
-
+        exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = current_user))) != 0
+        current_rating_value = 0
         if exist_rating:
-            past_rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
-            past_rating_value = past_rating.rating
+            past_rating = BooksRatings.objects.get(isbn = book.isbn, user = current_user)
 
         if request.method=='POST':
             if book_form.is_valid() and book_form.cleaned_data.get('rating') != '':
@@ -111,15 +110,31 @@ def show_book(request, book_id):
                     new_rating = BooksRatings.objects.create(
                         isbn = book.isbn,
                         rating = book_form.cleaned_data.get('rating'),
-                        user = request.user
+                        user = current_user
                     )
                     new_rating.save()
+                    exist_rating = True
+                    current_rating_value = new_rating.rating
                 else:
                     past_rating.rating = book_form.cleaned_data.get('rating')
+                    current_rating_value = past_rating.rating
                     past_rating.save()
 
+        else:
+            if book not in request.user.wishlist.all() and exist_rating:
+                exist_rating = False
+                rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
+                rating.delete()
+
+            elif exist_rating:
+                current_rating_value = past_rating.rating
+
         return render(request, 'show_book.html',
-            {'book': book,'form':book_form,'book_id':book_id, 'exist_rating': exist_rating, 'past_rating_value': past_rating_value}
+                     {'book': book,'form': book_form,
+                     'book_id': book_id,
+                     'exist_rating': exist_rating,
+                     'current_rating_value': current_rating_value,
+                     'in_wishlist': in_wishlist}
     )
 
 @login_required
