@@ -20,13 +20,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-
-from .models import Book, Club, Role, User, Invitation
-
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm, EventForm
-from .models import Book, Club, Role, User, Invitation, Message,Event
-
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm, UserPostForm, CommentForm, SearchForm
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, EventForm, UserPostForm, CommentForm, SearchForm
 from .models import Book, Club, Role, User, Invitation, Event, EventPost, UserPost, MembershipPost, Comment
 from itertools import chain
 from datetime import datetime, timedelta
