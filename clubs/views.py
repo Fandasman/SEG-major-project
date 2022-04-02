@@ -61,7 +61,7 @@ def profile(request):
             {'user': current_user}
         )
 
-<<<<<<< HEAD
+
 # @login_required
 def search_books(request):
     search_book = request.GET.get('book_searchbar')
