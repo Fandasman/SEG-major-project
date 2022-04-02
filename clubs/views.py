@@ -825,7 +825,7 @@ def like_post(request, club_id, post_id):
 
         post.likes.add(request.user)
 
-    return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
+    return redirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
 
 def add_comment_to_post(request, club_id, post_id):
@@ -836,7 +836,7 @@ def add_comment_to_post(request, club_id, post_id):
         form = CommentForm(request.POST, instance = comment)
         if form.is_valid():
             comment = form.save()
-    return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
+    return redirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
 
 class Calendar(HTMLCalendar):
