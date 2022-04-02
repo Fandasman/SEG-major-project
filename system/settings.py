@@ -134,13 +134,8 @@ STATIC_URL = '/static/'
 # Login URL to redirect logged in users
 LOGIN_URL = 'login'
 
-<<<<<<< HEAD
-
-REDIRECT_URL_WHEN_LOGGED_IN = 'feed'
-=======
 #URL where @login_prohibited redirects to
 REDIRECT_URL_WHEN_LOGGED_IN= 'feed'
->>>>>>> calendar
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

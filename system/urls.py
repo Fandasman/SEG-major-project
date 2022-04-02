@@ -35,8 +35,11 @@ urlpatterns = [
     path('event_page/<int:club_id>/<int:event_id>/',views.event_page,name="event_page"),
     path('leave_club/<int:club_id>/',views.leave_club,name = "leave_club"),
     path('admin/', admin.site.urls),
+    path('add_book/<int:club_id>/',views.ClubBookView.as_view(), name='add_book'),
     path('', views.HomeView.as_view(), name = 'home'),
     path('club_list', views.ClubListView.as_view(), name = 'club_list'),
+    path('club/<int:club_id>', views.ShowClubView.as_view(), name='show_club'),
+    path('feed/', views.feed, name='feed'),
     path('edit_profile/', views.EditProfileView.as_view(), name='edit_profile'),
     path('like_post/<int:club_id>/<int:post_id>', views.like_post, name='like_post'),
     path('new_post/<int:club_id>/', views.NewPostView.as_view(), name='new_post'),
@@ -72,15 +75,11 @@ urlpatterns = [
     path('user/<int:user_id>/invitation_list/', views.InvitationlistView.as_view(), name='invitation_list'),
     path('accept_invitation/<int:inv_id>', views.accept_invitation, name='accept_invitation'),
     path('reject_invitation/<int:inv_id>', views.reject_invitation, name='reject_invitation'),
-<<<<<<< HEAD
     path('club/<int:club_id>/chat/', views.club_chat, name='club_chat'),
     path('send_club_message/', views.send_club_message, name='send_club_message'),
     path('get_club_messages/<int:club_id>/', views.get_club_messages, name='get_club_messages'),
     path('user/<int:receiver_id>/chat/', views.user_chat, name='user_chat'),
     path('send_user_message/', views.send_user_message, name='send_user_message'),
-    path('get_user_messages/<int:receiver_id>/', views.get_user_messages, name='get_user_messages')
-
-=======
-    path('search_view/', views.SearchView.as_view(), name='search_view'),
->>>>>>> calendar
+    path('get_user_messages/<int:receiver_id>/', views.get_user_messages, name='get_user_messages'),
+    path('search_view/', views.SearchView.as_view(), name='search_view')
 ]
