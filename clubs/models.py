@@ -139,5 +139,8 @@ class Invitation(models.Model):
         default='P'
     )
 
+    class Meta():
+        unique_together = ('user', 'club',)
+
     def get_club_name(self):
         return self.club.name
