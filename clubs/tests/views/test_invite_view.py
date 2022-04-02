@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from clubs.tests.helpers import reverse_with_next
 from clubs.models import Club, User, Role, Book, Invitation
 
 
@@ -21,6 +22,10 @@ class InviteViewTestCase(TestCase):
             'username': 'alicesmith',
         }
 
+    def test_invite_view_redirects_when_logged_out(self):
+        redirect_url = reverse_with_next('login', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
 
     def test_successful_invite_user(self):
         self.role.refresh_from_db()

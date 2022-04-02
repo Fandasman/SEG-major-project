@@ -688,6 +688,7 @@ def unwish(request, book_id):
 
 """This function is for club owner/officer to set the book for
     club to read"""
+@login_required
 def set_club_book(request, club_id):
     current_user = request.user
     club = Club.objects.get(id=club_id)
@@ -721,6 +722,7 @@ def set_club_book(request, club_id):
 
 """This function allows club office/owner to
     invite other users to join the club"""
+@login_required
 def invite(request, club_id):
     current_user = request.user
     club = Club.objects.get(id=club_id)
