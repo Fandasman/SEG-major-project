@@ -24,7 +24,7 @@ class ShowBookTest(TestCase,LogInTester):
     def test_show_book_url(self):
         self.assertEqual(self.url,f'/book/{self.target_book.id}')
 
-    def test_show_bok_redirects_when_logged_out(self):
+    def test_show_book_redirects_when_logged_out(self):
         redirect_url = reverse_with_next('login', self.url)
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)

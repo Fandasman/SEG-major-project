@@ -11,6 +11,7 @@ class WishViewTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.get(username = 'johndoe')
         self.book = Book.objects.get(pk=1)
+        self.url = reverse('remove_rating', args=(self.book.id,))
 
         self.rating = BooksRatings.objects.create(
             isbn = self.book.isbn,
@@ -19,8 +20,12 @@ class WishViewTestCase(TestCase):
         )
 
     def test_remove_rating_url(self):
-        url = reverse('remove_rating', args=(self.book.id,))
-        self.assertEqual(url, '/remove_rating/1')
+        self.assertEqual(self.url, '/remove_rating/1')
+
+    def test_remove_rating_redirects_when_logged_out(self):
+        redirect_url = reverse_with_next('login', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
 
     def test_valid_remove_rating(self):
         self.client.login(username=self.user.username, password="Password123")

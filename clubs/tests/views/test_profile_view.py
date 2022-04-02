@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from clubs.tests.helpers import reverse_with_next
 from clubs.models import User
 
 class ProfileTestCase(TestCase):
@@ -14,6 +15,11 @@ class ProfileTestCase(TestCase):
     def test_profile_url(self):
         self.assertEqual(self.url, '/profile/')
 
+    def test_profile_redirects_when_logged_out(self):
+        redirect_url = reverse_with_next('login', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
+
     def test_get_profile(self):
         self.client.login(username=self.user.username, password="Password123")
         response = self.client.get(self.url)
@@ -26,10 +32,3 @@ class ProfileTestCase(TestCase):
 
     def test_edit_profile_button(self):
         pass
-
-#    def test_get_profile_redirects_when_logged_out(self):
-#        self.client.login(username=self.user.username, password='Password123')
-#        response = self.client.get(self.url, follow=True)
-#        redirect_url = reverse('login')
-#        self.assertRedirects(response, redirect_url, status_code=302,target_status_code=200)
-#        self.assertTemplateUser(response, 'login')

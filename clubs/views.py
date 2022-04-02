@@ -308,6 +308,7 @@ class LogInView(View):
         return render(self.request, 'login.html', {'form': form, 'next' : self.next})
 
 """View used for logging out."""
+@login_required
 def log_out(request):
     logout(request)
     return redirect('home')
@@ -380,8 +381,7 @@ def create_club(request):
         return render(request, 'create_club.html' , {'form': form})
 
 
-
-class EditProfileView(View):
+class EditProfileView(LoginRequiredMixin, View):
     def get(self,request):
         return self.render()
 
@@ -663,6 +663,7 @@ def apply(request, club_id):
 
 """These functions are for adding/removing
     books from a user's wishlist."""
+@login_required
 def wish(request, book_id):
     user = request.user
     try:
@@ -674,6 +675,7 @@ def wish(request, book_id):
     except ObjectDoesNotExist:
         return redirect('search_books')
 
+@login_required
 def unwish(request, book_id):
     user = request.user
     try:
