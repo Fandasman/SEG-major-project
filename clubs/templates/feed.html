@@ -3,14 +3,14 @@
 | Feed
 {% endblock %}
 {% block content %}
-<div class="container">
-  <div class="row">
-    <div class="col-xs-12 col-lg-6 col-xl-8">
+<div class="d-flex align-items-start flex-column bd-highlight mb-3" style="height: 200px;">
       <h1>Welcome back, {{user.username}}.</h1>
       <br>
       <h2>Feed</h2>
       <p><b>UNDER CONSTRUCTION</b>: This is a lazy implementation.</p>
-    </div>
-  </div>
+</div>
+
+<div class="d-flex align-items-end flex-column bd-highlight mb-3" style="height: 200px;">
+  {{ cal | safe }}
 </div>
 {% endblock %}

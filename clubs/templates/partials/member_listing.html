@@ -1,0 +1,42 @@
+
+{% for member in members%}
+    <div class="row">
+      <div class="col-md-2">
+         <div style="width: 8rem;">
+           <img src="{{ user.mini_gravatar }}" alt="Gravatar of {{ user.first_name }}" class="rounded-circle" >
+         </div>
+      </div>
+<div class="col-md-6">
+    <div>
+      <h5 class="card-title">{{member.user.username}}</h5>
+        <p class="card-text"> {{member.get_role_display}}</p>
+          <div class="row">
+          <p class="card-text"></p>
+       </div>
+    </div>
+  </div>
+<div class="col-md-2">
+    <div class="btn-group" role="group" aria-label="Basic example">
+       {%if member.user != user%}
+         <form action = "{% url 'show_user' user.id %}" method = "get">
+            {% csrf_token %}
+              <input type = "hidden" name = "next" value = "{{ next }}">
+                 {% include 'partials/bootstrap_form.html' with form=form %}
+                   <input type = "submit" value = "See profile" class="event_list_button">
+                 </form>
+             {%else%}
+               <div class="invisible">
+                 <input type = "submit" value = "See profile" class="event_list_button">
+              </div>
+          {%endif%}
+            {%if userrole.role == "CO" or userrole.role == 'O' and member.role != "CO" and member.role != 'O'%}
+                {% include 'partials/action_dropdown_member_list.html' with member=member userrole=userrole%}
+           {%else%}
+              {%if member.user == user%}
+                  {% include 'partials/action_dropdown_member_list.html' with member=member userrole=userrole%}
+                {%endif%}
+            {%endif%}
+           </div>
+       </div>
+  </div>
+{%endfor%}

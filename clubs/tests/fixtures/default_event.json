@@ -1,0 +1,29 @@
+[
+    {
+<<<<<<< HEAD
+        "model":"clubs.event",
+        "pk":1,
+        "fields":{
+            "name":"DefaultEvent",
+            "description":"This is an event created for testing.",
+            "maxNumberOfParticipants":17,
+            "deadline":"2022-03-29",
+            "book":1,
+            "location":"London",
+            "club" :1,
+            "organiser": 3
+=======
+        "model": "clubs.Event",
+        "pk": 1,
+        "fields": {
+            "name": "Test Event",
+            "description": "An ordinary event. ",
+            "maxNumberOfParticipants": "16",
+            "deadline": "",
+            "book": "1",
+            "club": "1",
+            "participants": None,
+>>>>>>> calendar
+        }
+    }
+]

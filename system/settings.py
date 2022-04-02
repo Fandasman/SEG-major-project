@@ -14,6 +14,7 @@ from django.contrib.messages import constants as message_constants
 from pathlib import Path
 import os
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -41,6 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'clubs',
     'widget_tweaks',
+    'bootstrap_pagination',
+    'django.contrib.humanize',
+    'location_field.apps.DefaultConfig',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +73,7 @@ TEMPLATES = [
 
                 # Custom context processors
                 'clubs.context_processors.get_current_user',
+                'clubs.context_processors.inject_form',
             ],
         },
     },
@@ -129,6 +134,9 @@ STATIC_URL = '/static/'
 # Login URL to redirect logged in users
 LOGIN_URL = 'login'
 
+#URL where @login_prohibited redirects to
+REDIRECT_URL_WHEN_LOGGED_IN= 'feed'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -142,3 +150,9 @@ MESSAGE_TAGS = {
     message_constants.DEBUG: 'dark',
     message_constants.ERROR: 'danger',
 }
+
+# page lengths
+
+USERS_PER_PAGE= 25
+CLUBS_PER_PAGE= 15
+BOOKS_PER_PAGE= 30

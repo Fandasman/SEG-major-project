@@ -32,7 +32,7 @@ class TestEditProfileView(TestCase):
         self.client.login(username=self.user.username, password="Password123")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'edit_profile.html')
+        self.assertTemplateUsed(response, 'user_templates/edit_profile.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, EditProfileForm))
         self.assertEqual(form.instance, self.user)
@@ -45,7 +45,7 @@ class TestEditProfileView(TestCase):
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'edit_profile.html')
+        self.assertTemplateUsed(response, 'user_templates/edit_profile.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, EditProfileForm))
         self.assertTrue(form.is_bound)
@@ -65,7 +65,7 @@ class TestEditProfileView(TestCase):
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'edit_profile.html')
+        self.assertTemplateUsed(response, 'user_templates/edit_profile.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, EditProfileForm))
         self.assertTrue(form.is_bound)
@@ -85,7 +85,7 @@ class TestEditProfileView(TestCase):
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'edit_profile.html')
+        self.assertTemplateUsed(response, 'user_templates/edit_profile.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, EditProfileForm))
         self.assertTrue(form.is_bound)
@@ -105,7 +105,7 @@ class TestEditProfileView(TestCase):
         self.assertEqual(after_count, before_count)
         response_url = reverse('feed')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'feed.html')
+        self.assertTemplateUsed(response, 'navbar_templates/feed.html')
         #messages_list = list(response.context['messages'])
         #self.assertEqual(len(messages_list), 2)
         #self.assertEqual(messages_list[0].level, messages.SUCCESS)
@@ -117,8 +117,8 @@ class TestEditProfileView(TestCase):
         self.assertEqual(self.user.email, 'johndoe2@example.org')
         self.assertEqual(self.user.bio, 'New bio')
 
-#Need to add mixins
-#    def test_post_edit_profile_redirects_when_not_logged_in(self):
-#       redirect_url = reverse_with_next('login', self.url)
-#       response = self.client.post(self.url, self.form_input)
-#       self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+# Need to add mixins
+    # def test_post_edit_profile_redirects_when_not_logged_in(self):
+    #     redirect_url = reverse_with_next('login', self.url)
+    #     response = self.client.post(self.url, self.form_input)
+    #     self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)

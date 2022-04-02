@@ -1,14 +1,39 @@
-<div class="row content">
-  <div class="col-12">
-    <img src="{{ book.imgURLMedium }}" alt="Image of {{ book.title }}">
-    <div class="profile-text">
-      <h3 class="profile-title">{{ book.title }}</h3>
-      <p class="profile-username">{{ book.author }}</p>
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    .content {
+      padding-top: 50px;
+      padding-right: 30px;
+      padding-bottom: 50px;
+      padding-left: 80px;
+    }
+    </style>
+  </head>
+</html>
+<body>
+  <div class="container-fluid">
+    <div class="row no-gutters">
+      <div class="col-md-4">
+        <img src="{{ book.imgURLLarge }}" alt="Image of {{ book.title }}">
+      </div>
+      <div class="col-md-6">
+        <div class="card m-2">
+          <div class="card-body" id=content>
+            <h3 class="card-title"><i class="bi bi-book-half"> {{ book.title }}</i></h3>
+            <hr>
+            <p class="card-text"><i class="bi bi-vector-pen"> {{book.author}}</i></p>
+            <p class="card-text"><i class="bi bi-calendar"> {{book.published}}</i></p>
+            <p class="card-text"><i class="bi bi-briefcase-fill"> {{book.publisher}}</i></p>
+            <p class="card-text"><i class="bi bi-funnel"> {{book.genre}}</i></p>
+          {% if book in current_user.wishlist.all %}
+            <a class="btn btn-danger" href="{% url 'unwish' book.id %}">Remove from wishlist</a>
+          {% else %}
+            <a class="btn btn-success" href="{% url 'wish' book.id %}">Add to wishlist</a>
+          {% endif %}
+          </div>
+        </div>
+      </div>
     </div>
-    {% if book in current_user.wishlist.all %}
-    <a class="btn btn-danger" href="{% url 'unwish' book.id %}">Remove from wishlist</a>
-    {% else %}
-    <a class="btn btn-success" href="{% url 'wish' book.id %}">Add to wishlist</a>
-    {% endif %}
   </div>
-</div>
+</body>
