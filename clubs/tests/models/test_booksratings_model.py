@@ -82,8 +82,8 @@ class BooksRatingsModelTestCase(TestCase):
         self.rating.rating = second_rating.rating
         self._assert_rating_is_valid()
 
-    # Test rating must be a unique entry.
-    def test_rating_must_be_unique(self):
+    # Test rating must be a unique together entry.
+    def test_rating_must_be_unique_together(self):
         second_rating = self._get_second_rating()
         self.rating.user = second_rating.user
         self.rating.isbn = second_rating.isbn

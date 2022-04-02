@@ -113,6 +113,9 @@ class Role(models.Model):
         default='A'
     )
 
+    class Meta():
+        unique_together = ('user', 'club',)
+
     def get_club_name(self):
         return self.club.name
 
