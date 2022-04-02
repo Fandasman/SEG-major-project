@@ -5,6 +5,7 @@ from django.core.validators import RegexValidator, MaxValueValidator, MinValueVa
 from django.contrib.auth.models import AbstractUser
 from libgravatar import Gravatar
 from multiselectfield import MultiSelectField
+from .helpers import get_genres
 
 
 # Create the Book model
@@ -43,7 +44,7 @@ class User(AbstractUser):
     bio = models.CharField(max_length = 500, blank = True)
     wishlist = models.ManyToManyField(Book, related_name="wishlist", blank=True)
     genres_preferences = MultiSelectField(
-        choices=[(genre, genre) for genre in sorted(Book.objects.values_list('genre', flat=True).distinct())],
+        choices=get_genres(),
         max_choices=5,
         blank=True,
         default=None

@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate
 from django.shortcuts import redirect
 from bootstrap5.widgets import RadioSelectButtonGroup
 from .models import BooksRatings, Club, User, Book
+from .helpers import get_genres
 
 
 class SignUpForm(forms.ModelForm):
@@ -137,7 +138,7 @@ class GenreForm(forms.ModelForm):
         model = User
         fields = ["genres_preferences"]
         genres_preferences = forms.MultipleChoiceField(
-            choices=[(genre, genre) for genre in sorted(Book.objects.values_list('genre', flat=True).distinct())],
+            choices=get_genres(),
             widget=forms.CheckboxInput(),
         )
         error_messages={'genres_preferences':

@@ -38,6 +38,8 @@ def feed(request):
     current_user = request.user
 
     user_books = Book.objects.filter(isbn__in = current_user.users.values('isbn')).values_list('isbn', flat=True)
+    user_genres = list(current_user.genres_preferences)
+    filtered_user_books = Book.objects.exclude(isbn__in = user_books)
 
     recommended_books = []
 
@@ -45,11 +47,6 @@ def feed(request):
 
         """Generate a query for books with the most positive ratings based on genre preferences"""
 
-        if len(user_books) != 0:
-            user_genres = user_books.values_list('genre', flat=True)
-        else:
-            user_genres = list(current_user.genres_preferences)
-        filtered_user_books = Book.objects.exclude(isbn__in = user_books)
         filtered_user_genres = filtered_user_books.filter(genre__in = user_genres).values_list('isbn', flat=True)
         filtered_user_genres = BooksRatings.objects.filter(isbn__in = filtered_user_genres)
         good_isbns = list(filtered_user_genres.filter(rating__gte = 4).values_list('isbn'))
@@ -64,8 +61,6 @@ def feed(request):
     else:
         """Generate a query for the recommended books"""
 
-        user_genres = Book.objects.filter(isbn__in = current_user.users.values('isbn')).values_list('genre', flat=True)
-        filtered_user_books = Book.objects.exclude(isbn__in = user_books)
         filtered_user_genres = filtered_user_books.filter(genre__in = user_genres)
 
         recommendations = {}
@@ -115,6 +110,9 @@ def show_book(request, book_id):
                     new_rating.save()
                     exist_rating = True
                     current_rating_value = new_rating.rating
+                    if book.genre not in current_user.genres_preferences:
+                        current_user.genres_preferences.insert(len(current_user.genres_preferences), book.genre)
+                        current_user.save()
                 else:
                     past_rating.rating = book_form.cleaned_data.get('rating')
                     current_rating_value = past_rating.rating
@@ -236,11 +234,7 @@ class RecommendedClubListView(ListView):
         club_similarities = {}
 
         current_user = self.request.user
-        user_books = Book.objects.filter(isbn__in = current_user.users.values('isbn'))
-        if len(user_books) != 0:
-            user_genres = user_books.values_list('genre', flat=True)
-        else:
-            user_genres = list(current_user.genres_preferences)
+        user_genres = list(current_user.genres_preferences)
         user_genres_counter = Counter(user_genres)
 
         filtered_clubs = Club.objects.filter(club_book__genre__in = user_genres)
@@ -248,9 +242,8 @@ class RecommendedClubListView(ListView):
             distance_sum = 0
             members = Role.objects.filter(club = club).filter(role = 'M')
             for member in members.values():
-                current_member = User.objects.get(id=member['user_id'])
-                member_books = Book.objects.filter(isbn__in = current_member.users.values('isbn'))
-                member_genres = member_books.values_list('genre', flat=True)
+                current_member = User.objects.get(id = member['user_id'])
+                member_genres = list(current_member.genres_preferences)
                 member_genres_counter = Counter(member_genres)
                 all_genres  = list(user_genres_counter.keys() | member_genres_counter.keys())
                 user_vect = [user_genres_counter.get(word, 0) for word in all_genres]
@@ -295,10 +288,13 @@ class LogInView(View):
         form = LogInForm(request.POST)
         self.next = request.POST.get('next')
         user = form.get_user()
-        if user is not None:
-                """Redirect to club selection page, with option to create new club"""
-                login(request, user)
-                return redirect('feed')
+        if user is not None and len(user.genres_preferences) != 0:
+            """Redirect to club selection page, with option to create new club"""
+            login(request, user)
+            return redirect('feed')
+        elif user is not None and len(user.genres_preferences) == 0:
+            login(request, user)
+            return redirect('select_genres')
 
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
         return self.render()

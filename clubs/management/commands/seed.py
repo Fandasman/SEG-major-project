@@ -31,6 +31,8 @@ class Command(BaseCommand):
 
         Command.get_books(self, books_dataset)
 
+        Command.update_genres_preferences(self)
+
         Command.generate_clubs(self)
 
         print("Seeding complete!")
@@ -103,6 +105,18 @@ class Command(BaseCommand):
                 imgURLMedium = row['Image-URL-M'],
                 imgURLLarge = row['Image-URL-L']
             )
+
+        print("Done!")
+
+    # Update the genres preferences of current users
+    def update_genres_preferences(self):
+        print("Updating the genres preferences of current users...")
+
+        for user in tqdm(User.objects.all()):
+            user_genres = Book.objects.filter(isbn__in = user.users.values('isbn')).values_list('genre', flat=True).distinct()
+            for i in range(len(user_genres)):
+                user.genres_preferences.insert(i, user_genres[i])
+            user.save()
 
         print("Done!")
 
