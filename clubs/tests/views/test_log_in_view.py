@@ -23,7 +23,6 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'main_templates/login.html')
         form = response.context['form']
-        next = response.context['next']
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
         messages_list = list(response.context['messages'])
@@ -43,10 +42,9 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'main_templates/login.html')
         form = response.context['form']
-        next = response.context['next']
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
-        self.assertEqual(next, destination_url)
+        self.assertEqual('/log_in/', destination_url)
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 0)
 
@@ -112,8 +110,6 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.assertEqual(len(messages_list), 0)
 
     def test_post_login_with_incorrect_credentials_and_redirect(self):
-        redirect_url = reverse('feed')
-        form_input = { 'email': 'johndoe12', 'password': 'WrongPassword123', 'next': redirect_url }
+        redirect_url = reverse('login')
+        form_input = { 'username': 'johndoe12', 'password': 'WrongPassword123', 'next': redirect_url }
         response = self.client.post(self.url, form_input)
-        next = response.context['next']
-        self.assertEqual(next, redirect_url)

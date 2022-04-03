@@ -18,6 +18,7 @@
         {% endfor %}
         {% include 'partials/bootstrap_form.html' with form=form %}
         <input type = "submit" value = "Log in" class="btn btn-primary" name="login">
+        <a class="btn btn-secondary" href="{% url 'sign_up' %}">Sign up</a>
       </form>
     </div>
   </div>

@@ -287,10 +287,15 @@ class LogInView(View):
     def post(self,request):
         form = LogInForm(request.POST)
         user = form.get_user()
+        if user is not None and len(user.genres_preferences) == 0:
+            login(request, user)
+            return redirect('select_genres')
+            
         if user is not None:
                 """Redirect to club selection page, with option to create new club"""
                 login(request, user)
                 return redirect('feed')
+        
 
         else:
             messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
@@ -298,7 +303,7 @@ class LogInView(View):
             
     def render(self):
         form = LogInForm()
-        return render(self.request, 'login.html', {'form': form})
+        return render(self.request, 'main_templates/login.html', {'form': form})
 
 """View used for logging out."""
 @login_required
