@@ -5,7 +5,9 @@ from clubs.models import User
 class UserModelTestCase(TestCase):
     fixtures = [
         "clubs/tests/fixtures/default_user.json",
-        "clubs/tests/fixtures/other_users.json"
+        "clubs/tests/fixtures/other_users.json",
+        "clubs/tests/fixtures/default_book.json",
+        "clubs/tests/fixtures/other_books.json",
     ]
 
     def setUp(self):
@@ -135,13 +137,38 @@ class UserModelTestCase(TestCase):
 # Wishlist test cases
     def test_wishlist_can_be_empty(self):
         self.user.wishlist.set([])
-        self._assert_user_is_valid()
+        self._assert_user_is_valid
 
     def test_valid_wishlist(self):
-        pass
+        self.user.wishlist.set([1, 2, 3])
+        self._assert_user_is_valid
 
     def test_wishlist_does_not_have_to_be_unique(self):
-        pass
+        second_user = User.objects.get(username = 'janedoe')
+        second_user.wishlist.set([1, 2, 3])
+        self.user.wishlist.set([1, 2, 3])
+        self._assert_user_is_valid
+
+# Genre preference test cases
+    def test_genres_preferences_can_be_empty(self):
+        self.user.genres_preferences = []
+        self._assert_user_is_valid
+
+    def test_user_can_have_five_genres_preferences(self):
+        self.user.genres_preferences = ['Fiction', 'Romance', 'Horror', 'Mystery', 'Politics']
+        self._assert_user_is_valid
+
+    def test_genres_preferences_do_not_have_to_be_unique(self):
+        second_user = User.objects.get(username='janedoe')
+        second_user.genres_preferences = ['Fiction', 'Romance', 'Horror', 'Mystery', 'Politics']
+        self.user.genres_preferences = second_user.genres_preferences
+        self._assert_user_is_valid
+
+
+    def test_user_cannot_have_over_five_genres_preferences(self):
+        self.user.genres_preferences = ['Fiction', 'Romance', 'Horror', 'Mystery', 'Politics', 'Crime']
+        self._assert_user_is_invalid
+
 
 # Test case assertions
     def _assert_user_is_valid(self):

@@ -62,4 +62,8 @@ class LogInFormTestCase(TestCase):
         form_input = {'username': ' ', 'password': 'Password123'}
         form = LogInForm(data=form_input)
         user = form.get_user()
+<<<<<<< HEAD
         self.assertEqual(user, None)
+=======
+        self.assertEqual(user, None)
+>>>>>>> 67c3ad16c9244813f45d373463c1cd385c351512

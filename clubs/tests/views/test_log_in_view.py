@@ -16,7 +16,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.user = User.objects.get(username='johndoe')
 
     def test_login_url(self):
-        self.assertEqual(self.url, '/login/')
+        self.assertEqual(self.url, '/log_in/')
 
     def test_get_login(self):
         response = self.client.get(self.url)
@@ -87,18 +87,25 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.assertEqual(len(messages_list), 1)
         self.assertEqual(messages_list[0].level, messages.ERROR)
 
-    def test_successful_login(self):
-        response_url = reverse('feed')
-        form_input = {'username': 'johndoe', 'password': 'Password123', 'next': response_url}
+    def test_succesful_login_with_redirect_to_select_genres(self):
+        redirect_url = reverse('login')
+        form_input = { 'username': 'johndoe', 'password': 'Password123', 'next': redirect_url }
         response = self.client.post(self.url, form_input, follow=True)
         self.assertTrue(self._is_logged_in())
+<<<<<<< HEAD
         self.assertRedirects(response, response_url, status_code = 302, target_status_code = 200)
         self.assertTemplateUsed(response, 'calendar.html')
+=======
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'select_genres.html')
+>>>>>>> 67c3ad16c9244813f45d373463c1cd385c351512
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 0)
 
-    def test_succesful_login_with_redirect(self):
+    def test_succesful_login_with_redirect_to_feed(self):
         redirect_url = reverse('login')
+        self.user.genres_preferences = ['Fiction']
+        self.user.save()
         form_input = { 'username': 'johndoe', 'password': 'Password123', 'next': redirect_url }
         response = self.client.post(self.url, form_input, follow=True)
         self.assertTrue(self._is_logged_in())
@@ -106,6 +113,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.assertTemplateUsed(response, 'calendar.html')
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 0)
+<<<<<<< HEAD
     
     def test_post_login_redirects_when_logged_in(self):
         self.client.login(username=self.user.username, password="Password123")
@@ -114,11 +122,14 @@ class LogInViewTestCase(TestCase, LogInTester):
         redirect_url = reverse('feed')
         self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'calendar.html')
+=======
+>>>>>>> 67c3ad16c9244813f45d373463c1cd385c351512
 
     def test_post_login_with_incorrect_credentials_and_redirect(self):
         redirect_url = reverse('login')
         form_input = { 'username': 'johndoe12', 'password': 'WrongPassword123', 'next': redirect_url }
         response = self.client.post(self.url, form_input)
+<<<<<<< HEAD
         self.assertEqual('/login/', redirect_url)
 
     def test_valid_login_by_inactive_user(self):
@@ -135,3 +146,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 1)
         self.assertEqual(messages_list[0].level, messages.ERROR)
+=======
+        next = response.context['next']
+        self.assertEqual(next, redirect_url)
+>>>>>>> 67c3ad16c9244813f45d373463c1cd385c351512

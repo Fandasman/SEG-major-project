@@ -49,12 +49,19 @@ urlpatterns = [
     path('logout/', views.log_out, name='log_out'),
     path('create_club/', views.create_club, name ='create_club'),
     path('user/<int:user_id>/wishlist', views.WishlistView.as_view(), name = 'wishlist'),
-    path('login/', views.LogInView.as_view(), name='login'),
+    path('log_in/', views.LogInView.as_view(), name='login'),
     path('member_club_list', views.MemberClubListView.as_view(), name = 'member_club_list'),
     path('user_list', views.UserListView.as_view(), name = 'user_list'),
     path('owner_club_list', views.OwnerClubListView.as_view(), name = 'owner_club_list'),
+    path('recommended_club_list', views.RecommendedClubListView.as_view(), name = 'recommended_club_list'),
     path('sign_up/', views.SignUpView.as_view(), name='sign_up'),
+<<<<<<< HEAD
     path('book/<int:book_id>', views.ShowBookView.as_view(), name='show_book'),
+=======
+    path('select_genres/', views.select_genres, name='select_genres'),
+    path('book/<int:book_id>', views.show_book, name='show_book'),
+    path('remove_rating/<int:book_id>', views.remove_rating, name='remove_rating'),
+>>>>>>> 67c3ad16c9244813f45d373463c1cd385c351512
     path('user/<int:user_id>', views.ShowUserView.as_view(), name='show_user'),
     path('club/<int:club_id>', views.ShowClubView.as_view(), name='show_club'),
     path('promoted/<int:club_id>/<int:member_id>', views.promote_member_to_officer, name = "promotion"),

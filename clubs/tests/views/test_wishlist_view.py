@@ -15,7 +15,7 @@ class WishlistViewTestCase(TestCase):
     def test_wishlist_url(self):
         self.assertEquals(self.url, "/user/1/wishlist")
 
-    def test_redirects_when_logged_out(self):
+    def test_wishlist_redirects_when_logged_out(self):
         redirect_url = reverse_with_next('login', self.url)
         response = self.client.get(self.url)
         self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)

@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from clubs.tests.helpers import reverse_with_next
 from clubs.models import Club, User, Role, Book
 
 
@@ -19,6 +20,11 @@ class SetClubBookViewTestCase(TestCase):
         self.form_input = {
             'book_title': 'Bob in Wonderland',
         }
+
+    def test_set_club_view_redirects_when_logged_out(self):
+        redirect_url = reverse_with_next('login', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
 
     def test_add_repeat_club_book(self):
         self.role.refresh_from_db()

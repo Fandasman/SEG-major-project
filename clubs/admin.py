@@ -1,5 +1,9 @@
 from django.contrib import admin
+<<<<<<< HEAD
 from .models import User, Book, Club, Role, Invitation,Event, EventPost, UserPost, MembershipPost, Comment, Message
+=======
+from .models import BooksRatings, User, Book, Club, Role, Invitation, Event, Message
+>>>>>>> 67c3ad16c9244813f45d373463c1cd385c351512
 
 
 # Register User model.
@@ -31,6 +35,12 @@ class RoleAdmin(admin.ModelAdmin):
 class InvitationAdmin(admin.ModelAdmin):
     list_display = [
         'user', 'club', 'status',
+    ]
+
+@admin.register(BooksRatings)
+class BookRatingsAdmin(admin.ModelAdmin):
+    list_display = [
+        'isbn', 'rating', 'user',
     ]
 
 @admin.register(Message)

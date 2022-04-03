@@ -1,8 +1,14 @@
+import sys
+from distutils.bcppcompiler import BCPPCompiler
 from django import template
 from django.conf import settings
 from django.contrib import messages
+<<<<<<< HEAD
 from django.urls import reverse, reverse_lazy
 from itertools import chain
+=======
+from django.urls import reverse, resolve
+>>>>>>> 67c3ad16c9244813f45d373463c1cd385c351512
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -20,6 +26,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
+<<<<<<< HEAD
 from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, EventForm, UserPostForm, CommentForm, SearchForm
 from .models import Book, Club, Role, User, Invitation, Event, EventPost, UserPost, MembershipPost, Comment
 from itertools import chain
@@ -32,13 +39,71 @@ import calendar
 from calendar import HTMLCalendar
 import csv
 from django.http import StreamingHttpResponse
+=======
+from .forms import GenreForm, RatingForm, SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm, EventForm
+from .models import Book, Club, Role, User, Invitation, BooksRatings, Message,Event
+from collections import Counter
+from surprise import dump
+from scipy import spatial
+>>>>>>> 67c3ad16c9244813f45d373463c1cd385c351512
+
+
+if "runserver" in sys.argv:
+    print("Loading the model!")
+    _, model = dump.load('./model.pkl')
+
+THRESHOLD = 25
 
 
 # Create your views here.
-
+@login_required
 def feed(request):
     current_user = request.user
+<<<<<<< HEAD
     return render(request, 'feed.html', {'user': current_user})
+=======
+
+    user_books = Book.objects.filter(isbn__in = current_user.users.values('isbn')).values_list('isbn', flat=True)
+    user_genres = list(current_user.genres_preferences)
+    filtered_user_books = Book.objects.exclude(isbn__in = user_books)
+
+    recommended_books = []
+
+    if len(user_books) < THRESHOLD:
+
+        """Generate a query for books with the most positive ratings based on genre preferences"""
+
+        filtered_user_genres = filtered_user_books.filter(genre__in = user_genres).values_list('isbn', flat=True)
+        filtered_user_genres = BooksRatings.objects.filter(isbn__in = filtered_user_genres)
+        good_isbns = list(filtered_user_genres.filter(rating__gte = 4).values_list('isbn'))
+        good_sorted = [rating for ratings, c in Counter(good_isbns).most_common()
+                  for rating in [ratings] * c]
+        good_ratings = list(dict.fromkeys(good_sorted))[:30]
+
+        for rating in good_ratings:
+            book = Book.objects.get(isbn = rating[0])
+            recommended_books.append(book)
+
+    else:
+        """Generate a query for the recommended books"""
+
+        filtered_user_genres = filtered_user_books.filter(genre__in = user_genres)
+
+        recommendations = {}
+
+        for book in filtered_user_genres:
+            predicted_rating = model.predict(uid=current_user.id, iid=book.isbn).est
+            recommendations[book.isbn] = predicted_rating
+
+        sorted_ratings = list(recommendations.items())
+        sorted_ratings.sort(key=lambda k: k[1], reverse=True)
+
+        for pair in sorted_ratings[:30]:
+            book = Book.objects.get(isbn = pair[0])
+            recommended_books.append(book)
+
+    return render(request, 'navbar_templates/feed.html', {'user': current_user, 'recommended_books': recommended_books})
+>>>>>>> 67c3ad16c9244813f45d373463c1cd385c351512
 
 class LoginProhibitedMixin:
 
@@ -47,48 +112,97 @@ class LoginProhibitedMixin:
             return redirect('feed')
         return super().dispatch(*args, **kwargs)
 
+<<<<<<< HEAD
+=======
+@login_required
+def show_book(request, book_id):
+    current_user = request.user
+    try:
+        book = Book.objects.get(id=book_id)
+        in_wishlist = current_user.wishlist.filter(isbn=book.isbn).exists()
+    except ObjectDoesNotExist:
+        return redirect('search_books')
+    else:
+        book_form = RatingForm(request.POST)
+        exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = current_user))) != 0
+        current_rating_value = 0
+        if exist_rating:
+            past_rating = BooksRatings.objects.get(isbn = book.isbn, user = current_user)
 
-# @login_required
+        if request.method=='POST':
+            if book_form.is_valid() and book_form.cleaned_data.get('rating') != '':
+                if exist_rating == False:
+                    new_rating = BooksRatings.objects.create(
+                        isbn = book.isbn,
+                        rating = book_form.cleaned_data.get('rating'),
+                        user = current_user
+                    )
+                    new_rating.save()
+                    exist_rating = True
+                    current_rating_value = new_rating.rating
+                    if book.genre not in current_user.genres_preferences:
+                        current_user.genres_preferences.insert(len(current_user.genres_preferences), book.genre)
+                        current_user.save()
+                else:
+                    past_rating.rating = book_form.cleaned_data.get('rating')
+                    current_rating_value = past_rating.rating
+                    past_rating.save()
+
+        else:
+            if book not in request.user.wishlist.all() and exist_rating:
+                exist_rating = False
+                rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
+                rating.delete()
+
+            elif exist_rating:
+                current_rating_value = past_rating.rating
+
+        return render(request, 'book_templates/show_book.html',
+                     {'book': book,'form': book_form,
+                     'book_id': book_id,
+                     'exist_rating': exist_rating,
+                     'current_rating_value': current_rating_value,
+                     'in_wishlist': in_wishlist}
+    )
+>>>>>>> 67c3ad16c9244813f45d373463c1cd385c351512
+
+@login_required
+def remove_rating(request, book_id):
+    try:
+        book = Book.objects.get(id = book_id)
+    except ObjectDoesNotExist:
+        return redirect('search_books')
+
+    exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) != 0
+    if exist_rating:
+        rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
+        rating.delete()
+
+    return redirect('show_book', book_id)
+
+@login_required
 def profile(request):
     current_user = request.user
     return render(request, 'user_templates/profile.html',
             {'user': current_user}
         )
 
+<<<<<<< HEAD
 
 # @login_required
+=======
+@login_required
+>>>>>>> 67c3ad16c9244813f45d373463c1cd385c351512
 def search_books(request):
     search_book = request.GET.get('book_searchbar')
     if search_book:
-        books= Book.objects.filter(name__icontains=search_book)
+        books = Book.objects.filter(name__icontains=search_book)
     else:
         books = Book.objects.all()
     return render(request, 'book_templates/search_books.html', {'books': books})
 
-
-# class FeedView(LoginRequiredMixin, ListView):
-#     """Class-based generic view for displaying a view."""
-#
-#     model = Post
-#     template_name = "feed.html"
-#     context_object_name = 'posts'
-#
-#     def get_queryset(self):
-#         """Return the user's feed."""
-#         current_user = self.request.user
-#         authors = list(current_user.followees.all()) + [current_user]
-#         posts = Post.objects.filter(author__in=authors)
-#         return posts
-#
-#     def get_context_data(self, **kwargs):
-#         """Return context data, including new post form."""
-#         context = super().get_context_data(**kwargs)
-#         context['user'] = self.request.user
-#         context['form'] = ClubForm()
-#         return context
-
-class HomeView(View):
-    template_name = 'main_templates/home.html'
+class HomeView(LoginProhibitedMixin,View):
+    template_name = 'home.html'
 
 class HomeView(LoginProhibitedMixin,View):
     template_name = 'home.html'
@@ -136,9 +250,9 @@ class ClubListView(LoginRequiredMixin, ListView):
     ordering = ['name']
 
     def get_context_data(self, *args, **kwargs):
-        context= super().get_context_data(*args, **kwargs)
-        club= Club.objects.all()
-        context['roles']= Role.objects.all().filter(role= "O")
+        context = super().get_context_data(*args, **kwargs)
+        club = Club.objects.all()
+        context['roles'] = Role.objects.all().filter(role= "O")
         return context
 
 class OwnerClubListView(LoginRequiredMixin, ListView):
@@ -149,6 +263,7 @@ class OwnerClubListView(LoginRequiredMixin, ListView):
     ordering = ['name']
 
     def get_context_data(self, *args, **kwargs):
+<<<<<<< HEAD
         context= super().get_context_data(*args, **kwargs)
         current_user= self.request.user
         context['roles']= Role.objects.all().filter(user= current_user, role= "CO")
@@ -160,13 +275,26 @@ class MemberClubListView(LoginRequiredMixin, ListView):
     context_object_name= 'clubs'
     paginate_by = settings.CLUBS_PER_PAGE
     ordering = ['name']
-
-    def get_context_data(self, *args, **kwargs):
-        context= super().get_context_data(*args, **kwargs)
-        current_user= self.request.user
-        context['roles']= Role.objects.all().filter(user= current_user, role= "M")
+=======
+        context = super().get_context_data(*args, **kwargs)
+        current_user = self.request.user
+        context['roles'] = Role.objects.all().filter(user= current_user, role= "O")
         return context
 
+# class MemberClubListView(LoginRequiredMixin, ListView):
+class MemberClubListView(ListView):
+    model = Club
+    template_name= 'navbar_templates/member_club_list.html'
+    context_object_name = 'user'
+>>>>>>> 67c3ad16c9244813f45d373463c1cd385c351512
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        current_user = self.request.user
+        context['roles'] = Role.objects.all().filter(user= current_user, role= "M")
+        return context
+
+<<<<<<< HEAD
 class ShowBookView(LoginRequiredMixin, DetailView):
     model = Book
     template_name = 'book_templates/show_book.html'
@@ -200,6 +328,60 @@ class ShowClubView(LoginRequiredMixin, DetailView):
         except Http404:
             return redirect('club_list')
 
+=======
+class RecommendedClubListView(ListView):
+    model = Club
+    template_name = 'navbar_templates/recommended_club_list.html'
+    context_object_name = 'clubs'
+
+    def get_club_recommendations(self):
+        club_similarities = {}
+
+        current_user = self.request.user
+        user_genres = list(current_user.genres_preferences)
+        user_genres_counter = Counter(user_genres)
+
+        filtered_clubs = Club.objects.filter(club_book__genre__in = user_genres)
+        for club in filtered_clubs:
+            distance_sum = 0
+            members = Role.objects.filter(club = club).filter(role = 'M')
+            for member in members.values():
+                current_member = User.objects.get(id = member['user_id'])
+                member_genres = list(current_member.genres_preferences)
+                member_genres_counter = Counter(member_genres)
+                all_genres  = list(user_genres_counter.keys() | member_genres_counter.keys())
+                user_vect = [user_genres_counter.get(word, 0) for word in all_genres]
+                member_vect = [member_genres_counter.get(word, 0) for word in all_genres]
+                distance_sum += 1 - spatial.distance.cosine(user_vect, member_vect)
+            club_similarities[club] = distance_sum / len(members)
+
+        sorted_clubs = list(club_similarities.items())
+        sorted_clubs.sort(key=lambda k: k[1], reverse=True)
+
+        return [i[0] for i in sorted_clubs]
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset(*args, **kwargs)
+        queryset = self.get_club_recommendations()
+        return queryset
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        club = Club.objects.all()
+        context['roles'] = Role.objects.all().filter(role= "O")
+        return context
+
+
+class ShowUserView(DetailView):
+    model = User
+    template_name = 'user_templates/show_user.html'
+    pk_url_kwarg = "user_id"
+
+class ShowClubView(DetailView):
+    model = Club
+    template_name = 'show_club.html'
+    pk_url_kwarg = "club_id"
+>>>>>>> 67c3ad16c9244813f45d373463c1cd385c351512
 
 class LogInView(View):
     """Log-in handling view"""
@@ -209,10 +391,13 @@ class LogInView(View):
     def post(self,request):
         form = LogInForm(request.POST)
         user = form.get_user()
-        if user is not None:
-                """Redirect to club selection page, with option to create new club"""
-                login(request, user)
-                return redirect('feed')
+        if user is not None and len(user.genres_preferences) != 0:
+            """Redirect to club selection page, with option to create new club"""
+            login(request, user)
+            return redirect('feed')
+        elif user is not None and len(user.genres_preferences) == 0:
+            login(request, user)
+            return redirect('select_genres')
 
         else:
             messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
@@ -223,6 +408,7 @@ class LogInView(View):
         return render(self.request, 'login.html', {'form': form})
 
 """View used for logging out."""
+@login_required
 def log_out(request):
     logout(request)
     return redirect('home')
@@ -245,10 +431,33 @@ class SignUpView(LoginProhibitedMixin,FormView):
     def form_valid(self, form):
         self.object = form.save()
         login(self.request, self.object)
-        return super().form_valid(form)
+        super().form_valid(form)
+        return redirect('select_genres')
 
     def get_success_url(self):
-        return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+        pass
+        #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
+"""This function allows the user to select prefered genres upon sign up."""
+@login_required
+def select_genres(request):
+
+    genres = Book.objects.values_list('genre',flat=True).distinct()
+    current_user = request.user
+
+    if request.method=='POST':
+            form = GenreForm(request.POST)
+            if form.is_valid():
+                    current_user.genres_preferences = form.save()
+                    current_user.save()
+                    messages.add_message(request, messages.SUCCESS, "Preferences updated!")
+                    return redirect('feed')
+            else:
+                messages.add_message(request, messages.ERROR, "You must select a maximum of 5 choices!")
+    else:
+        form = GenreForm(instance = current_user)
+    return render(request, "select_genres.html", {'genres': genres, 'form': form})
+
 
 """This function standardize the requirements for
     creating clubs, if club is successfully created,
@@ -277,8 +486,7 @@ def create_club(request):
         return render(request, 'club_templates/create_club.html' , {'form': form})
 
 
-
-class EditProfileView(View):
+class EditProfileView(LoginRequiredMixin, View):
     def get(self,request):
         return self.render()
 
@@ -591,6 +799,10 @@ def apply(request, club_id):
     else:
         return HttpResponseForbidden()
 
+
+"""These functions are for adding/removing
+    books from a user's wishlist."""
+@login_required
 def wish(request, book_id):
     user = request.user
     try:
@@ -602,20 +814,24 @@ def wish(request, book_id):
     except ObjectDoesNotExist:
         return redirect('book_list')
 
+@login_required
 def unwish(request, book_id):
     user = request.user
     try:
         book = Book.objects.get(pk = book_id)
+        previous_url = request.META.get('HTTP_REFERER')
         if user.wishlist.filter(isbn=book.isbn).exists():
             user.wishlist.remove(book)
-        return redirect('wishlist', user.id)
+            if previous_url != None and 'wishlist' in previous_url:
+                return redirect('wishlist', user.id)
+        return redirect('show_book', book.id)
 
     except ObjectDoesNotExist:
         return redirect('book_list')
 
-
 """This function is for club owner/officer to set the book for
     club to read"""
+@login_required
 def set_club_book(request, club_id):
     current_user = request.user
     club = Club.objects.get(id=club_id)
@@ -649,6 +865,7 @@ def set_club_book(request, club_id):
 
 """This function allows club office/owner to
     invite other users to join the club"""
+@login_required
 def invite(request, club_id):
     current_user = request.user
     club = Club.objects.get(id=club_id)
@@ -1049,6 +1266,7 @@ def get_club_messages(request, club_id):
             })
 
     return JsonResponse({"messages":message_list})
+<<<<<<< HEAD
 
 class SearchView(ListView):
     template_name = 'search_view.html'
@@ -1097,3 +1315,5 @@ class SearchView(ListView):
             return qs_sorted
         return query
 
+=======
+>>>>>>> 67c3ad16c9244813f45d373463c1cd385c351512

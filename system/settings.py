@@ -42,9 +42,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'clubs',
     'widget_tweaks',
+<<<<<<< HEAD
     'bootstrap_pagination',
     'django.contrib.humanize',
     'location_field.apps.DefaultConfig',
+=======
+    'bootstrap5',
+    'location_field.apps.DefaultConfig'
+>>>>>>> 67c3ad16c9244813f45d373463c1cd385c351512
 ]
 
 MIDDLEWARE = [
@@ -130,12 +135,21 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Login URL to redirect logged in users
+# Login URL to redirect logged out users
 LOGIN_URL = 'login'
 
+<<<<<<< HEAD
 #URL where @login_prohibited redirects to
 REDIRECT_URL_WHEN_LOGGED_IN= 'feed'
+=======
+# Login URL to redirect logged in users
+REDIRECT_URL_WHEN_LOGGED_IN = 'feed'
+>>>>>>> 67c3ad16c9244813f45d373463c1cd385c351512
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

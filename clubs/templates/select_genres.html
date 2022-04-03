@@ -1,0 +1,24 @@
+{% extends 'base_content.html' %}
+{% block title %}
+| Select genres
+{% endblock %}
+<script></script>
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Select genres</h1>
+            <p>Select up to <b>5</b> genres that you're interested in!</p>
+            <p>The more information you share, the more accurate our recomendations will be ;)</p>
+
+            <form action="{% url 'select_genres' %}" method="post">
+                {% csrf_token %}
+                
+                {{ form.as_table }}
+                <input type='submit' value="Save" class="btn btn-primary">
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
