@@ -282,27 +282,28 @@ class ShowClubView(DetailView):
 class LogInView(View):
     """Log-in handling view"""
     def get(self,request):
-        self.next = request.GET.get('next') or 'officer'
         return self.render()
 
     def post(self,request):
         form = LogInForm(request.POST)
-        self.next = request.POST.get('next')
         user = form.get_user()
-        if user is not None and len(user.genres_preferences) != 0:
-            """Redirect to club selection page, with option to create new club"""
-            login(request, user)
-            return redirect('feed')
-        elif user is not None and len(user.genres_preferences) == 0:
+        if user is not None and len(user.genres_preferences) == 0:
             login(request, user)
             return redirect('select_genres')
+            
+        if user is not None:
+                """Redirect to club selection page, with option to create new club"""
+                login(request, user)
+                return redirect('feed')
+        
 
-        messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
-        return self.render()
-
+        else:
+            messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
+            return self.render()
+            
     def render(self):
         form = LogInForm()
-        return render(self.request, 'main_templates/login.html', {'form': form, 'next' : self.next})
+        return render(self.request, 'main_templates/login.html', {'form': form})
 
 """View used for logging out."""
 @login_required
