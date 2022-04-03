@@ -121,12 +121,12 @@ class Club(models.Model):
        return Role.objects.filter(club = self).filter(role = 'O' ).count() + 1
 
     def get_upcoming_events(self):
-        return Event.objects.filter(deadline__gte = date.today())
+        return Event.objects.filter(deadline__gte = date.today()).filter(club = self)
 
     def get_past_events(self):
         start_date = datetime.date(2021, 3, 13)
         end_date = datetime.date.today() - timedelta(days = 1)
-        return Event.objects.filter(deadline__range = (start_date,end_date))
+        return Event.objects.filter(deadline__range = (start_date,end_date)).filter(club = self)
 
 # Create the user's Roles model
 ROLES = (

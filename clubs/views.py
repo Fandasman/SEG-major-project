@@ -23,6 +23,7 @@ from .models import Book, Club, Role, User, Invitation, BooksRatings, Message,Ev
 from collections import Counter
 from surprise import dump
 from scipy import spatial
+from itertools import chain
 
 
 if "runserver" in sys.argv:
@@ -199,7 +200,7 @@ class ClubListView(ListView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         club = Club.objects.all()
-        context['roles'] = Role.objects.all().filter(role= "O")
+        context['roles'] = Role.objects.filter(role= "O")
         return context
 
 # class OwnerClubListView(LoginRequiredMixin, ListView):
@@ -211,7 +212,7 @@ class OwnerClubListView(ListView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         current_user = self.request.user
-        context['roles'] = Role.objects.all().filter(user= current_user, role= "O")
+        context['roles'] = Role.objects.filter(user = current_user, role= "CO")
         return context
 
 # class MemberClubListView(LoginRequiredMixin, ListView):
@@ -223,7 +224,9 @@ class MemberClubListView(ListView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         current_user = self.request.user
-        context['roles'] = Role.objects.all().filter(user= current_user, role= "M")
+        member_roles = Role.objects.all().filter(user= current_user, role = "M")
+        officer_roles = Role.objects.all().filter(user= current_user, role = "O")
+        context['roles'] = list(chain(officer_roles, member_roles))
         return context
 
 class RecommendedClubListView(ListView):
@@ -748,7 +751,7 @@ def invite(request, club_id):
             else:
                 messages.add_message(request, messages.ERROR, "you don't have the permission to invite others")
                 form = InviteForm()
-                return redirect('show_club', club.id)
+                return redirect('club_feed', club.id)
         else:
             messages.add_message(request, messages.ERROR, "Invalid username")
             form = InviteForm()
