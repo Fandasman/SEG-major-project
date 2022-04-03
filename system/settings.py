@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'clubs',
     'widget_tweaks',
+    'multiselectfield',
 ]
 
 MIDDLEWARE = [
