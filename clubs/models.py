@@ -1,4 +1,3 @@
-# from asyncio.windows_events import NULL
 import datetime
 from django.db import models
 from django.db.models import Q
@@ -66,7 +65,7 @@ class UserManager(AbstractUserManager):
 
 
 class Book(models.Model):
-    isbn = models.CharField(primary_key=True,max_length = 13, unique = True, blank = False)
+    isbn = models.CharField(max_length = 13, unique = True, blank = False)
     title = models.CharField(max_length = 100, blank = False)
     author = models.CharField(max_length = 100, blank = False)
     publisher = models.CharField(max_length = 100, blank = False)

@@ -7,11 +7,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+<<<<<<< HEAD
 from django.http.response import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect, render
+=======
+from django.http.response import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.shortcuts import redirect, render, get_object_or_404
+>>>>>>> calendar
 from django.views import View
-from .forms import ClubBookForm, SignUpForm, LogInForm, EditProfileForm, ClubForm
-from django.conf import settings
 from django.views.generic.edit import CreateView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -20,7 +23,11 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, EventForm, UserPostForm, CommentForm, SearchForm
+<<<<<<< HEAD
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm, EventForm
+from .models import Book, Club, Role, User, Invitation, Message,Event
+=======
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm, UserPostForm, CommentForm, SearchForm
 from .models import Book, Club, Role, User, Invitation, Event, EventPost, UserPost, MembershipPost, Comment
 from itertools import chain
 from datetime import datetime, timedelta
@@ -30,9 +37,11 @@ from django.views import generic
 from django.utils.safestring import mark_safe
 import calendar
 from calendar import HTMLCalendar
+>>>>>>> calendar
+
+
 import csv
 from django.http import StreamingHttpResponse
-
 
 # Create your views here.
 
@@ -55,7 +64,7 @@ def profile(request):
             {'user': current_user}
         )
 
-
+<<<<<<< HEAD
 # @login_required
 def search_books(request):
     search_book = request.GET.get('book_searchbar')
@@ -89,9 +98,10 @@ def search_books(request):
 
 class HomeView(View):
     template_name = 'main_templates/home.html'
-
+=======
 class HomeView(LoginProhibitedMixin,View):
     template_name = 'home.html'
+>>>>>>> calendar
 
     def get(self,request):
         return self.render()
@@ -204,23 +214,24 @@ class ShowClubView(LoginRequiredMixin, DetailView):
 class LogInView(View):
     """Log-in handling view"""
     def get(self,request):
+        self.next = request.GET.get('next') or 'officer'
         return self.render()
 
     def post(self,request):
         form = LogInForm(request.POST)
+        self.next = request.POST.get('next')
         user = form.get_user()
         if user is not None:
                 """Redirect to club selection page, with option to create new club"""
                 login(request, user)
                 return redirect('feed')
 
-        else:
-            messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
-            return self.render()
-            
+        messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
+        return self.render()
+
     def render(self):
         form = LogInForm()
-        return render(self.request, 'login.html', {'form': form})
+        return render(self.request, 'login.html', {'form': form, 'next' : self.next})
 
 """View used for logging out."""
 def log_out(request):
@@ -235,12 +246,13 @@ class SignUpView(LoginProhibitedMixin,FormView):
     """View that signs up user."""
 
     form_class = SignUpForm
+<<<<<<< HEAD
     template_name = "main_templates/sign_up.html"
     redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
-
+=======
     template_name = "sign_up.html"
     #redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
-
+>>>>>>> calendar
 
     def form_valid(self, form):
         self.object = form.save()
@@ -297,32 +309,6 @@ class EditProfileView(View):
         form = EditProfileForm(instance=current_user)
         return render(self.request,'user_templates/edit_profile.html', {'form': form})
 
-
-
-class ClubBookView(View):
-    def get(self,club_id,request):
-        club = Club.objects.get(id=club_id)
-        return self.render()
-
-    def post(self,club_id,request):
-    
-        form = ClubBookForm(data=request.POST)
-        if form.is_valid():
-            messages.add_message(request, messages.SUCCESS, "Book amended!")
-            form.save()
-            club = Club.objects.get(id=club_id)
-            current_book = form.cleaned_data.get('current_book')
-            book_page = form.cleaned_data.get('book_page')
-            Club.objects.filter(club_book=current_book, id= club_id)
-            Club.objects.filter(book_page=book_page, id= club_id)
-            return redirect('feed')
-        return render(request, 'club_book.html', {'form': form})
-
-
-    def render(self):
-        current_user = self.request.user
-        form = ClubBookForm(instance=current_user)
-        return render(self.request,'club_book.html', {'form': form})
 
 """Includes the view for a user's wishlist."""
 class WishlistView(LoginRequiredMixin, ListView):
@@ -794,7 +780,8 @@ def event_list(request,club_id):
                                                       'club' : club,
                                                       'events' : events})
 
-
+<<<<<<< HEAD
+=======
 class NewPostView(LoginRequiredMixin, CreateView):
     """Class-based generic view for new post handling."""
 
@@ -825,7 +812,7 @@ def like_post(request, club_id, post_id):
 
         post.likes.add(request.user)
 
-    return redirect(reverse('club_feed',kwargs={'club_id':club_id}))
+    return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
 
 def add_comment_to_post(request, club_id, post_id):
@@ -836,7 +823,7 @@ def add_comment_to_post(request, club_id, post_id):
         form = CommentForm(request.POST, instance = comment)
         if form.is_valid():
             comment = form.save()
-    return redirect(reverse('club_feed',kwargs={'club_id':club_id}))
+    return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
 
 class Calendar(HTMLCalendar):
@@ -918,7 +905,7 @@ def get_date(req_day):
         return date(year, month, day=1)
     return datetime.today()
 
-
+>>>>>>> calendar
 def join_event(request,event_id,club_id):
      club = Club.objects.get(id=club_id)
      members = Role.objects.filter(club=club)
@@ -968,6 +955,7 @@ def leave_club(request,club_id):
     return redirect('feed')
 
 
+<<<<<<< HEAD
 def user_chat(request, receiver_id):
     user = request.user
     receiver = User.objects.get(id=receiver_id)
@@ -1049,7 +1037,7 @@ def get_club_messages(request, club_id):
             })
 
     return JsonResponse({"messages":message_list})
-
+=======
 class SearchView(ListView):
     template_name = 'search_view.html'
     count = 0
@@ -1096,4 +1084,4 @@ class SearchView(ListView):
             self.query = query
             return qs_sorted
         return query
-
+>>>>>>> calendar

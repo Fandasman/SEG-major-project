@@ -46,6 +46,11 @@ class SignUpForm(forms.ModelForm):
 
 class LogInForm(forms.Form):
     username = forms.CharField(required=True, label = "Username")
+
+    # Tried to make email not case senstive.
+    # def clean_email(self):
+    #     data = self.cleaned_data['email']
+    #     return data.lower()
     password = forms.CharField(label = "Password", widget = forms.PasswordInput())
 
     def get_user(self):
@@ -88,11 +93,36 @@ class EditProfileForm(forms.ModelForm):
         widgets = { 'bio': forms.Textarea()}
 
 
-class ClubBookForm(forms.ModelForm):
-    """Form to update a club's current book."""
+class SetClubBookForm(forms.Form):
+    book_title = forms.CharField(max_length=50, required=True, label="book title")
+    #club_name = forms.CharField(max_length=50, required=True, label="club name")
 
-    class Meta:
-        """Form options."""
+    def get_book(self):
+            book = Book.objects.get(title=self.cleaned_data.get('book_title'))
+            return book
+
+
+   # def get_club(self):
+           # club = Club.objects.get(name=self.cleaned_data.get('club_name'))
+           # return club
+
+
+    def is_valid(self):
+        super().is_valid()
+        try:
+            book = Book.objects.get(title=self.cleaned_data.get('book_title'))
+           # club = Club.objects.get(name=self.cleaned_data.get('club_name'))
+            return True
+        except ObjectDoesNotExist:
+            return False
+
+class InviteForm(forms.Form):
+    model = User
+    username = forms.CharField(max_length=50, required=True, label="username")
+
+    def get_user(self):
+        user = User.objects.get(username=self.cleaned_data.get('username'))
+        return user
 
     def is_valid(self):
         super().is_valid()
