@@ -388,10 +388,26 @@ def delete_club(request, club_id):
     try:
         role = Role.objects.get(user = current_user, club = club)
     except ObjectDoesNotExist:
-        redirect('feed')
+        return redirect('feed')
     else:
         if role.role == 'CO':
-            return render(request, 'club_templates/delete_club.html')
+            return render(request, 'club_templates/delete_club.html', {'club': club})
+
+@login_required
+def delete_club_action(request, club_id):
+    current_user = request.user
+    club = Club.objects.get(id = club_id)
+    try:
+        role = Role.objects.get(user = current_user, club = club)
+    except ObjectDoesNotExist:
+        return redirect('feed')
+    else:
+        if role.role == 'CO':
+            Club.objects.get(id = club_id).delete()
+            messages.add_message(request, messages.SUCCESS, "Club deleted! Time to make another one?")
+        
+        return redirect('feed')
+
 
 class EditProfileView(LoginRequiredMixin, View):
     def get(self,request):

@@ -3,7 +3,20 @@
 | Delete club
 {% endblock %}
 {% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
 
-<p>HEHEHEHEHEH</p>
+            <h1>Delete club</h1>
 
+            <br>
+
+            <h2>Are you sure you want to delete club {{ club.name }}?</h2>
+            <h3>The action is irreversible!</h3>
+            <hr>
+            <a class="btn btn-danger" href="{% url 'delete_club_action' club.id %}">Nuke </a>
+            <a class="btn btn-success" href="{% url 'club_feed' club.id %}">Go back!</a>
+        </div>
+    </div>
+</div>
 {% endblock %}
