@@ -24,7 +24,7 @@ class ProfileTestCase(TestCase):
         self.client.login(username=self.user.username, password="Password123")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'profile.html')
+        self.assertTemplateUsed(response, 'user_templates/profile.html')
 #        self.assertContains(response, self.user.username)
 #        self.assertContains(response, self.user.full_name)
 #        self.assertContains(response, self.user.bio)

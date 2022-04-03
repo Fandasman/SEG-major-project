@@ -1,0 +1,7 @@
+{%extends 'base_content.html'%}
+{% block content %}
+
+  {% include 'partials/club_page_jumbotron.html' with members=members club=club userrole=userrole%}
+    {% include 'club_templates/club_chat.html' with club=club %}
+
+{% endblock %}

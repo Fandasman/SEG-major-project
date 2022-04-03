@@ -4,7 +4,7 @@ from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
 from bootstrap5.widgets import RadioSelectButtonGroup
-from .models import BooksRatings, Club, User, Book
+from .models import BooksRatings, Club, User, Book, Event
 from .helpers import get_genres
 
 
@@ -168,3 +168,46 @@ class RatingForm(forms.ModelForm):
     class Meta:
         model = BooksRatings
         fields = ["rating"]
+
+
+class BookModelChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+         return obj.get_title()
+
+class EventForm(forms.ModelForm):
+    """Form allowing a officer to create a new tournament model"""
+
+
+
+    class Meta:
+        """Form options."""
+        model = Event
+        fields = ['name', 'description', 'maxNumberOfParticipants','deadline','book','location']
+        widgets = { 'description': forms.Textarea()}
+
+        book = BookModelChoiceField(label ="Book",queryset = Book.objects.values_list('title',flat = True))
+
+
+
+    def get_book_titles():
+       for book in Book.objects.all():
+           book_titles = book.name
+       return book_titles
+
+    def clean(self):
+        pass
+    def save(self, club_id,current_user):
+        super().save(commit = False)
+        event = Event.objects.create(
+            name=self.cleaned_data.get('name'),
+            description=self.cleaned_data.get('description'),
+            maxNumberOfParticipants= self.cleaned_data.get('maxNumberOfParticipants'),
+            deadline = self.cleaned_data.get('deadline'),
+            book = self.cleaned_data.get('book'),
+            club = Club.objects.get(id = club_id),
+            organiser = current_user,
+            location = self.cleaned_data.get('location')
+
+        )
+        event.save()
+        return event

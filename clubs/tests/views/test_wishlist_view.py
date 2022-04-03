@@ -4,14 +4,14 @@ from clubs.tests.helpers import reverse_with_next
 from clubs.models import User
 
 class WishlistViewTestCase(TestCase):
-    
+
     fixtures = ["clubs/tests/fixtures/default_user.json",
                 "clubs/tests/fixtures/other_users.json"]
-    
+
     def setUp(self):
         self.user = User.objects.get(username = "johndoe")
         self.url = reverse("wishlist", args=(self.user.pk,))
-    
+
     def test_wishlist_url(self):
         self.assertEquals(self.url, "/user/1/wishlist")
 

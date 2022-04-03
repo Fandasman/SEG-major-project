@@ -15,7 +15,7 @@
             <td>{{ club.name }}</td>
             <td>
               <p>
-              <form action = "{% url 'member_list' club.id %}" method = "get">
+              <form action = "{% url 'club_feed' club.id %}" method = "get">
                 {% csrf_token %}
                 <input type = "hidden" name = "next" value = "{{ next }}">
                 {% include 'partials/bootstrap_form.html' with form=form %}

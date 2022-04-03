@@ -31,7 +31,7 @@ class SignUpViewTestCase(TestCase, LogInTester):
     def test_get_sign_up(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'sign_up.html')
+        self.assertTemplateUsed(response, 'main_templates/sign_up.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, SignUpForm))
         self.assertFalse(form.is_bound)
@@ -43,7 +43,7 @@ class SignUpViewTestCase(TestCase, LogInTester):
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'sign_up.html')
+        self.assertTemplateUsed(response, 'main_templates/sign_up.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, SignUpForm))
         self.assertTrue(form.is_bound)
@@ -82,4 +82,3 @@ class SignUpViewTestCase(TestCase, LogInTester):
     #     response_url = reverse('club_list')
     #     self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
     #     self.assertTemplateUsed(response,'club_list.html')
-

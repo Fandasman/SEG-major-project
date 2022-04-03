@@ -40,7 +40,7 @@ class SelectGenreViewTestCase(TestCase, LogInTester):
         response = self.client.post(self.url, self.form_input, follow = True)
         response_url = reverse('feed')
         self.assertRedirects(response, response_url, status_code = 302, target_status_code = 200)
-        self.assertTemplateUsed(response, 'feed.html')
+        self.assertTemplateUsed(response, 'navbar_templates/feed.html')
         user_after_count = User.objects.count
         self.assertEqual(user_before_count, user_after_count)
         #self.assertEqual(self.user.genres_preferences, [('Fiction'), ('Romance'), ('Horror'), ('Mystery'), ('Politics')])

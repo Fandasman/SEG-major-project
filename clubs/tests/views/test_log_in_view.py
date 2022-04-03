@@ -21,7 +21,7 @@ class LogInViewTestCase(TestCase, LogInTester):
     def test_get_login(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'login.html')
+        self.assertTemplateUsed(response, 'main_templates/login.html')
         form = response.context['form']
         next = response.context['next']
         self.assertTrue(isinstance(form, LogInForm))
@@ -34,14 +34,14 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.assertTrue(self._is_logged_in)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'login.html')
+        self.assertTemplateUsed(response, 'main_templates/login.html')
 
     def test_get_login_with_redirect(self):
         destination_url = reverse('login')
         self.url = reverse_with_next('login', destination_url)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'login.html')
+        self.assertTemplateUsed(response, 'main_templates/login.html')
         form = response.context['form']
         next = response.context['next']
         self.assertTrue(isinstance(form, LogInForm))
@@ -54,7 +54,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         form_input = {'username': 'johndoe1', 'password': 'Password123'}
         response = self.client.post(self.url, form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'login.html')
+        self.assertTemplateUsed(response, 'main_templates/login.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
@@ -67,7 +67,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         form_input = { 'username': '', 'password': 'Password123' }
         response = self.client.post(self.url, form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'login.html')
+        self.assertTemplateUsed(response, 'main_templates/login.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
@@ -80,7 +80,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         form_input = { 'username': 'johndoe', 'password': '' }
         response = self.client.post(self.url, form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'login.html')
+        self.assertTemplateUsed(response, 'main_templates/login.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
@@ -107,17 +107,9 @@ class LogInViewTestCase(TestCase, LogInTester):
         response = self.client.post(self.url, form_input, follow=True)
         self.assertTrue(self._is_logged_in())
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'feed.html')
+        self.assertTemplateUsed(response, 'navbar_templates/feed.html')
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 0)
-
-    # def test_post_login_redirects_when_logged_in(self):
-    #     self.client.login(username=self.user.username, password="Password123")
-    #     form_input = { 'email': 'johndoe', 'password': 'Password123' }
-    #     response = self.client.post(self.url, form_input, follow=True)
-    #     redirect_url = reverse('feed')
-    #     self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
-    #     self.assertTemplateUsed(response, 'feed.html')
 
     def test_post_login_with_incorrect_credentials_and_redirect(self):
         redirect_url = reverse('feed')
@@ -125,18 +117,3 @@ class LogInViewTestCase(TestCase, LogInTester):
         response = self.client.post(self.url, form_input)
         next = response.context['next']
         self.assertEqual(next, redirect_url)
-
-    # def test_valid_login_by_inactive_user(self):
-    #     self.user.is_active = False
-    #     self.user.save()
-    #     form_input = {'email': 'johndoe@example.org', 'password': 'Password123'}
-    #     response = self.client.post(self.url, form_input, follow = True)
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertTemplateUsed(response, 'login.html')
-    #     form = response.context['form']
-    #     self.assertTrue(isinstance(form, LogInForm))
-    #     self.assertFalse(form.is_bound)
-    #     self.assertFalse(self._is_logged_in())
-    #     messages_list = list(response.context['messages'])
-    #     self.assertEqual(len(messages_list), 1)
-    #     self.assertEqual(messages_list[0].level, messages.ERROR)

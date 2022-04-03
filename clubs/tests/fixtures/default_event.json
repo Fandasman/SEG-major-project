@@ -1,0 +1,16 @@
+[
+    {
+        "model":"clubs.event",
+        "pk":1,
+        "fields":{
+            "name":"DefaultEvent",
+            "description":"This is an event created for testing.",
+            "maxNumberOfParticipants":17,
+            "deadline":"2022-03-29",
+            "book":1,
+            "location":"London",
+            "club" :1,
+            "organiser": 3
+        }
+    }
+]

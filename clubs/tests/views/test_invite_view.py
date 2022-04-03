@@ -33,7 +33,7 @@ class InviteViewTestCase(TestCase):
         before_count = Invitation.objects.count()
         response = self.client.post(self.url, self.form_input, follow=True)
         after_count = Invitation.objects.count()
-        response_url = reverse('show_club', kwargs={"club_id": self.club.id})
+        response_url = reverse('club_members', kwargs={"club_id": self.club.id})
         self.assertEqual(after_count, before_count+1)
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
 

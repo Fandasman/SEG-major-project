@@ -29,7 +29,7 @@ class WishViewTestCase(TestCase):
         response = self.client.get(unwish_url, follow = True)
         redirect_url = reverse('show_book', args=(self.book.id,))
         self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
-        self.assertTemplateUsed(response, 'show_book.html')
+        self.assertTemplateUsed(response, 'book_templates/show_book.html')
         after_count = self.user.wishlist.count()
         self.assertEqual(after_count, before_count - 1)
 
@@ -41,7 +41,7 @@ class WishViewTestCase(TestCase):
         response = self.client.get(url, follow = True)
         redirect_url = reverse('show_book', args=(self.book.id,))
         self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
-        self.assertTemplateUsed(response, 'show_book.html')
+        self.assertTemplateUsed(response, 'book_templates/show_book.html')
         after_count = self.user.wishlist.count()
         self.assertEqual(after_count, before_count - 1)
 
@@ -51,5 +51,5 @@ class WishViewTestCase(TestCase):
         response = self.client.get(url, follow = True)
         redirect_url = reverse('search_books')
         self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
-        self.assertTemplateUsed(response, 'search_books.html')
+        self.assertTemplateUsed(response, 'book_templates/search_books.html')
         self.assertEqual(self.user.wishlist.count(), 1)

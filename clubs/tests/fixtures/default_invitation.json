@@ -1,0 +1,11 @@
+[
+  {
+    "model": "clubs.Invitation",
+    "pk": 1,
+    "fields": {
+      "user": "1",
+      "club": "1",
+      "status": "P"
+    }
+  }
+]
