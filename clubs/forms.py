@@ -172,7 +172,7 @@ class RatingForm(forms.ModelForm):
 
 class BookModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
-         return obj.get_title()
+         return f'{obj.title}'
 
 class EventForm(forms.ModelForm):
     """Form allowing a officer to create a new tournament model"""
@@ -185,13 +185,13 @@ class EventForm(forms.ModelForm):
         fields = ['name', 'description', 'maxNumberOfParticipants','deadline','book','location']
         widgets = { 'description': forms.Textarea()}
 
-        book = BookModelChoiceField(label ="Book",queryset = Book.objects.values_list('title',flat = True))
+    book = BookModelChoiceField(label ="Book",queryset = Book.objects.all())
 
 
 
     def get_book_titles():
        for book in Book.objects.all():
-           book_titles = book.name
+           book_titles = book.title
        return book_titles
 
     def clean(self):
