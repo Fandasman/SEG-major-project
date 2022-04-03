@@ -3,10 +3,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
-
-
-
-from .models import Club, User, Book,Event
+from bootstrap5.widgets import RadioSelectButtonGroup
+from .models import BooksRatings, Club, User, Book, Event
+from .helpers import get_genres
 
 
 class SignUpForm(forms.ModelForm):
@@ -14,6 +13,7 @@ class SignUpForm(forms.ModelForm):
         model = User
         fields = ['username','first_name','last_name', 'email','bio']
         widgets = { 'bio': forms.Textarea()}
+
     new_password = forms.CharField(
         label='Password',
         widget=forms.PasswordInput(),
@@ -49,10 +49,6 @@ class SignUpForm(forms.ModelForm):
 class LogInForm(forms.Form):
     username = forms.CharField(required=True, label = "Username")
 
-    # Tried to make email not case senstive.
-    # def clean_email(self):
-    #     data = self.cleaned_data['email']
-    #     return data.lower()
     password = forms.CharField(label = "Password", widget = forms.PasswordInput())
 
     def get_user(self):
@@ -133,6 +129,45 @@ class InviteForm(forms.Form):
             return True
         except ObjectDoesNotExist:
             return False
+
+
+
+class GenreForm(forms.ModelForm):
+
+    class Meta:
+        model = User
+        fields = ["genres_preferences"]
+        genres_preferences = forms.MultipleChoiceField(
+            choices=get_genres(),
+            widget=forms.CheckboxInput(),
+        )
+        error_messages={'genres_preferences':
+            {'max_choices': 'Try selecting just a few of your favourites. Keep it nice and simple!'}
+        }
+
+    def save(self):
+        super().save(commit=False)
+        genres_preferences = self.cleaned_data.get('genres_preferences')
+        return genres_preferences
+
+
+class RatingForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(forms.ModelForm, self).__init__(*args, **kwargs)
+        self.fields['rating'].label = ""
+
+    rating = forms.ChoiceField(
+        choices=[(rating, rating) for rating in range(1,6)],
+        widget=RadioSelectButtonGroup,
+        initial=1,
+        required = False
+    )
+
+
+    class Meta:
+        model = BooksRatings
+        fields = ["rating"]
 
 
 class BookModelChoiceField(forms.ModelChoiceField):

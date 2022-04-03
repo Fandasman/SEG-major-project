@@ -1,11 +1,5 @@
 <div class="collapse navbar-collapse" id="navbarSupportedContent">
   <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-    <li class="nav-item">
-      <a class="nav-link" href="{% url 'feed' %}">Feed</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Books</a>
-    </li>
     <li class="nav-item dropdown">
       <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
           Clubs
@@ -14,6 +8,7 @@
         <li><a class="dropdown-item" href="{% url 'club_list' %}">All Clubs</a></li>
         <li><a class="dropdown-item" href="{% url 'owner_club_list' %}">As Owner</a></li>
         <li><a class="dropdown-item" href="{% url 'member_club_list' %}">As Member</a></li>
+        <li><a class="dropdown-item" href="{% url 'recommended_club_list' %}">Clubs For You</a></li>
         <li><hr class="dropdown-divider"></li>
         <li><a class="dropdown-item" href="{% url 'create_club' %}">Create club</a></li>
       </ul>
@@ -32,7 +27,7 @@
       </a>
       <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
         <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
-        {# <li><a class = "dropdown-item" href="{% url 'wishlist' current_user.id %}">Wishlist</a></li> #}
+        <li><a class = "dropdown-item" href="{% url 'wishlist' current_user.id %}">Wishlist</a></li>
         <li><hr class="dropdown-divider"></li>
         <li><a  class="dropdown-item" href="{% url 'log_out' %}">Log out</a></li>
       </ul>

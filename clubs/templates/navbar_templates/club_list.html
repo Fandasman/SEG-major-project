@@ -21,6 +21,7 @@
                 {% include 'partials/bootstrap_form.html' with form=form %}
                 <input type = "submit" value = "View page" class="btn btn-primary">
               </form>
+              <br>
               <form action="{% url 'apply' club.id%}" method="post">
               {% csrf_token %}
               <button type="submit", class='btn btn-success'>Apply</button>

@@ -12,10 +12,15 @@ class WishViewTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.get(username = 'johndoe')
         self.book = Book.objects.get(pk=1)
+        self.url = reverse('wish', args=(self.book.id,))
 
     def test_wish_url(self):
-        url = reverse('wish', args=(self.book.id,))
-        self.assertEqual(url, '/book/1/wish')
+        self.assertEqual(self.url, '/book/1/wish')
+
+    def test_wish_redirects_when_logged_out(self):
+        redirect_url = reverse_with_next('login', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
 
     def test_valid_add_book_to_wishlist(self):
         self.client.login(username=self.user.username, password="Password123")

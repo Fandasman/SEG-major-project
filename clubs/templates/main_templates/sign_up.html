@@ -13,23 +13,27 @@
                                   <div class="row m-l-0 m-r-0">
                                       <div class="col-sm-4 bg-c-lite-green user-profile">
                                           <div class="card-block text-center text-white">
-                                              <h4 class="f-w-600">Welcome to the Chess Club Management System</h4>
-                                                <br>
-                                                <p>Already on here?</p>
-                                                <br>
-                                                <a class="btn btn-secondary" href="{% url 'login' %}">Log In</a>
+                                              <h4 class="f-w-600">Welcome to the Booker!</h4>
                                           </div>
                                       </div>
                                       <div class="col-sm-8">
                                           <div class="card-block">
-                                              <h5 class="m-b-20 p-b-5 b-b-default f-w-600">Sign Up</h5>
+                                              <h1 class="m-b-20 p-b-5 b-b-default f-w-600">Sign Up</h1>
+                                              <br>
                                               <form action="{% url 'sign_up' %}" method="post" enctype="multipart/form-data">
                                                 {% csrf_token %}
                                                 {% include 'partials/bootstrap_form.html' with form=form %}
                                                 <div class="form-group">
                                 		            	<button type="submit" class="form-control btn btn-primary submit px-3" style="background:linear-gradient(to right, #5898ed, #4170e8); border-radius: 30px 30px 30px 30px; border-style:none;">Sign Up</button>
-                                		            </div>
+                                                        
+                                                        <hr>
+                                                        
+                                                        <p>Already on here?</p>
+                                                        <a class="form-control btn btn-secondary submit px-3" style="border-radius: 30px 30px 30px 30px; border-style:none;" href="{% url 'login' %}">Log In</a>
+                                                    </div>
                                               </form>
+                                              <br>
+                                                
                                           </div>
                                       </div>
                                   </div>

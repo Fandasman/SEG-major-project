@@ -42,8 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'clubs',
     'widget_tweaks',
-    'location_field.apps.DefaultConfig',
-
+    'bootstrap5',
+    'location_field.apps.DefaultConfig'
 ]
 
 MIDDLEWARE = [
@@ -128,11 +128,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Login URL to redirect logged in users
+# Login URL to redirect logged out users
 LOGIN_URL = 'login'
 
-
+# Login URL to redirect logged in users
 REDIRECT_URL_WHEN_LOGGED_IN = 'feed'
 
 # Default primary key field type

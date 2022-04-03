@@ -10,7 +10,9 @@
     </div>
   </div>
   <form action= "{% url 'edit_profile'%}" method = "get">
-  <button class="btn btn-primary" href="{% url 'edit_profile'  %}">Edit Profile</button>
+  <button class="btn btn-primary" href="{% url 'edit_profile'  %}">Edit profile</button>
 </form>
+<hr>
+<a class="btn btn-secondary" href="{% url 'select_genres' %}">Update genre preferences</a>
 </div>
 {% endblock %}
