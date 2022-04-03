@@ -207,7 +207,6 @@ class EventForm(forms.ModelForm):
             club = Club.objects.get(id = club_id),
             organiser = current_user,
             location = self.cleaned_data.get('location')
-
         )
         event.save()
         return event
