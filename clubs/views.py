@@ -380,6 +380,18 @@ def create_club(request):
         form = ClubForm()
         return render(request, 'navbar_templates/create_club.html' , {'form': form})
 
+"""This function allows owners of a club to delete the club"""
+@login_required
+def delete_club(request, club_id):
+    current_user = request.user
+    club = Club.objects.get(id = club_id)
+    try:
+        role = Role.objects.get(user = current_user, club = club)
+    except ObjectDoesNotExist:
+        redirect('feed')
+    else:
+        if role.role == 'CO':
+            return render(request, 'club_templates/delete_club.html')
 
 class EditProfileView(LoginRequiredMixin, View):
     def get(self,request):

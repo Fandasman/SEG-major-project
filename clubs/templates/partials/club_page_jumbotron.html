@@ -57,13 +57,17 @@
         <form action = "{% url 'create_event' club.id %}" method = "get">
             <button type="submit" class="jumbotron_button" >Schedule Event</button>
         </form>
-      {%endif%}
 
-        {% if userrole.role == 'CO' or userrole.role == 'O' %}
         <form action="{% url 'invite' club.id %}">
             {% csrf_token %}
-            <button type = "submit" class="jumbotron_button"> Invite</button>
+            <button type = "submit" class="jumbotron_button">Invite</button>
         </form>
+
+        <form action="{% url 'delete_club' club.id %}">
+          {% csrf_token %}
+          <button type = "submit" class="jumbotron_button">Delete club</button>
+        </form>
+
         {%endif%}
      </div>
    </div>
