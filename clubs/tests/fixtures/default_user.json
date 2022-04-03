@@ -9,6 +9,7 @@
             "email": "johndoe@example.org",
             "password": "pbkdf2_sha256$260000$iGkOGC00dvNVncr3rtGWdL$IkIyONd+R4mPoN4APRvVqk5tGVLa3xocSQ2qJur+VZo=",
             "bio": "Hi, I'm John.",
+            "genres_preferences":["Crime","Fiction","Horror","Historical","Mystery"],
             "is_active": true
         }
     }
