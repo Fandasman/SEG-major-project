@@ -21,19 +21,41 @@ from django.views.generic.edit import FormView
 from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm, UserPostForm, CommentForm, SearchForm
 from .models import Book, Club, Role, User, Invitation, Event, EventPost, UserPost, MembershipPost, Comment
 from itertools import chain
-from datetime import datetime, timedelta
+from datetime import datetime
 from django.shortcuts import render
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 from django.views import generic
 from django.utils.safestring import mark_safe
 import calendar
 from calendar import HTMLCalendar
 
-
 import csv
 from django.http import StreamingHttpResponse
 
 # Create your views here.
+
+
+class Echo(View):
+    """An object that implements just the write method of the file-like
+    interface.
+    """
+    def write(self, value):
+        """Write the value by returning it, instead of storing in a buffer."""
+        return value
+
+    def some_streaming_csv_view(request):
+        """A view that streams a large CSV file."""
+        # Generate a sequence of rows. The range is based on the maximum number of
+        # rows that can be handled by a single sheet in most spreadsheet
+        # applications.
+        rows = (["Row {}".format(idx), str(idx)] for idx in range(271380))
+        book_buffer = Echo()
+        writer = csv.writer(book_buffer)
+        return StreamingHttpResponse(
+            (writer.writerow(row) for row in rows),
+            content_type="text/csv",
+            headers={'Content-Disposition': 'attachment; filename="BX_Books.csv"'},
+        )
 
 def feed(request):
     current_user = request.user
@@ -52,6 +74,27 @@ def profile(request):
     return render(request, 'user_templates/profile.html',
             {'user': current_user}
         )
+
+# class FeedView(LoginRequiredMixin, ListView):
+#     """Class-based generic view for displaying a view."""
+#
+#     model = Post
+#     template_name = "feed.html"
+#     context_object_name = 'posts'
+#
+#     def get_queryset(self):
+#         """Return the user's feed."""
+#         current_user = self.request.user
+#         authors = list(current_user.followees.all()) + [current_user]
+#         posts = Post.objects.filter(author__in=authors)
+#         return posts
+#
+#     def get_context_data(self, **kwargs):
+#         """Return context data, including new post form."""
+#         context = super().get_context_data(**kwargs)
+#         context['user'] = self.request.user
+#         context['form'] = ClubForm()
+#         return context
 
 class HomeView(LoginProhibitedMixin,View):
     template_name = 'home.html'
@@ -130,39 +173,48 @@ class MemberClubListView(LoginRequiredMixin, ListView):
         context['roles']= Role.objects.all().filter(user= current_user, role= "M")
         return context
 
-class ShowBookView(LoginRequiredMixin, DetailView):
+class ShowBookView(DetailView):
     model = Book
     template_name = 'book_templates/show_book.html'
     pk_url_kwarg = "book_id"
 
-    def get(self, request, *args, **kwargs):
-        try:
-            return super().get(self, request, *args, **kwargs)
-        except Http404:
-            return redirect('book_list')
-
-class ShowUserView(LoginRequiredMixin, DetailView):
+class ShowUserView(DetailView):
     model = User
     template_name = 'user_templates/show_user.html'
     pk_url_kwarg = "user_id"
 
-    def get(self, request, *args, **kwargs):
-        try:
-            return super().get(self, request, *args, **kwargs)
-        except Http404:
-            return redirect('user_list')
-
-class ShowClubView(LoginRequiredMixin, DetailView):
+class ShowClubView(DetailView):
     model = Club
     template_name = 'club_templates/show_club.html'
     pk_url_kwarg = "club_id"
 
-    def get(self, request, *args, **kwargs):
-        try:
-            return super().get(self, request, *args, **kwargs)
-        except Http404:
-            return redirect('club_list')
 
+# class LoginProhibitedMixin:
+
+#          """Mixin that redirects when a user is logged in."""
+
+#          redirect_when_logged_in_url = None
+
+#          def dispatch(self, *args, **kwargs):
+#             """Redirect when logged in, or dispatch as normal otherwise."""
+#             if self.request.user.is_authenticated:
+#                 return self.handle_already_logged_in(*args, **kwargs)
+#             return super().dispatch(*args, **kwargs)
+
+#          def handle_already_logged_in(self, *args, **kwargs):
+#              url = self.get_redirect_when_logged_in_url()
+#              return redirect('feed')
+
+#          def get_redirect_when_logged_in_url(self):
+#              """Returns the url to redirect to when not logged in."""
+#              if self.redirect_when_logged_in_url is None:
+#                 raise ImproperlyConfigured(
+#                  "LoginProhibitedMixin requires either a value for "
+#                  "'redirect_when_logged_in_url', or an implementation for "
+#                  "'get_redirect_when_logged_in_url()'."
+#                  )
+#              else:
+#                  return self.redirect_when_logged_in_url
 
 class LogInView(View):
     """Log-in handling view"""
@@ -770,6 +822,10 @@ def add_comment_to_post(request, club_id, post_id):
             comment = form.save()
     return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
+
+from datetime import datetime, timedelta
+from calendar import HTMLCalendar
+from .models import Event
 
 class Calendar(HTMLCalendar):
     def __init__(self, year=None, month=None):
