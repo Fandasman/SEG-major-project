@@ -9,7 +9,7 @@ class BooksRatingsModelTestCase(TestCase):
         "clubs/tests/fixtures/default_user.json",
         "clubs/tests/fixtures/other_users.json",
         "clubs/tests/fixtures/default_book.json",
-        "clubs/tests/fixtures/other_books.json"
+        "clubs/tests/fixtures/other_books.json",
     ]
 
     def setUp(self):
@@ -36,7 +36,7 @@ class BooksRatingsModelTestCase(TestCase):
 
     def test_isbn_does_not_have_to_be_unique(self):
         second_rating = self._get_second_rating()
-        
+
         self.rating.isbn = second_rating.isbn
         self._assert_rating_is_valid()
 
@@ -89,7 +89,7 @@ class BooksRatingsModelTestCase(TestCase):
         self.rating.isbn = second_rating.isbn
         self._assert_rating_is_invalid()
 
-    
+
     # Test case assertions
     def _assert_rating_is_valid(self):
         try:

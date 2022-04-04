@@ -12,7 +12,7 @@ class EventModelTestCase(TestCase):
     'clubs/tests/fixtures/other_users.json',
     'clubs/tests/fixtures/default_book.json',
     'clubs/tests/fixtures/default_event.json',
-    'clubs/tests/fixtures/other_event.json'
+    'clubs/tests/fixtures/other_event.json',
     ]
 
     def setUp(self):

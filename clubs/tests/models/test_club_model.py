@@ -8,7 +8,8 @@ class ClubModelTestCase(TestCase):
     fixtures = ['clubs/tests/fixtures/default_user.json',
                 'clubs/tests/fixtures/default_club.json',
                 'clubs/tests/fixtures/other_users.json',
-                'clubs/tests/fixtures/other_clubs.json',]
+                'clubs/tests/fixtures/other_clubs.json',
+                ]
 
     def setUp(self):
         super(TestCase, self).setUp()

@@ -1,4 +1,5 @@
-{%extends 'base_content.html'%}
+{% extends 'base_content.html'%}
+{% load bootstrap_pagination %}
 {% block content %}
 <div class="container">
   <div class="row">
@@ -23,14 +24,15 @@
               </form>
               <br>
               <form action="{% url 'apply' club.id%}" method="post">
-              {% csrf_token %}
-              <button type="submit", class='btn btn-success'>Apply</button>
-            </form>
-          </p>
+                {% csrf_token %}
+                <button type="submit", class='btn btn-success'>Apply</button>
+              </form>
+              </p>
             </td>
           </tr>
         {% endfor %}
       </table>
+      {% bootstrap_paginate page_obj range=6 previous_label="Previous" next_label="Next" show_first_last="true" %}
     </div>
   </div>
 </div>

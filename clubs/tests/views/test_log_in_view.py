@@ -21,9 +21,8 @@ class LogInViewTestCase(TestCase, LogInTester):
     def test_get_login(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'main_templates/login.html')
+        self.assertTemplateUsed(response, 'login.html')
         form = response.context['form']
-        next = response.context['next']
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
         messages_list = list(response.context['messages'])
@@ -34,19 +33,18 @@ class LogInViewTestCase(TestCase, LogInTester):
         self.assertTrue(self._is_logged_in)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'main_templates/login.html')
+        self.assertTemplateUsed(response, 'login.html')
 
     def test_get_login_with_redirect(self):
         destination_url = reverse('login')
         self.url = reverse_with_next('login', destination_url)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'main_templates/login.html')
+        self.assertTemplateUsed(response, 'login.html')
         form = response.context['form']
-        next = response.context['next']
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
-        self.assertEqual(next, destination_url)
+        self.assertEqual('/log_in/', destination_url)
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 0)
 
@@ -54,7 +52,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         form_input = {'username': 'johndoe1', 'password': 'Password123'}
         response = self.client.post(self.url, form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'main_templates/login.html')
+        self.assertTemplateUsed(response, 'login.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
@@ -67,7 +65,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         form_input = { 'username': '', 'password': 'Password123' }
         response = self.client.post(self.url, form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'main_templates/login.html')
+        self.assertTemplateUsed(response, 'login.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
@@ -80,7 +78,7 @@ class LogInViewTestCase(TestCase, LogInTester):
         form_input = { 'username': 'johndoe', 'password': '' }
         response = self.client.post(self.url, form_input)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'main_templates/login.html')
+        self.assertTemplateUsed(response, 'login.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, LogInForm))
         self.assertFalse(form.is_bound)
@@ -107,13 +105,11 @@ class LogInViewTestCase(TestCase, LogInTester):
         response = self.client.post(self.url, form_input, follow=True)
         self.assertTrue(self._is_logged_in())
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'navbar_templates/feed.html')
+        self.assertTemplateUsed(response, 'feed.html')
         messages_list = list(response.context['messages'])
         self.assertEqual(len(messages_list), 0)
 
     def test_post_login_with_incorrect_credentials_and_redirect(self):
-        redirect_url = reverse('feed')
-        form_input = { 'email': 'johndoe12', 'password': 'WrongPassword123', 'next': redirect_url }
+        redirect_url = reverse('login')
+        form_input = { 'username': 'johndoe12', 'password': 'WrongPassword123', 'next': redirect_url }
         response = self.client.post(self.url, form_input)
-        next = response.context['next']
-        self.assertEqual(next, redirect_url)

@@ -3,10 +3,10 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
-from bootstrap5.widgets import RadioSelectButtonGroup
-from .models import BooksRatings, Club, User, Book, Event
+from django.forms import Form,ChoiceField, CharField
+from django_bootstrap5.widgets import RadioSelectButtonGroup
+from .models import BooksRatings, Club, User, Book, Event, UserPost, Comment
 from .helpers import get_genres
-
 
 class SignUpForm(forms.ModelForm):
     class Meta:
@@ -172,7 +172,7 @@ class RatingForm(forms.ModelForm):
 
 class BookModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
-         return obj.get_title()
+         return f'{obj.title}'
 
 class EventForm(forms.ModelForm):
     """Form allowing a officer to create a new tournament model"""
@@ -185,13 +185,13 @@ class EventForm(forms.ModelForm):
         fields = ['name', 'description', 'maxNumberOfParticipants','deadline','book','location']
         widgets = { 'description': forms.Textarea()}
 
-        book = BookModelChoiceField(label ="Book",queryset = Book.objects.values_list('title',flat = True))
+    book = BookModelChoiceField(label ="Book",queryset = Book.objects.all())
 
 
 
     def get_book_titles():
        for book in Book.objects.all():
-           book_titles = book.name
+           book_titles = book.title
        return book_titles
 
     def clean(self):
@@ -207,7 +207,44 @@ class EventForm(forms.ModelForm):
             club = Club.objects.get(id = club_id),
             organiser = current_user,
             location = self.cleaned_data.get('location')
-
         )
         event.save()
         return event
+
+class UserPostForm(forms.ModelForm):
+    """Form to ask user for post text.
+
+    The post author must be by the post creator.
+    """
+
+    class Meta:
+        """Form options."""
+
+        model = UserPost
+        fields = ['text']
+        labels = {
+            'text': ('Add post'),
+        }
+        widgets = {
+            'Post': forms.Textarea(attrs={'rows':10, 'cols':10})
+        }
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['body']
+        labels = {
+            'body': ('Add comment'),
+        }
+        widgets = {
+            'Comment': forms.Textarea(attrs={'rows':1, 'cols':1, 'style':'resize:none;'})
+        }
+class SearchForm(Form):
+    FILTER_CHOICES = (
+        ('books', 'Books'),
+        ('users', 'Users'),
+        ('clubs', 'Clubs'),
+        ('all', 'All')
+    )
+    search = CharField(required=True)
+    filter_field = ChoiceField(choices=FILTER_CHOICES)
