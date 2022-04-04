@@ -2,7 +2,7 @@ import calendar
 import csv
 import sys
 from collections import Counter
-from calendar import HTMLCalendar
+from calendar import HTMLCalendar, c
 from datetime import datetime, timedelta
 from distutils.bcppcompiler import BCPPCompiler
 from django import template
@@ -137,6 +137,16 @@ def show_book(request, book_id):
                      'current_rating_value': current_rating_value,
                      'in_wishlist': in_wishlist}
     )
+
+class ShowBookView(View):
+    def get(self,request):
+            pass
+
+    def post(self,request):
+        pass
+
+    def render(self,request):
+        pass
 
 @login_required
 def remove_rating(request, book_id):
@@ -353,24 +363,47 @@ class SignUpView(LoginProhibitedMixin,FormView):
         #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
 
 """This function allows the user to select prefered genres upon sign up."""
-@login_required
-def select_genres(request):
+# @login_required
+# def select_genres(request):
 
-    genres = Book.objects.values_list('genre',flat=True).distinct()
-    current_user = request.user
+#     genres = Book.objects.values_list('genre',flat=True).distinct()
+#     current_user = request.user
 
-    if request.method=='POST':
-            form = GenreForm(request.POST)
-            if form.is_valid():
+#     if request.method=='POST':
+#             form = GenreForm(request.POST)
+#             if form.is_valid():
+#                     current_user.genres_preferences = form.save()
+#                     current_user.save()
+#                     messages.add_message(request, messages.SUCCESS, "Preferences updated!")
+#                     return redirect('feed')
+#             else:
+#                 messages.add_message(request, messages.ERROR, "You must select a maximum of 5 choices!")
+#     else:
+#         form = GenreForm(instance = current_user)
+#     return render(request, "select_genres.html", {'genres': genres, 'form': form})
+
+
+"""This class allows the user to select prefered genres upon sign up."""
+class SelectGenresView(LoginRequiredMixin,FormView):
+    
+    form_class = GenreForm
+    template_name = "select_genres.html"
+    
+
+    def form_valid(self,form):
+                    current_user = self.request.user
                     current_user.genres_preferences = form.save()
                     current_user.save()
-                    messages.add_message(request, messages.SUCCESS, "Preferences updated!")
+                    messages.add_message(self.request, messages.SUCCESS, "Preferences updated!")
                     return redirect('feed')
-            else:
-                messages.add_message(request, messages.ERROR, "You must select a maximum of 5 choices!")
-    else:
-        form = GenreForm(instance = current_user)
-    return render(request, "select_genres.html", {'genres': genres, 'form': form})
+           
+    def form_invalid(self,form):
+                    genres = Book.objects.values_list('genre',flat=True).distinct()
+                    messages.add_message(self.request, messages.ERROR, "You must select a maximum of 5 choices!")
+                    return render(self.request, "select_genres.html", {'genres': genres, 'form': form})
+
+    
+
 
 
 """This function standardize the requirements for
