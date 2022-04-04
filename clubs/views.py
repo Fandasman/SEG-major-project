@@ -455,6 +455,38 @@ def create_club(request):
 
 
 
+    # class CreateEventView(CreateView):
+
+    # def get(self,request,*args, **kwargs):
+    #     return self.render()
+
+    # def form_valid(self,request,club_id):
+    #     form = EventForm(request.POST)
+    #     current_user = request.user
+    #     if form.is_valid():
+    #         this_event = form.save(club_id,current_user)
+    #         EventPost.objects.create(event = this_event, user=request.user)
+    #         return redirect('events_list',club_id)
+
+    # def form_invalid(self):
+    #     messages.add_message(self.request, messages.ERROR, "The credentials provided were invalid!")
+    #     return self.render()
+
+
+ 
+
+    # def render(self,*args, **kwargs):
+    #     club_id = self.kwargs['club_id']
+    #     club = Club.objects.get(id=club_id)
+    #     members = Role.objects.filter(club=club)
+    #     userrole = Role.objects.get(club = club, user=self.request.user)
+    #     events = Event.objects.filter(club = club)
+    #     form = EventForm()
+    #     return render(self.request, 'club_templates/create_event.html', {'form': form,
+    #                                                 'members': members,
+    #                                                 'userrole':userrole,
+    #                                                 'club': club})
+
 
 
 # class CreateClubView(LoginRequiredMixin,CreateView):
@@ -462,7 +494,20 @@ def create_club(request):
 #     form_class = ClubForm
 #     template_name = 'create_club.html'
 #     success_url = reverse('club_list')
-# # problem with getting current clubs owned length
+
+#     def form_valid(self, form):
+#         current_user = self.request.user
+#         current_owned_clubs = Role.objects.filter(user = current_user, role = 'CO')
+#         if len(current_owned_clubs) > 3:
+#             self.render
+
+#     def render(self,request):
+#         form = ClubForm()
+#         messages.add_message(request, messages.ERROR, "You already own too many clubs!")
+#         return render(request, 'club_templates/create_club.html' , {'form': form})
+
+
+
 
 
 """This function allows owners of a club to delete the club"""
@@ -914,73 +959,41 @@ def invite(request, club_id):
     return render(request, 'club_templates/invite.html', {'form': form, 'club':club})
 
 
-    # class CreateEventView(CreateView):
-
-    # def get(self,request,*args, **kwargs):
-    #     return self.render()
-
-    # def form_valid(self,request,club_id):
-    #     form = EventForm(request.POST)
-    #     current_user = request.user
-    #     if form.is_valid():
-    #         this_event = form.save(club_id,current_user)
-    #         EventPost.objects.create(event = this_event, user=request.user)
-    #         return redirect('events_list',club_id)
-
-    # def form_invalid(self):
-    #     messages.add_message(self.request, messages.ERROR, "The credentials provided were invalid!")
-    #     return self.render()
-
-
- 
-
-    # def render(self,*args, **kwargs):
-    #     club_id = self.kwargs['club_id']
-    #     club = Club.objects.get(id=club_id)
-    #     members = Role.objects.filter(club=club)
-    #     userrole = Role.objects.get(club = club, user=self.request.user)
-    #     events = Event.objects.filter(club = club)
-    #     form = EventForm()
-    #     return render(self.request, 'club_templates/create_event.html', {'form': form,
-    #                                                 'members': members,
-    #                                                 'userrole':userrole,
-    #                                                 'club': club})
 
 
 
-
-class InviteView(CreateView):
-    form_class = InviteForm
-    template_name = "invite.html"
-
-
-    def form_valid(self, form,club_id):
-        club = Club.objects.get(id=club_id)
-        user = form.get_user()
-        owned_club = Role.objects.filter(user=self.current_user, role='O', club=club) |\
-                                 Role.objects.filter(user=self.current_user, role='CO', club=club)
-        invited = Invitation.objects.filter(user=user, club=club, status='P')
-        isMember = Role.objects.filter(club=club, user=user)
-        if owned_club.count() == 1:
-            if invited.count() == 0 and isMember.count() == 0:
-                    invitations = Invitation.objects.create(user=user, club=club, status='P')
-                    return redirect('club_members', club.id)
-            else:
-                messages.add_message(self.request, messages.ERROR, "you have already invited this user "
-                                                                  "or this user already in the club")
-                form = InviteForm()
-                return redirect('invite', self.club.id)
-        else:
-            messages.add_message(self.request, messages.ERROR, "you don't have the permission to invite others")
-            form = InviteForm()
-            return redirect('club_list')
+# # class InviteView(CreateView):
+# #     form_class = InviteForm
+# #     template_name = "invite.html"
 
 
-    def form_invalid(self,club_id):
-        club = Club.objects.get(id=club_id)
-        messages.add_message(self.request, messages.ERROR, "Invalid username")
-        form = InviteForm()
-        return redirect('invite', club.id)
+# #     def form_valid(self, form,club_id):
+# #         club = Club.objects.get(id=club_id)
+# #         user = form.get_user()
+# #         owned_club = Role.objects.filter(user=self.current_user, role='O', club=club) |\
+# #                                  Role.objects.filter(user=self.current_user, role='CO', club=club)
+# #         invited = Invitation.objects.filter(user=user, club=club, status='P')
+# #         isMember = Role.objects.filter(club=club, user=user)
+# #         if owned_club.count() == 1:
+# #             if invited.count() == 0 and isMember.count() == 0:
+# #                     invitations = Invitation.objects.create(user=user, club=club, status='P')
+# #                     return redirect('club_members', club.id)
+# #             else:
+# #                 messages.add_message(self.request, messages.ERROR, "you have already invited this user "
+# #                                                                   "or this user already in the club")
+# #                 form = InviteForm()
+# #                 return redirect('invite', self.club.id)
+# #         else:
+# #             messages.add_message(self.request, messages.ERROR, "you don't have the permission to invite others")
+# #             form = InviteForm()
+# #             return redirect('club_list')
+
+
+# #     def form_invalid(self,club_id):
+# #         club = Club.objects.get(id=club_id)
+# #         messages.add_message(self.request, messages.ERROR, "Invalid username")
+# #         form = InviteForm()
+# #         return redirect('invite', club.id)
 
 
 
@@ -1026,18 +1039,18 @@ def reject_invitation(request, inv_id):
     else:
         return HttpResponseForbidden()
 
-# class RejectInvitationView(View):
+class RejectInvitationView(View):
 
-#     def post(self,request,inv_id):
-#         user = request.user
-#         invitation = Invitation.objects.get(id=inv_id)
-#         club = invitation.club
-#         old_invitation = Invitation.objects.filter(id=inv_id).delete()
-#         messages.add_message(request, messages.INFO, "you have rejected this invitation")
-#         return redirect('invitation_list', user.id)
+    def post(self,request,inv_id):
+        user = self.request.user
+        invitation = Invitation.objects.get(id=inv_id)
+        club = invitation.club
+        old_invitation = Invitation.objects.filter(id=inv_id).delete()
+        messages.add_message(request, messages.INFO, "you have rejected this invitation")
+        return redirect('invitation_list', user.id)
 
-#     def get(self,request):
-#         return HttpResponseForbidden()
+    def get(self):
+        return HttpResponseForbidden()
 
 
 """This view class allows users to see all the pending invitation from the club"""
@@ -1207,6 +1220,23 @@ def add_comment_to_post(request, club_id, post_id):
         if form.is_valid():
             comment = form.save()
     return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
+
+# class CommentOnPostView(FormView):
+
+#     form = CommentForm()
+    
+
+#     def form_valid(self, form, *args, **kwargs):
+#         post_id = self.kwargs['post_id']
+#         club_id = self.kwargs['club_id']
+#         post = UserPost.objects.get(id=post_id)
+#         club = Club.objects.get(id=club_id)
+#         comment = Comment.objects.create(club=club,post=post,user=self.request.user)
+#         comment = form.save()
+
+#     def form_invalid(self, form):
+#         club_id = self.kwargs['club_id']
+#         return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
 
 
