@@ -122,12 +122,8 @@ def show_book(request, book_id):
                     past_rating.save()
 
         else:
-            if book not in request.user.wishlist.all() and exist_rating:
-                exist_rating = False
-                rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
-                rating.delete()
 
-            elif exist_rating:
+            if exist_rating:
                 current_rating_value = past_rating.rating
 
         return render(request, 'book_templates/show_book.html',
@@ -1101,11 +1097,6 @@ def add_user_to_interested_list_from_event_page(request,event_id,club_id):
     event.add_user_to_interested_field(request.user)
     return render(request, 'club_templates/event_page.html', {'event': event,
                                                               'club' : club})
-
-# def leave_club(request,club_id):
-#     club = Club.objects.get(id = club_id)
-#     role = Role.objects.filter(club= club).get(user = request.user).delete()
-#     return redirect('feed')
 
 
 def user_chat(request, receiver_id):
