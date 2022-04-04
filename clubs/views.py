@@ -570,6 +570,7 @@ def leave_club(request, club_id):
             post = MembershipPost.objects.create(user = user, club = current_club)
             post.join = False
             post.save()
+            messages.add_message(request, messages.SUCCESS, f'You have successfully left {current_club.name}!')
             return redirect('feed')
         else:
             return redirect('login')
