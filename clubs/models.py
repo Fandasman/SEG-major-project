@@ -1,4 +1,5 @@
 import datetime
+from secrets import choice
 from django.db import models
 from django.db.models import Q
 from django.core.validators import RegexValidator, MaxValueValidator, MinValueValidator
@@ -6,11 +7,12 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager, UserManage
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from libgravatar import Gravatar
+from multiselectfield import MultiSelectField
+from .helpers import get_genres
 from datetime import date
 from datetime import timedelta
 from .validators import validate_date
 from django.urls import reverse
-
 
 # Create the Book model
 
@@ -104,6 +106,12 @@ class User(AbstractUser):
     email = models.EmailField(unique = True, blank = False)
     bio = models.CharField(max_length = 500, blank = True)
     wishlist = models.ManyToManyField(Book, related_name="wishlist", blank=True)
+    genres_preferences = MultiSelectField(
+        choices=get_genres(),
+        max_choices=5,
+        blank=True,
+        default=None
+    )
     objects= UserManager()
 
     def full_name(self):
@@ -131,20 +139,23 @@ class User(AbstractUser):
 class BooksRatings(models.Model):
     isbn = models.CharField(max_length = 13, blank = False)
     rating = models.IntegerField(
+        choices = [(rating, rating) for rating in range(1,6)],
         validators = [MaxValueValidator(5), MinValueValidator(1)]
     )
-    user = models.ForeignKey(User, related_name='books', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE)
 
     def get_absolute_url(self):
         return reverse('show_user', args=[str(self.id)])
 
+    class Meta():
+        unique_together = ('user', 'isbn',)
 
 # Create the book Club model
 class Club(models.Model):
     name = models.CharField(
         max_length = 50,
         unique = True,
-        validators=[
+        validators = [
             RegexValidator(
                 regex = r'^.{3,}$',
                 message = 'The name of the club must contain at least three characters!'
@@ -187,7 +198,7 @@ class Club(models.Model):
 
 
 # Create the user's Roles model
-ROLES= (
+ROLES = (
     ('A', 'Applicant'),
     ('M', 'Member'),
     ('O', 'Officer'),
@@ -195,29 +206,29 @@ ROLES= (
 )
 
 class Role(models.Model):
-    user= models.ForeignKey(User, on_delete=models.CASCADE)
-    club= models.ForeignKey(Club, on_delete=models.CASCADE)
-    role= models.CharField(
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    role = models.CharField(
         max_length=2,
         choices=ROLES,
         default='A'
     )
+
+    def __str__(self):
+        return self.user.full_name() + " is " + self.role
 
     def get_club_name(self):
         return self.club.name
 
     def get_role(self):
         return self.role
-
-
-
-
-    def __str__(self):
-        return self.user.full_name + " is " + self.role
+        
+    class Meta():
+        unique_together = ('user', 'club',)
 
 
 # Create the Invitation model
-STATUS={
+STATUS = {
     ('P', 'Pending'),
     ('A', 'Accept'),
     ('R', 'Reject'),
@@ -231,6 +242,9 @@ class Invitation(models.Model):
         choices=STATUS,
         default='P'
     )
+
+    class Meta():
+        unique_together = ('user', 'club',)
 
     def get_club_name(self):
         return self.club.name
@@ -334,7 +348,7 @@ class Message(models.Model):
 
     def get_username(self):
         return self.user.username
-        
+
 # Create the Event's Posts model
 class EventPost(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)

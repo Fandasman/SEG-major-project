@@ -1,53 +1,83 @@
+import calendar
+import csv
+import sys
+from collections import Counter
+from calendar import HTMLCalendar
+from datetime import datetime, timedelta
+from distutils.bcppcompiler import BCPPCompiler
 from django import template
 from django.conf import settings
 from django.contrib import messages
-from django.urls import reverse, reverse_lazy
-from itertools import chain
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-<<<<<<< HEAD
-from django.http.response import HttpResponse, HttpResponseForbidden, JsonResponse
-from django.shortcuts import redirect, render
-=======
-from django.http.response import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.http import Http404, StreamingHttpResponse
+from django.http.response import HttpResponse, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
->>>>>>> calendar
-from django.views import View
-from django.views.generic.edit import CreateView
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
-from django.core.exceptions import ImproperlyConfigured
+from django.urls import reverse, reverse_lazy, resolve
+from django.utils.safestring import mark_safe
+from django.views import View, generic
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import FormView
-<<<<<<< HEAD
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm, EventForm
-from .models import Book, Club, Role, User, Invitation, Message,Event
-=======
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm, UserPostForm, CommentForm, SearchForm
-from .models import Book, Club, Role, User, Invitation, Event, EventPost, UserPost, MembershipPost, Comment
+from django.views.generic.edit import CreateView, FormView
 from itertools import chain
-from datetime import datetime, timedelta
-from django.shortcuts import render
-from django.http import HttpResponse, Http404
-from django.views import generic
-from django.utils.safestring import mark_safe
-import calendar
-from calendar import HTMLCalendar
->>>>>>> calendar
+from scipy import spatial
+from surprise import dump
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm, UserPostForm, CommentForm, SearchForm, GenreForm
+from .models import Book, Club, Role, User, Invitation, Event, EventPost, UserPost, MembershipPost, Comment, Message, BooksRatings
 
+if "runserver" in sys.argv:
+    print("Loading the model!")
+    _, model = dump.load('./model.pkl')
 
-import csv
-from django.http import StreamingHttpResponse
+THRESHOLD = 25
+
 
 # Create your views here.
-
+@login_required
 def feed(request):
     current_user = request.user
-    return render(request, 'feed.html', {'user': current_user})
+    user_books = Book.objects.filter(isbn__in = current_user.users.values('isbn')).values_list('isbn', flat=True)
+    user_genres = list(current_user.genres_preferences)
+    filtered_user_books = Book.objects.exclude(isbn__in = user_books)
+
+    recommended_books = []
+
+    if len(user_books) < THRESHOLD:
+
+        """Generate a query for books with the most positive ratings based on genre preferences"""
+
+        filtered_user_genres = filtered_user_books.filter(genre__in = user_genres).values_list('isbn', flat=True)
+        filtered_user_genres = BooksRatings.objects.filter(isbn__in = filtered_user_genres)
+        good_isbns = list(filtered_user_genres.filter(rating__gte = 4).values_list('isbn'))
+        good_sorted = [rating for ratings, c in Counter(good_isbns).most_common()
+                  for rating in [ratings] * c]
+        good_ratings = list(dict.fromkeys(good_sorted))[:30]
+
+        for rating in good_ratings:
+            book = Book.objects.get(isbn = rating[0])
+            recommended_books.append(book)
+
+    else:
+        """Generate a query for the recommended books"""
+
+        filtered_user_genres = filtered_user_books.filter(genre__in = user_genres)
+
+        recommendations = {}
+
+        for book in filtered_user_genres:
+            predicted_rating = model.predict(uid=current_user.id, iid=book.isbn).est
+            recommendations[book.isbn] = predicted_rating
+
+        sorted_ratings = list(recommendations.items())
+        sorted_ratings.sort(key=lambda k: k[1], reverse=True)
+
+        for pair in sorted_ratings[:30]:
+            book = Book.objects.get(isbn = pair[0])
+            recommended_books.append(book)
+
+    return render(request, 'feed.html', {'user': current_user, 'recommended_books': recommended_books})
 
 class LoginProhibitedMixin:
 
@@ -57,51 +87,29 @@ class LoginProhibitedMixin:
         return super().dispatch(*args, **kwargs)
 
 
-# @login_required
+@login_required
+def remove_rating(request, book_id):
+    try:
+        book = Book.objects.get(id = book_id)
+    except ObjectDoesNotExist:
+        return redirect('book_list')
+
+    exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) != 0
+    if exist_rating:
+        rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
+        rating.delete()
+
+    return redirect('show_book', book_id)
+
+@login_required
 def profile(request):
     current_user = request.user
     return render(request, 'user_templates/profile.html',
             {'user': current_user}
         )
 
-<<<<<<< HEAD
-# @login_required
-def search_books(request):
-    search_book = request.GET.get('book_searchbar')
-    if search_book:
-        books= Book.objects.filter(name__icontains=search_book)
-    else:
-        books = Book.objects.all()
-    return render(request, 'book_templates/search_books.html', {'books': books})
-
-
-# class FeedView(LoginRequiredMixin, ListView):
-#     """Class-based generic view for displaying a view."""
-#
-#     model = Post
-#     template_name = "feed.html"
-#     context_object_name = 'posts'
-#
-#     def get_queryset(self):
-#         """Return the user's feed."""
-#         current_user = self.request.user
-#         authors = list(current_user.followees.all()) + [current_user]
-#         posts = Post.objects.filter(author__in=authors)
-#         return posts
-#
-#     def get_context_data(self, **kwargs):
-#         """Return context data, including new post form."""
-#         context = super().get_context_data(**kwargs)
-#         context['user'] = self.request.user
-#         context['form'] = ClubForm()
-#         return context
-
-class HomeView(View):
-    template_name = 'main_templates/home.html'
-=======
 class HomeView(LoginProhibitedMixin,View):
     template_name = 'home.html'
->>>>>>> calendar
 
     def get(self,request):
         return self.render()
@@ -146,9 +154,9 @@ class ClubListView(LoginRequiredMixin, ListView):
     ordering = ['name']
 
     def get_context_data(self, *args, **kwargs):
-        context= super().get_context_data(*args, **kwargs)
-        club= Club.objects.all()
-        context['roles']= Role.objects.all().filter(role= "O")
+        context = super().get_context_data(*args, **kwargs)
+        club = Club.objects.all()
+        context['roles'] = Role.objects.all().filter(role= "O")
         return context
 
 class OwnerClubListView(LoginRequiredMixin, ListView):
@@ -172,68 +180,100 @@ class MemberClubListView(LoginRequiredMixin, ListView):
     ordering = ['name']
 
     def get_context_data(self, *args, **kwargs):
-        context= super().get_context_data(*args, **kwargs)
-        current_user= self.request.user
-        context['roles']= Role.objects.all().filter(user= current_user, role= "M")
+        context = super().get_context_data(*args, **kwargs)
+        current_user = self.request.user
+        context['roles'] = Role.objects.all().filter(user= current_user, role= "M")
         return context
 
-class ShowBookView(LoginRequiredMixin, DetailView):
-    model = Book
-    template_name = 'book_templates/show_book.html'
-    pk_url_kwarg = "book_id"
+class RecommendedClubListView(ListView):
+    model = Club
+    template_name = 'recommended_club_list.html'
+    context_object_name = 'clubs'
 
-    def get(self, request, *args, **kwargs):
-        try:
-            return super().get(self, request, *args, **kwargs)
-        except Http404:
-            return redirect('book_list')
+    def get_club_recommendations(self):
+        club_similarities = {}
 
-class ShowUserView(LoginRequiredMixin, DetailView):
+        current_user = self.request.user
+        user_genres = list(current_user.genres_preferences)
+        user_genres_counter = Counter(user_genres)
+
+        filtered_clubs = Club.objects.filter(club_book__genre__in = user_genres)
+        for club in filtered_clubs:
+            distance_sum = 0
+            members = Role.objects.filter(club = club).filter(role = 'M')
+            for member in members.values():
+                current_member = User.objects.get(id = member['user_id'])
+                member_genres = list(current_member.genres_preferences)
+                member_genres_counter = Counter(member_genres)
+                all_genres  = list(user_genres_counter.keys() | member_genres_counter.keys())
+                user_vect = [user_genres_counter.get(word, 0) for word in all_genres]
+                member_vect = [member_genres_counter.get(word, 0) for word in all_genres]
+                distance_sum += 1 - spatial.distance.cosine(user_vect, member_vect)
+            club_similarities[club] = distance_sum / len(members)
+
+        sorted_clubs = list(club_similarities.items())
+        sorted_clubs.sort(key=lambda k: k[1], reverse=True)
+
+        return [i[0] for i in sorted_clubs]
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = super().get_queryset(*args, **kwargs)
+        queryset = self.get_club_recommendations()
+        return queryset
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        club = Club.objects.all()
+        context['roles'] = Role.objects.all().filter(role= "O")
+        return context
+
+
+class ShowUserView(DetailView):
     model = User
     template_name = 'user_templates/show_user.html'
     pk_url_kwarg = "user_id"
 
-    def get(self, request, *args, **kwargs):
-        try:
-            return super().get(self, request, *args, **kwargs)
-        except Http404:
-            return redirect('user_list')
-
-class ShowClubView(LoginRequiredMixin, DetailView):
+class ShowClubView(DetailView):
     model = Club
     template_name = 'club_templates/show_club.html'
     pk_url_kwarg = "club_id"
 
-    def get(self, request, *args, **kwargs):
-        try:
-            return super().get(self, request, *args, **kwargs)
-        except Http404:
-            return redirect('club_list')
+class ShowBookView(DetailView):
+    model = Book
+    template_name = 'book_templates/show_book.html'
+    pk_url_kwarg = "book_id"
 
 
 class LogInView(View):
     """Log-in handling view"""
     def get(self,request):
-        self.next = request.GET.get('next') or 'officer'
         return self.render()
 
     def post(self,request):
         form = LogInForm(request.POST)
-        self.next = request.POST.get('next')
         user = form.get_user()
+        if user is not None and len(user.genres_preferences) == 0:
+            login(request, user)
+            return redirect('select_genres')
+
         if user is not None:
                 """Redirect to club selection page, with option to create new club"""
                 login(request, user)
                 return redirect('feed')
 
-        messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
-        return self.render()
+
+        else:
+            messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
+            return self.render()
 
     def render(self):
         form = LogInForm()
-        return render(self.request, 'login.html', {'form': form, 'next' : self.next})
+        return render(self.request, 'login.html', {'form': form
+        # , 'next' : self.next
+        })
 
 """View used for logging out."""
+@login_required
 def log_out(request):
     logout(request)
     return redirect('home')
@@ -246,21 +286,39 @@ class SignUpView(LoginProhibitedMixin,FormView):
     """View that signs up user."""
 
     form_class = SignUpForm
-<<<<<<< HEAD
-    template_name = "main_templates/sign_up.html"
-    redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
-=======
     template_name = "sign_up.html"
-    #redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
->>>>>>> calendar
+    redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
 
     def form_valid(self, form):
         self.object = form.save()
         login(self.request, self.object)
-        return super().form_valid(form)
+        super().form_valid(form)
+        return redirect('select_genres')
 
     def get_success_url(self):
-        return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+        pass
+        #return reverse(settings.REDIRECT_URL_WHEN_LOGGED_IN)
+
+"""This function allows the user to select prefered genres upon sign up."""
+@login_required
+def select_genres(request):
+
+    genres = Book.objects.values_list('genre',flat=True).distinct()
+    current_user = request.user
+
+    if request.method=='POST':
+            form = GenreForm(request.POST)
+            if form.is_valid():
+                    current_user.genres_preferences = form.save()
+                    current_user.save()
+                    messages.add_message(request, messages.SUCCESS, "Preferences updated!")
+                    return redirect('feed')
+            else:
+                messages.add_message(request, messages.ERROR, "You must select a maximum of 5 choices!")
+    else:
+        form = GenreForm(instance = current_user)
+    return render(request, "select_genres.html", {'genres': genres, 'form': form})
+
 
 """This function standardize the requirements for
     creating clubs, if club is successfully created,
@@ -289,8 +347,7 @@ def create_club(request):
         return render(request, 'club_templates/create_club.html' , {'form': form})
 
 
-
-class EditProfileView(View):
+class EditProfileView(LoginRequiredMixin, View):
     def get(self,request):
         return self.render()
 
@@ -577,6 +634,10 @@ def apply(request, club_id):
     else:
         return HttpResponseForbidden()
 
+
+"""These functions are for adding/removing
+    books from a user's wishlist."""
+@login_required
 def wish(request, book_id):
     user = request.user
     try:
@@ -588,20 +649,24 @@ def wish(request, book_id):
     except ObjectDoesNotExist:
         return redirect('book_list')
 
+@login_required
 def unwish(request, book_id):
     user = request.user
     try:
         book = Book.objects.get(pk = book_id)
+        previous_url = request.META.get('HTTP_REFERER')
         if user.wishlist.filter(isbn=book.isbn).exists():
             user.wishlist.remove(book)
-        return redirect('wishlist', user.id)
+            if previous_url != None and 'wishlist' in previous_url:
+                return redirect('wishlist', user.id)
+        return redirect('show_book', book.id)
 
     except ObjectDoesNotExist:
         return redirect('book_list')
 
-
 """This function is for club owner/officer to set the book for
     club to read"""
+@login_required
 def set_club_book(request, club_id):
     current_user = request.user
     club = Club.objects.get(id=club_id)
@@ -635,6 +700,7 @@ def set_club_book(request, club_id):
 
 """This function allows club office/owner to
     invite other users to join the club"""
+@login_required
 def invite(request, club_id):
     current_user = request.user
     club = Club.objects.get(id=club_id)
@@ -780,8 +846,6 @@ def event_list(request,club_id):
                                                       'club' : club,
                                                       'events' : events})
 
-<<<<<<< HEAD
-=======
 class NewPostView(LoginRequiredMixin, CreateView):
     """Class-based generic view for new post handling."""
 
@@ -826,78 +890,78 @@ def add_comment_to_post(request, club_id, post_id):
     return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
 
-class Calendar(HTMLCalendar):
-    def __init__(self, year=None, month=None):
-        self.year = year
-        self.month = month
-        super(Calendar, self).__init__()
-
-    def formatday(self, day, user, month, year):
-        roles = Role.objects.filter(user=user)
-        events_per_day = []
-        for role in roles:
-            events_per_day+=(Event.objects.filter(deadline__day=day,club=role.club, deadline__month=month, deadline__year = year))
-
-        d = ''
-        for event in events_per_day:
-            d += f'<li> {event.name} </li>'
-
-        if day != 0:
-            if not events_per_day :
-                return f"<td><span class='date'>{day}</span></td>"
-            else:
-                return f"<td><mark style='background-color:#ced4da'>{day}</mark></td>"
-
-        return '<td></td>'
-
-    def formatweek(self, theweek, user, month, year):
-        week = ''
-        for d, weekday in theweek:
-            week += self.formatday(d, user, month, year)
-        return f'<tr> {week} </tr>'
-
-    def formatmonth(self, user, withyear=True):
-        user=user
-        month=self.month
-        year=self.year
-
-        cal = f'<table>\n'
-        cal += f'{self.formatmonthname(self.year, self.month, withyear=withyear)}\n'
-        cal += f'{self.formatweekheader()}\n'
-        for week in self.monthdays2calendar(self.year, self.month):
-            cal += f'{self.formatweek(week, user, month, year)}\n'
-        cal += f'</table>\n'
-        return cal
-
-
-class CalendarView(generic.ListView):
-    model = Event
-    template_name = 'calendar.html'
+# class Calendar(HTMLCalendar):
+#     def __init__(self, year=None, month=None):
+#         self.year = year
+#         self.month = month
+#         super(Calendar, self).__init__()
+#
+#     def formatday(self, day, user, month, year):
+#         roles = Role.objects.filter(user=user)
+#         events_per_day = []
+#         for role in roles:
+#             events_per_day+=(Event.objects.filter(deadline__day=day,club=role.club, deadline__month=month, deadline__year = year))
+#
+#         d = ''
+#         for event in events_per_day:
+#             d += f'<li> {event.name} </li>'
+#
+#         if day != 0:
+#             if not events_per_day :
+#                 return f"<td><span class='date'>{day}</span></td>"
+#             else:
+#                 return f"<td><mark style='background-color:#ced4da'>{day}</mark></td>"
+#
+#         return '<td></td>'
+#
+#     def formatweek(self, theweek, user, month, year):
+#         week = ''
+#         for d, weekday in theweek:
+#             week += self.formatday(d, user, month, year)
+#         return f'<tr> {week} </tr>'
+#
+#     def formatmonth(self, user, withyear=True):
+#         user=user
+#         month=self.month
+#         year=self.year
+#
+#         cal = f'<table>\n'
+#         cal += f'{self.formatmonthname(self.year, self.month, withyear=withyear)}\n'
+#         cal += f'{self.formatweekheader()}\n'
+#         for week in self.monthdays2calendar(self.year, self.month):
+#             cal += f'{self.formatweek(week, user, month, year)}\n'
+#         cal += f'</table>\n'
+#         return cal
 
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # use today's date for the calendar
-        d = get_date(self.request.GET.get('day', None))
-
-        # Instantiate our calendar class with today's year and date
-        cal = Calendar(d.year, d.month)
-
-
-        user=self.request.user
-
-        roles = Role.objects.filter(user=user)
-        events= []
-        for role in roles:
-            events+=(Event.objects.filter(club=role.club, deadline__month=d.month, deadline__year =d.year))
-
-        # Call the formatmonth method, which returns our calendar as a table
-        html_cal = cal.formatmonth(withyear=True, user=user)
-        context['calendar'] = mark_safe(html_cal)
-        context['events'] = events
-
-        return context
+# class CalendarView(generic.ListView):
+#     model = Event
+#     template_name = 'calendar.html'
+#
+#
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#
+#         # use today's date for the calendar
+#         d = get_date(self.request.GET.get('day', None))
+#
+#         # Instantiate our calendar class with today's year and date
+#         cal = Calendar(d.year, d.month)
+#
+#
+#         user=self.request.user
+#
+#         roles = Role.objects.filter(user=user)
+#         events= []
+#         for role in roles:
+#             events+=(Event.objects.filter(club=role.club, deadline__month=d.month, deadline__year =d.year))
+#
+#         # Call the formatmonth method, which returns our calendar as a table
+#         html_cal = cal.formatmonth(withyear=True, user=user)
+#         context['calendar'] = mark_safe(html_cal)
+#         context['events'] = events
+#
+#         return context
 
 def get_date(req_day):
     if req_day:
@@ -905,7 +969,6 @@ def get_date(req_day):
         return date(year, month, day=1)
     return datetime.today()
 
->>>>>>> calendar
 def join_event(request,event_id,club_id):
      club = Club.objects.get(id=club_id)
      members = Role.objects.filter(club=club)
@@ -955,7 +1018,6 @@ def leave_club(request,club_id):
     return redirect('feed')
 
 
-<<<<<<< HEAD
 def user_chat(request, receiver_id):
     user = request.user
     receiver = User.objects.get(id=receiver_id)
@@ -1037,7 +1099,8 @@ def get_club_messages(request, club_id):
             })
 
     return JsonResponse({"messages":message_list})
-=======
+
+
 class SearchView(ListView):
     template_name = 'search_view.html'
     count = 0
@@ -1084,4 +1147,3 @@ class SearchView(ListView):
             self.query = query
             return qs_sorted
         return query
->>>>>>> calendar

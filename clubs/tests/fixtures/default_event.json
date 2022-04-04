@@ -1,6 +1,5 @@
 [
     {
-<<<<<<< HEAD
         "model":"clubs.event",
         "pk":1,
         "fields":{
@@ -12,18 +11,6 @@
             "location":"London",
             "club" :1,
             "organiser": 3
-=======
-        "model": "clubs.Event",
-        "pk": 1,
-        "fields": {
-            "name": "Test Event",
-            "description": "An ordinary event. ",
-            "maxNumberOfParticipants": "16",
-            "deadline": "",
-            "book": "1",
-            "club": "1",
-            "participants": None,
->>>>>>> calendar
         }
     }
 ]

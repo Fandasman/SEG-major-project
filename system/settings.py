@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'bootstrap_pagination',
     'django.contrib.humanize',
     'location_field.apps.DefaultConfig',
+    'django_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -130,17 +131,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Login URL to redirect logged in users
+# Login URL to redirect logged out users
 LOGIN_URL = 'login'
 
-<<<<<<< HEAD
-
-REDIRECT_URL_WHEN_LOGGED_IN = 'feed'
-=======
 #URL where @login_prohibited redirects to
 REDIRECT_URL_WHEN_LOGGED_IN= 'feed'
->>>>>>> calendar
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -157,7 +158,6 @@ MESSAGE_TAGS = {
 }
 
 # page lengths
-
 USERS_PER_PAGE= 25
 CLUBS_PER_PAGE= 15
 BOOKS_PER_PAGE= 30

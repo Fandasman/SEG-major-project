@@ -1,6 +1,7 @@
 """Test of the create club view"""
 from django.test import TestCase
 from django.urls import reverse
+from clubs.tests.helpers import reverse_with_next
 from clubs.models import Club, User, Role
 
 
@@ -20,11 +21,16 @@ class CreateClubViewTestCase(TestCase):
     def test_create_club_url(self):
         self.assertEqual(reverse('create_club'), '/create_club/')
 
+    def test_create_club_redirects_when_logged_out(self):
+        redirect_url = reverse_with_next('login', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
+
     def test_get_create_club(self):
         self.client.login(username = self.user.username, password = "Password123")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'navbar_templates/create_club.html')
+        self.assertTemplateUsed(response, 'club_templates/create_club.html')
 
     def test_unsuccessful_create_club(self):
         self.form_input['name'] = ''
