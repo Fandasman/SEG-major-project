@@ -998,18 +998,18 @@ def invite(request, club_id):
 
 
 """This function allows users to accept the invitation from the club"""
-def accept_invitation(request, inv_id):
-    if request.method == "POST":
-        user = request.user
-        invitation = Invitation.objects.get(id=inv_id)
-        club = invitation.club
-        new_role = Role.objects.create(user=user, club=club, role="M")
-        MembershipPost.objects.create(user = user, club = club)
-        old_invitation = Invitation.objects.filter(id=inv_id).delete()
-        messages.add_message(request, messages.INFO, "join successful")
-        return redirect('invitation_list', user.id)
-    else:
-        return HttpResponseForbidden()
+# def accept_invitation(request, inv_id):
+#     if request.method == "POST":
+#         user = request.user
+#         invitation = Invitation.objects.get(id=inv_id)
+#         club = invitation.club
+#         new_role = Role.objects.create(user=user, club=club, role="M")
+#         MembershipPost.objects.create(user = user, club = club)
+#         old_invitation = Invitation.objects.filter(id=inv_id).delete()
+#         messages.add_message(request, messages.INFO, "join successful")
+#         return redirect('invitation_list', user.id)
+#     else:
+#         return HttpResponseForbidden()
 
 class AcceptInvitationView(View):
 
@@ -1028,16 +1028,16 @@ class AcceptInvitationView(View):
 
 
 """This function allows users to reject the invitation from the club"""
-def reject_invitation(request, inv_id):
-    if request.method == "POST":
-        user = request.user
-        invitation = Invitation.objects.get(id=inv_id)
-        club = invitation.club
-        old_invitation = Invitation.objects.filter(id=inv_id).delete()
-        messages.add_message(request, messages.INFO, "you have rejected this invitation")
-        return redirect('invitation_list', user.id)
-    else:
-        return HttpResponseForbidden()
+# def reject_invitation(request, inv_id):
+#     if request.method == "POST":
+#         user = request.user
+#         invitation = Invitation.objects.get(id=inv_id)
+#         club = invitation.club
+#         old_invitation = Invitation.objects.filter(id=inv_id).delete()
+#         messages.add_message(request, messages.INFO, "you have rejected this invitation")
+#         return redirect('invitation_list', user.id)
+#     else:
+#         return HttpResponseForbidden()
 
 class RejectInvitationView(View):
 
