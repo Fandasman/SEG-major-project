@@ -560,13 +560,16 @@ def leave_club(request, club_id):
             user = request.user
             current_club = Club.objects.get(id=club_id)
             userrole = Role.objects.filter(club=current_club).get(user=user)
-            redirect_url = reverse('club_members', kwargs={'club_id':club_id})
-            members = Role.objects.filter(club=current_club)
-            userrole.delete()
-            post = MembershipPost.objects.create(user = user, club = current_club)
-            post.join = False
-            post.save()
-            messages.add_message(request, messages.SUCCESS, f'You have successfully left {current_club.name}!')
+            if userrole.role == "CO":
+                messages.add_message(request, messages.INFO, f'You cannot leave a club that you own!')
+            else:
+                redirect_url = reverse('club_members', kwargs={'club_id':club_id})
+                members = Role.objects.filter(club=current_club)
+                userrole.delete()
+                post = MembershipPost.objects.create(user = user, club = current_club)
+                post.join = False
+                post.save()
+                messages.add_message(request, messages.SUCCESS, f'You have successfully left {current_club.name}!')
             return redirect('feed')
         else:
             return redirect('login')
