@@ -7,7 +7,9 @@ from clubs.models import Club, User, Role
 
 class CreateClubViewTestCase(TestCase):
 
-    fixtures = ['clubs/tests/fixtures/default_user.json']
+    fixtures = ['clubs/tests/fixtures/default_user.json',
+                'clubs/tests/fixtures/default_club.json',
+                'clubs/tests/fixtures/other_clubs.json',]
 
     def setUp(self):
         self.url = reverse('create_club')
@@ -31,6 +33,31 @@ class CreateClubViewTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'navbar_templates/create_club.html')
+
+    def test_create_club_with_too_many_created_clubs(self):
+        self.client.login(username = self.user.username, password = "Password123")
+        before_count = Club.objects.count()
+        response = self.client.get(self.url)
+        after_count = Club.objects.count()
+        self.assertEqual(before_count, after_count)    
+        self.assertEqual(response.status_code, 200)    
+
+    def create_ownership_roles(self):
+        Role.objects.create(
+            user = self.user,
+            club = Club.objects.get(id = 2),
+            role = "CO"
+        )
+        Role.objects.create(
+            user = self.user,
+            club = Club.objects.get(id = 3),
+            role = "CO"
+        )
+        Role.objects.create(
+            user = self.user,
+            club = Club.objects.get(id = 4),
+            role = "CO"
+        )
 
     def test_unsuccessful_create_club(self):
         self.form_input['name'] = ''
