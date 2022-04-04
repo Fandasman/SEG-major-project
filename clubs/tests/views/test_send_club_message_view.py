@@ -52,3 +52,8 @@ class SendClubMessageViewTestCase(TestCase):
         response = self.client.post(self.url, form_input, follow=True)
         after_count = Message.objects.count()
         self.assertNotEqual(after_count, before_count + 1)
+
+    def test_unsuccessful_send_club_message(self):
+        self.client.login(username=self.user.username, password="Password123")
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)

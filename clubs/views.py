@@ -772,7 +772,7 @@ def set_club_book(request, club_id):
             else:
                 messages.add_message(request, messages.ERROR, "you don't own this club")
                 form = SetClubBookForm()
-                return redirect('club_feed', club.id)
+                return redirect('club_list')
         else:
             messages.add_message(request, messages.ERROR, "Invalid club name or book name")
             form = SetClubBookForm()
@@ -808,7 +808,7 @@ def invite(request, club_id):
             else:
                 messages.add_message(request, messages.ERROR, "you don't have the permission to invite others")
                 form = InviteForm()
-                return redirect('club_feed', club.id)
+                return redirect('club_list')
         else:
             messages.add_message(request, messages.ERROR, "Invalid username")
             form = InviteForm()
