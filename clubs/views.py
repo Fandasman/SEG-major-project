@@ -392,6 +392,7 @@ def delete_club(request, club_id):
     else:
         if role.role == 'CO':
             return render(request, 'club_templates/delete_club.html', {'club': club})
+        return redirect("feed")
 
 @login_required
 def delete_club_action(request, club_id):
