@@ -23,6 +23,12 @@ class CreateClubViewTestCase(TestCase):
     def test_create_club_url(self):
         self.assertEqual(reverse('create_club'), '/create_club/')
 
+    def test_template_used_by_invite_view(self):
+        self.client.login(username=self.user.username, password='Password123')
+        response = self.client.get(self.url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'club_templates/create_club.html')
+
     def test_create_club_redirects_when_logged_out(self):
         redirect_url = reverse_with_next('login', self.url)
         response = self.client.get(self.url)
@@ -35,12 +41,16 @@ class CreateClubViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'club_templates/create_club.html')
 
     def test_create_club_with_too_many_created_clubs(self):
-        self.client.login(username = self.user.username, password = "Password123")
-        before_count = Club.objects.count()
-        response = self.client.get(self.url)
-        after_count = Club.objects.count()
-        self.assertEqual(before_count, after_count)    
-        self.assertEqual(response.status_code, 200)    
+        club1 = Club.objects.create(name='club1')
+        club2 = Club.objects.create(name='club2')
+        club3 = Club.objects.create(name='club3')
+        Role.objects.create(club=club1, user=self.user, role='CO')
+        Role.objects.create(club=club2, user=self.user, role='CO')
+        Role.objects.create(club=club3, user=self.user, role='CO')
+        self.client.login(username=self.user.username, password="Password123")
+        response = self.client.post(self.url, self.form_input, follow=True)
+        messages = list(response.context['messages'])
+        self.assertEqual(str(messages[0]), 'You already own too many clubs!')
 
     def create_ownership_roles(self):
         Role.objects.create(
