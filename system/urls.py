@@ -81,5 +81,7 @@ urlpatterns = [
     path('user/<int:receiver_id>/chat/', views.user_chat, name='user_chat'),
     path('send_user_message/', views.send_user_message, name='send_user_message'),
     path('get_user_messages/<int:receiver_id>/', views.get_user_messages, name='get_user_messages'),
+    path('club/<int:club_id>/delete_club/', views.delete_club, name='delete_club'),
+    path('club/<int:club_id>/delete/', views.delete_club_action, name='delete_club_action'),
     path('search_view/', views.SearchView.as_view(), name='search_view'),
 ]

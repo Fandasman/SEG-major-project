@@ -156,7 +156,7 @@ class ClubListView(LoginRequiredMixin, ListView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         club = Club.objects.all()
-        context['roles'] = Role.objects.all().filter(role= "O")
+        context['roles'] = Role.objects.filter(role= "O")
         return context
 
 class OwnerClubListView(LoginRequiredMixin, ListView):
@@ -167,9 +167,9 @@ class OwnerClubListView(LoginRequiredMixin, ListView):
     ordering = ['name']
 
     def get_context_data(self, *args, **kwargs):
-        context= super().get_context_data(*args, **kwargs)
-        current_user= self.request.user
-        context['roles']= Role.objects.all().filter(user= current_user, role= "CO")
+        context = super().get_context_data(*args, **kwargs)
+        current_user = self.request.user
+        context['roles'] = Role.objects.filter(user = current_user, role= "CO")
         return context
 
 class MemberClubListView(LoginRequiredMixin, ListView):
@@ -182,7 +182,9 @@ class MemberClubListView(LoginRequiredMixin, ListView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         current_user = self.request.user
-        context['roles'] = Role.objects.all().filter(user= current_user, role= "M")
+        member_roles = Role.objects.all().filter(user= current_user, role = "M")
+        officer_roles = Role.objects.all().filter(user= current_user, role = "O")
+        context['roles'] = list(chain(officer_roles, member_roles))
         return context
 
 class RecommendedClubListView(ListView):
@@ -345,6 +347,35 @@ def create_club(request):
     else:
         form = ClubForm()
         return render(request, 'club_templates/create_club.html' , {'form': form})
+
+"""This function allows owners of a club to delete the club"""
+@login_required
+def delete_club(request, club_id):
+    current_user = request.user
+    club = Club.objects.get(id = club_id)
+    try:
+        role = Role.objects.get(user = current_user, club = club)
+    except ObjectDoesNotExist:
+        return redirect('feed')
+    else:
+        if role.role == 'CO':
+            return render(request, 'club_templates/delete_club.html', {'club': club})
+        return redirect("feed")
+
+@login_required
+def delete_club_action(request, club_id):
+    current_user = request.user
+    club = Club.objects.get(id = club_id)
+    try:
+        role = Role.objects.get(user = current_user, club = club)
+    except ObjectDoesNotExist:
+        return redirect('feed')
+    else:
+        if role.role == 'CO':
+            Club.objects.get(id = club_id).delete()
+            messages.add_message(request, messages.SUCCESS, "Club deleted! Time to make another one?")
+        
+        return redirect('feed')
 
 
 class EditProfileView(LoginRequiredMixin, View):
@@ -724,7 +755,7 @@ def invite(request, club_id):
             else:
                 messages.add_message(request, messages.ERROR, "you don't have the permission to invite others")
                 form = InviteForm()
-                return redirect('show_club', club.id)
+                return redirect('club_feed', club.id)
         else:
             messages.add_message(request, messages.ERROR, "Invalid username")
             form = InviteForm()
