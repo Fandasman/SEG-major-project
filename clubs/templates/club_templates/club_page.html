@@ -58,10 +58,6 @@ Member List
   <div class="card" style="width: 30rem;">
     <div class="card-body">
       <h5 class="card-title">Members <span style="color:#676A6D;"> · {{members | length}} </span> </h5>
-      <h6 style="color:#676A6D;">New people that join this group will appear here. </h6>
-        <hr class="my-2">
-        {% include 'partials/member_listing.html' with members=user.get_current_user_role userrole=userrole%}
-        <hr class="my-2">
       {%if userrole.role == "CO" or userrole.role == 'O'%}
         {% if club.get_all_aplicants.count > 0 %}
           <h6>Aplicants · <span style="color:#FF0000;"> {{club.get_all_aplicants | length}} </span></h6>
