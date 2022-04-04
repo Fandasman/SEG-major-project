@@ -1535,6 +1535,34 @@ def event_list(request,club_id):
                                                       'club' : club,
                                                       'events' : events})
 
+class EventList(View):
+
+    def get(self,*args, **kwargs):
+        return self.render()
+
+    def post(self,request,club_id):
+        self.render()
+        
+    
+
+
+    def render(self,*args, **kwargs):
+        club_id = self.kwargs['club_id']
+        club = Club.objects.get(id=club_id)
+        members = Role.objects.filter(club=club)
+        userrole = Role.objects.get(club = club, user=self.request.user)
+        try:
+            events = Event.objects.filter(club=club)
+        except ObjectDoesNotExist:
+            messages.add_message(self.request,messages.ERROR,"There are no events")
+            return redirect('club_list')
+        else:
+            return render(self.request, 'club_templates/events_list.html', {'members': members,
+                                                        'userrole': userrole,
+                                                        'club' : club,
+                                                        'events' : events})
+
+
 class NewPostView(LoginRequiredMixin, CreateView):
     """Class-based generic view for new post handling."""
 
