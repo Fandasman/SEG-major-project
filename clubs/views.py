@@ -633,7 +633,6 @@ def reject_applicant_to_club_as_Owner(request,club_id,member_id):
             club = Club.objects.get(id = club_id)
             member = User.objects.get(id = member_id)
             newMember = Role.objects.get(club = club, user = member)
-            # print(Role.objects.filter(club=club).count())
             newMember.delete()
             members = Role.objects.filter(club=club)
             return redirect(redirect_url,members = members,
