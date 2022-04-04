@@ -167,15 +167,9 @@ class OwnerClubListView(LoginRequiredMixin, ListView):
     ordering = ['name']
 
     def get_context_data(self, *args, **kwargs):
-<<<<<<< HEAD
         context = super().get_context_data(*args, **kwargs)
         current_user = self.request.user
         context['roles'] = Role.objects.filter(user = current_user, role= "CO")
-=======
-        context= super().get_context_data(*args, **kwargs)
-        current_user= self.request.user
-        context['roles']= Role.objects.all().filter(user= current_user, role= "CO")
->>>>>>> ed476bf6f6dc9aeea4911d46f42f512f6d017b0c
         return context
 
 class MemberClubListView(LoginRequiredMixin, ListView):
