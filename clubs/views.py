@@ -1046,25 +1046,25 @@ def club_members(request, club_id):
 """This function is for the user to apply for the club.
     If the user already in the club, system will refuse
     to create a role for the user with an error message."""
-@login_required
-def apply(request, club_id):
-    current_club = Club.objects.get(id=club_id)
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            current_user = request.user
-            try:
-                role = Role.objects.filter(club=current_club).get(user=current_user)
-            except ObjectDoesNotExist:
-                messages.add_message(request,messages.SUCCESS,"You applied to this club successfully")
-                role = Role.objects.create(user=current_user, club=current_club, role='A')
-                return redirect('club_list')
-            else:
-                messages.add_message(request,messages.ERROR,"You've already applied for this club!")
-                return redirect('feed')
-        else:
-            return redirect('login')
-    else:
-        return HttpResponseForbidden()
+# @login_required
+# def apply(request, club_id):
+#     current_club = Club.objects.get(id=club_id)
+#     if request.method == "POST":
+#         if request.user.is_authenticated:
+#             current_user = request.user
+#             try:
+#                 role = Role.objects.filter(club=current_club).get(user=current_user)
+#             except ObjectDoesNotExist:
+#                 messages.add_message(request,messages.SUCCESS,"You applied to this club successfully")
+#                 role = Role.objects.create(user=current_user, club=current_club, role='A')
+#                 return redirect('club_list')
+#             else:
+#                 messages.add_message(request,messages.ERROR,"You've already applied for this club!")
+#                 return redirect('feed')
+#         else:
+#             return redirect('login')
+#     else:
+#         return HttpResponseForbidden()
 
 class ApplyView(LoginRequiredMixin,View):
 
@@ -1385,37 +1385,37 @@ class InvitationlistView(LoginRequiredMixin, ListView):
         except ObjectDoesNotExist:
             return redirect('feed')
 
-@login_required
-def club_feed(request,club_id):
-    user=request.user
-    form = UserPostForm()
-    comment_form = CommentForm
-    club = Club.objects.get(id=club_id)
-    members = Role.objects.filter(club=club)
-    try:
-        userrole = Role.objects.get(club = club, user=request.user)
-    except ObjectDoesNotExist:
-        messages.add_message(request, messages.ERROR, "It seems you don't belong to this club!")
-        return redirect('club_list')
-    else:
-        if userrole.role == "A":
-            messages.add_message(request, messages.ERROR, "You are an applicant in this club, you don't have authority to view the member list!")
-            return redirect('club_list')
-        else:
-            event_posts = EventPost.objects.filter(event__club=club)
-            comments = Comment.objects.filter(club=club)
-            membership_posts = MembershipPost.objects.filter(club=club)
-            user_posts = UserPost.objects.filter(club=club)
-            posts = sorted( chain(event_posts, membership_posts, user_posts),
-                    key=lambda instance: instance.created_at,reverse=True)
-            return render(request, 'club_templates/club_feed.html', {'members': members,
-                                                       'userrole': userrole,
-                                                       'posts':posts,
-                                                       'club' : club,
-                                                       'form' : form,
-                                                       'comment_form' : comment_form,
-                                                       'comments' : comments,
-                                                       'user':user})
+# @login_required
+# def club_feed(request,club_id):
+#     user=request.user
+#     form = UserPostForm()
+#     comment_form = CommentForm
+#     club = Club.objects.get(id=club_id)
+#     members = Role.objects.filter(club=club)
+#     try:
+#         userrole = Role.objects.get(club = club, user=request.user)
+#     except ObjectDoesNotExist:
+#         messages.add_message(request, messages.ERROR, "It seems you don't belong to this club!")
+#         return redirect('club_list')
+#     else:
+#         if userrole.role == "A":
+#             messages.add_message(request, messages.ERROR, "You are an applicant in this club, you don't have authority to view the member list!")
+#             return redirect('club_list')
+#         else:
+#             event_posts = EventPost.objects.filter(event__club=club)
+#             comments = Comment.objects.filter(club=club)
+#             membership_posts = MembershipPost.objects.filter(club=club)
+#             user_posts = UserPost.objects.filter(club=club)
+#             posts = sorted( chain(event_posts, membership_posts, user_posts),
+#                     key=lambda instance: instance.created_at,reverse=True)
+#             return render(request, 'club_templates/club_feed.html', {'members': members,
+#                                                        'userrole': userrole,
+#                                                        'posts':posts,
+#                                                        'club' : club,
+#                                                        'form' : form,
+#                                                        'comment_form' : comment_form,
+#                                                        'comments' : comments,
+#                                                        'user':user})
 
 
 class ClubFeedView(LoginRequiredMixin,View):
@@ -1520,20 +1520,20 @@ class CreateEventView(CreateView):
 
 
 
-def event_list(request,club_id):
-    club = Club.objects.get(id=club_id)
-    members = Role.objects.filter(club=club)
-    userrole = Role.objects.get(club = club, user=request.user)
-    try:
-        events = Event.objects.filter(club=club)
-    except ObjectDoesNotExist:
-        messages.add_message(request,messages.ERROR,"There are no events")
-        return redirect('club_list')
-    else:
-          return render(request, 'club_templates/events_list.html', {'members': members,
-                                                      'userrole': userrole,
-                                                      'club' : club,
-                                                      'events' : events})
+# def event_list(request,club_id):
+#     club = Club.objects.get(id=club_id)
+#     members = Role.objects.filter(club=club)
+#     userrole = Role.objects.get(club = club, user=request.user)
+#     try:
+#         events = Event.objects.filter(club=club)
+#     except ObjectDoesNotExist:
+#         messages.add_message(request,messages.ERROR,"There are no events")
+#         return redirect('club_list')
+#     else:
+#           return render(request, 'club_templates/events_list.html', {'members': members,
+#                                                       'userrole': userrole,
+#                                                       'club' : club,
+#                                                       'events' : events})
 
 class EventList(View):
 
@@ -1582,19 +1582,19 @@ class NewPostView(LoginRequiredMixin, CreateView):
     def handle_no_permission(self):
         return redirect('login')
 
-@login_required
-def like_post(request, club_id, post_id):
-    try:
-        post = UserPost.objects.get(id=post_id)
-        if post.likes.filter(id=request.user.id).exists():
-            post.likes.remove(request.user)
-        else:
+# @login_required
+# def like_post(request, club_id, post_id):
+#     try:
+#         post = UserPost.objects.get(id=post_id)
+#         if post.likes.filter(id=request.user.id).exists():
+#             post.likes.remove(request.user)
+#         else:
 
-            post.likes.add(request.user)
-    except ObjectDoesNotExist:
-        return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
-    else:
-        return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
+#             post.likes.add(request.user)
+#     except ObjectDoesNotExist:
+#         return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
+#     else:
+#         return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
 
 class LikePostView(LoginRequiredMixin,View):
@@ -1841,25 +1841,25 @@ def club_chat(request, club_id):
     })
 
 
-def send_club_message(request):
-    if request.method == "POST":
-        text = request.POST.get('text')
-        user_id = request.POST.get('user_id')
-        club_id = request.POST.get('club_id')
-        user = User.objects.get(id=user_id)
-        club = Club.objects.get(id=club_id)
-        try:
-            role = Role.objects.get(user=user, club=club)
-            if role.role == "O" or role.role == "CO" or role.role == "M":
-                new_message = Message.objects.create(text=text, user=user, club=club)
-                new_message.save()
-                return render(request, 'club_templates/club_chat.html')
-            else:
-                return redirect('club_list')
-        except ObjectDoesNotExist:
-            return HttpResponseForbidden()
-    else:
-        return HttpResponseForbidden()
+# def send_club_message(request):
+#     if request.method == "POST":
+#         text = request.POST.get('text')
+#         user_id = request.POST.get('user_id')
+#         club_id = request.POST.get('club_id')
+#         user = User.objects.get(id=user_id)
+#         club = Club.objects.get(id=club_id)
+#         try:
+#             role = Role.objects.get(user=user, club=club)
+#             if role.role == "O" or role.role == "CO" or role.role == "M":
+#                 new_message = Message.objects.create(text=text, user=user, club=club)
+#                 new_message.save()
+#                 return render(request, 'club_templates/club_chat.html')
+#             else:
+#                 return redirect('club_list')
+#         except ObjectDoesNotExist:
+#             return HttpResponseForbidden()
+#     else:
+#         return HttpResponseForbidden()
 
 
 class SendClubMessage(LoginRequiredMixin,View):
