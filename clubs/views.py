@@ -24,7 +24,7 @@ from django.views.generic.edit import CreateView, FormView
 from itertools import chain
 from scipy import spatial
 from surprise import dump
-from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm, UserPostForm, CommentForm, SearchForm, GenreForm
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm, UserPostForm, CommentForm, SearchForm, GenreForm, RatingForm
 from .models import Book, Club, Role, User, Invitation, Event, EventPost, UserPost, MembershipPost, Comment, Message, BooksRatings
 
 if "runserver" in sys.argv:
@@ -88,6 +88,57 @@ class LoginProhibitedMixin:
 
 
 @login_required
+def show_book(request, book_id):
+    current_user = request.user
+    try:
+        book = Book.objects.get(id=book_id)
+        in_wishlist = current_user.wishlist.filter(isbn=book.isbn).exists()
+    except ObjectDoesNotExist:
+        return redirect('book_list')
+    else:
+        book_form = RatingForm(request.POST)
+        exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = current_user))) != 0
+        current_rating_value = 0
+        if exist_rating:
+            past_rating = BooksRatings.objects.get(isbn = book.isbn, user = current_user)
+
+        if request.method=='POST':
+            if book_form.is_valid() and book_form.cleaned_data.get('rating') != '':
+                if exist_rating == False:
+                    new_rating = BooksRatings.objects.create(
+                        isbn = book.isbn,
+                        rating = book_form.cleaned_data.get('rating'),
+                        user = current_user
+                    )
+                    new_rating.save()
+                    exist_rating = True
+                    current_rating_value = new_rating.rating
+                    if book.genre not in current_user.genres_preferences:
+                        current_user.genres_preferences.insert(len(current_user.genres_preferences), book.genre)
+                        current_user.save()
+                else:
+                    past_rating.rating = book_form.cleaned_data.get('rating')
+                    current_rating_value = past_rating.rating
+                    past_rating.save()
+
+        else:
+            if book not in request.user.wishlist.all() and exist_rating:
+                exist_rating = False
+                rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
+                rating.delete()
+
+            elif exist_rating:
+                current_rating_value = past_rating.rating
+
+        return render(request, 'book_templates/show_book.html',
+                     {'book': book,'form': book_form,
+                     'book_id': book_id,
+                     'exist_rating': exist_rating,
+                     'current_rating_value': current_rating_value,
+                     'in_wishlist': in_wishlist}
+    )
+
+@login_required
 def remove_rating(request, book_id):
     try:
         book = Book.objects.get(id = book_id)
@@ -101,12 +152,12 @@ def remove_rating(request, book_id):
 
     return redirect('show_book', book_id)
 
-@login_required
-def profile(request):
-    current_user = request.user
-    return render(request, 'user_templates/profile.html',
-            {'user': current_user}
-        )
+# @login_required
+# def profile(request):
+#     current_user = request.user
+#     return render(request, 'user_templates/profile.html',
+#             {'user': current_user}
+#         )
 
 class HomeView(LoginProhibitedMixin,View):
     template_name = 'home.html'
@@ -374,7 +425,7 @@ def delete_club_action(request, club_id):
         if role.role == 'CO':
             Club.objects.get(id = club_id).delete()
             messages.add_message(request, messages.SUCCESS, "Club deleted! Time to make another one?")
-        
+
         return redirect('feed')
 
 
@@ -881,7 +932,7 @@ class NewPostView(LoginRequiredMixin, CreateView):
     """Class-based generic view for new post handling."""
 
     model = UserPost
-    template_name = 'club_feed.html'
+    template_name = 'club_templates/club_feed.html'
     form_class = UserPostForm
     http_method_names = ['post']
 
@@ -897,17 +948,20 @@ class NewPostView(LoginRequiredMixin, CreateView):
         return reverse('club_feed',kwargs={'club_id':self.kwargs['club_id']})
 
     def handle_no_permission(self):
-        return redirect('log_in')
+        return redirect('login')
 
 def like_post(request, club_id, post_id):
-    post = UserPost.objects.get(id=post_id)
-    if post.likes.filter(id=request.user.id).exists():
-        post.likes.remove(request.user)
+    try:
+        post = UserPost.objects.get(id=post_id)
+        if post.likes.filter(id=request.user.id).exists():
+            post.likes.remove(request.user)
+        else:
+
+            post.likes.add(request.user)
+    except ObjectDoesNotExist:
+        return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
     else:
-
-        post.likes.add(request.user)
-
-    return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
+        return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
 
 def add_comment_to_post(request, club_id, post_id):
@@ -921,78 +975,79 @@ def add_comment_to_post(request, club_id, post_id):
     return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
 
-# class Calendar(HTMLCalendar):
-#     def __init__(self, year=None, month=None):
-#         self.year = year
-#         self.month = month
-#         super(Calendar, self).__init__()
-#
-#     def formatday(self, day, user, month, year):
-#         roles = Role.objects.filter(user=user)
-#         events_per_day = []
-#         for role in roles:
-#             events_per_day+=(Event.objects.filter(deadline__day=day,club=role.club, deadline__month=month, deadline__year = year))
-#
-#         d = ''
-#         for event in events_per_day:
-#             d += f'<li> {event.name} </li>'
-#
-#         if day != 0:
-#             if not events_per_day :
-#                 return f"<td><span class='date'>{day}</span></td>"
-#             else:
-#                 return f"<td><mark style='background-color:#ced4da'>{day}</mark></td>"
-#
-#         return '<td></td>'
-#
-#     def formatweek(self, theweek, user, month, year):
-#         week = ''
-#         for d, weekday in theweek:
-#             week += self.formatday(d, user, month, year)
-#         return f'<tr> {week} </tr>'
-#
-#     def formatmonth(self, user, withyear=True):
-#         user=user
-#         month=self.month
-#         year=self.year
-#
-#         cal = f'<table>\n'
-#         cal += f'{self.formatmonthname(self.year, self.month, withyear=withyear)}\n'
-#         cal += f'{self.formatweekheader()}\n'
-#         for week in self.monthdays2calendar(self.year, self.month):
-#             cal += f'{self.formatweek(week, user, month, year)}\n'
-#         cal += f'</table>\n'
-#         return cal
+class Calendar(HTMLCalendar):
+    def __init__(self, year=None, month=None):
+        self.year = year
+        self.month = month
+        super(Calendar, self).__init__()
+
+    def formatday(self, day, user, month, year):
+        roles = Role.objects.filter(user=user)
+        events_per_day = []
+        for role in roles:
+            events_per_day+=(Event.objects.filter(deadline__day=day,club=role.club, deadline__month=month, deadline__year = year))
+
+        d = ''
+        for event in events_per_day:
+            d += f'<li> {event.name} </li>'
+
+        if day != 0:
+            if not events_per_day :
+                return f"<td><span class='date'>{day}</span></td>"
+            else:
+                return f"<td><mark style='background-color:#ced4da'>{day}</mark></td>"
+
+        return '<td></td>'
+
+    def formatweek(self, theweek, user, month, year):
+        week = ''
+        for d, weekday in theweek:
+            week += self.formatday(d, user, month, year)
+        return f'<tr> {week} </tr>'
+
+    def formatmonth(self, user, withyear=True):
+        user=user
+        month=self.month
+        year=self.year
+
+        cal = f'<table>\n'
+        cal += f'{self.formatmonthname(self.year, self.month, withyear=withyear)}\n'
+        cal += f'{self.formatweekheader()}\n'
+        for week in self.monthdays2calendar(self.year, self.month):
+            cal += f'{self.formatweek(week, user, month, year)}\n'
+        cal += f'</table>\n'
+        return cal
 
 
-# class CalendarView(generic.ListView):
-#     model = Event
-#     template_name = 'calendar.html'
-#
-#
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#
-#         # use today's date for the calendar
-#         d = get_date(self.request.GET.get('day', None))
-#
-#         # Instantiate our calendar class with today's year and date
-#         cal = Calendar(d.year, d.month)
-#
-#
-#         user=self.request.user
-#
-#         roles = Role.objects.filter(user=user)
-#         events= []
-#         for role in roles:
-#             events+=(Event.objects.filter(club=role.club, deadline__month=d.month, deadline__year =d.year))
-#
-#         # Call the formatmonth method, which returns our calendar as a table
-#         html_cal = cal.formatmonth(withyear=True, user=user)
-#         context['calendar'] = mark_safe(html_cal)
-#         context['events'] = events
-#
-#         return context
+class CalendarView(LoginRequiredMixin,generic.ListView):
+    model = Event
+    template_name = 'user_templates/profile.html'
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # use today's date for the calendar
+        d = get_date(self.request.GET.get('day', None))
+
+        # Instantiate our calendar class with today's year and date
+        cal = Calendar(d.year, d.month)
+
+
+        user=self.request.user
+
+        roles = Role.objects.filter(user=user)
+        events= []
+        for role in roles:
+            events+=(Event.objects.filter(club=role.club, deadline__month=d.month, deadline__year =d.year))
+
+        # Call the formatmonth method, which returns our calendar as a table
+        html_cal = cal.formatmonth(withyear=True, user=user)
+        context['calendar'] = mark_safe(html_cal)
+        context['events'] = events
+        context['user'] = user
+
+        return context
 
 def get_date(req_day):
     if req_day:
@@ -1043,10 +1098,10 @@ def add_user_to_interested_list_from_event_page(request,event_id,club_id):
     return render(request, 'club_templates/event_page.html', {'event': event,
                                                               'club' : club})
 
-def leave_club(request,club_id):
-    club = Club.objects.get(id = club_id)
-    role = Role.objects.filter(club= club).get(user = request.user).delete()
-    return redirect('feed')
+# def leave_club(request,club_id):
+#     club = Club.objects.get(id = club_id)
+#     role = Role.objects.filter(club= club).get(user = request.user).delete()
+#     return redirect('feed')
 
 
 def user_chat(request, receiver_id):

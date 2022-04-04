@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'bootstrap_pagination',
     'django.contrib.humanize',
     'location_field.apps.DefaultConfig',
-    'django_bootstrap5',
+    'django_bootstrap5'
 ]
 
 MIDDLEWARE = [

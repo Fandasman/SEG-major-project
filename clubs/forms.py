@@ -4,7 +4,7 @@ from django.core.validators import RegexValidator
 from django.contrib.auth import authenticate
 from django.shortcuts import redirect
 from django.forms import Form,ChoiceField, CharField
-from bootstrap5.widgets import RadioSelectButtonGroup
+from django_bootstrap5.widgets import RadioSelectButtonGroup
 from .models import BooksRatings, Club, User, Book, Event, UserPost, Comment
 from .helpers import get_genres
 
