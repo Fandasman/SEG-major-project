@@ -22,10 +22,10 @@ class LikeToggleTest(TestCase):
     def test_follow_toggle_url(self):
         self.assertEqual(self.url,f'/like_post/{self.club.id}/{self.post.id}')
 
-    # def test_get_follow_toggle_redirects_when_not_logged_in(self):
-    #     redirect_url = reverse_with_next('login', self.url)
-    #     response = self.client.get(self.url)
-    #     self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+    def test_get_follow_toggle_redirects_when_not_logged_in(self):
+        redirect_url = reverse_with_next('login', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
     def test_get_like_toggle_for_liked_post(self):
         self.client.login(username=self.user.username, password='Password123')

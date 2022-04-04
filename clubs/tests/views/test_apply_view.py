@@ -23,12 +23,13 @@ class TestSendApplicationView(TestCase, LogInTester):
     def test_send_application_url(self):
         self.assertEqual(self.url,f'/apply/{self.club.id}')
 
-    # def test_get_send_application_redirects_when_not_logged_in(self):
-    #     redirect_url = reverse_with_next('login', self.url)
-    #     response = self.client.get(self.url)
-    #     self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
+    def test_get_send_application_redirects_when_not_logged_in(self):
+        redirect_url = reverse_with_next('login', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
     def test_get_send_application_forbidden_when_get(self):
+        self.client.login(username='janedoe', password='Password123')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 

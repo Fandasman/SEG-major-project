@@ -697,6 +697,7 @@ def club_members(request, club_id):
 """This function is for the user to apply for the club.
     If the user already in the club, system will refuse
     to create a role for the user with an error message."""
+@login_required
 def apply(request, club_id):
     current_club = Club.objects.get(id=club_id)
     if request.method == "POST":
@@ -861,6 +862,7 @@ class InvitationlistView(LoginRequiredMixin, ListView):
         except ObjectDoesNotExist:
             return redirect('feed')
 
+@login_required
 def club_feed(request,club_id):
     user=request.user
     form = UserPostForm()
@@ -950,6 +952,7 @@ class NewPostView(LoginRequiredMixin, CreateView):
     def handle_no_permission(self):
         return redirect('login')
 
+@login_required
 def like_post(request, club_id, post_id):
     try:
         post = UserPost.objects.get(id=post_id)
@@ -963,7 +966,7 @@ def like_post(request, club_id, post_id):
     else:
         return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
-
+@login_required
 def add_comment_to_post(request, club_id, post_id):
     post = UserPost.objects.get(id=post_id)
     club = Club.objects.get(id=club_id)

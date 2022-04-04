@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from clubs.models import UserPost, User, Club, Comment
+from clubs.tests.helpers import reverse_with_next
 
 class NewCommentTest(TestCase):
 
@@ -25,15 +26,10 @@ class NewCommentTest(TestCase):
     def test_new_post_(self):
         self.assertEqual(self.url,f'/add_comment/{self.club.id}/{self.post.id}')
 
-    # def test_post_new_post_redirects_when_not_logged_in(self):
-    #     user_count_before = Comment.objects.count()
-    #     redirect_ = reverse('login')
-    #     response = self.client.post(self., self.data, follow=True)
-    #     self.assertRedirects(response, redirect_url,
-    #         status_code=302, target_status_code=200, fetch_redirect_response=True
-    #     )
-    #     user_count_after = Comment.objects.count()
-    #     self.assertEqual(user_count_after, user_count_before)
+    def test_post_new_post_redirects_when_not_logged_in(self):
+        redirect_url = reverse_with_next('login', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirect_url, status_code=302, target_status_code=200)
 
 
     def test_successful_new_post(self):
