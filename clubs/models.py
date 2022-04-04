@@ -165,7 +165,6 @@ class Club(models.Model):
     location = models.CharField(max_length = 100, blank = False)
     description = models.CharField(max_length = 500, blank = False)
     club_book = models.ForeignKey(Book, related_name="club_book", blank = True, null = True, on_delete=models.CASCADE)
-    book_page = models.IntegerField(blank=True, null=True)
     objects= ClubManager()
 
     def _add_book(self, club):

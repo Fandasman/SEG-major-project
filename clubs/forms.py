@@ -114,12 +114,7 @@ class SetClubBookForm(forms.Form):
         except ObjectDoesNotExist:
             return False
 
-class setClubBookPage(forms.ModelForm):
-    book_page = forms.IntegerField(blank = True, null = True)
 
-    class Meta:
-        model = Club
-        fields = ["book_page"]
 
     
 
