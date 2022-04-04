@@ -454,49 +454,13 @@ def create_club(request):
         return render(request, 'club_templates/create_club.html' , {'form': form})
 
 
-
-    # class CreateEventView(CreateView):
-
-    # def get(self,request,*args, **kwargs):
-    #     return self.render()
-
-    # def form_valid(self,request,club_id):
-    #     form = EventForm(request.POST)
-    #     current_user = request.user
-    #     if form.is_valid():
-    #         this_event = form.save(club_id,current_user)
-    #         EventPost.objects.create(event = this_event, user=request.user)
-    #         return redirect('events_list',club_id)
-
-    # def form_invalid(self):
-    #     messages.add_message(self.request, messages.ERROR, "The credentials provided were invalid!")
-    #     return self.render()
-
-
- 
-
-    # def render(self,*args, **kwargs):
-    #     club_id = self.kwargs['club_id']
-    #     club = Club.objects.get(id=club_id)
-    #     members = Role.objects.filter(club=club)
-    #     userrole = Role.objects.get(club = club, user=self.request.user)
-    #     events = Event.objects.filter(club = club)
-    #     form = EventForm()
-    #     return render(self.request, 'club_templates/create_event.html', {'form': form,
-    #                                                 'members': members,
-    #                                                 'userrole':userrole,
-    #                                                 'club': club})
-
-
-
 class CreateClubView(LoginRequiredMixin,FormView):
     model = Club
     form_class = ClubForm
     template_name = 'club_templates/create_club.html'
 
 
-    def form_invalid(self, form):
-        return self.render()
+ 
 
     def form_valid(self, form):
         current_user = self.request.user
@@ -513,18 +477,14 @@ class CreateClubView(LoginRequiredMixin,FormView):
 
 
         return self.render()
+    
+    def form_invalid(self):
+        return self.render()
 
     def render(self):
         form = ClubForm()
         return render(self.request, 'club_templates/create_club.html' , {'form': form})
     
-
-
-
-
-        
-
-
 
 
 
