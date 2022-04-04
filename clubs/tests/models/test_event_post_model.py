@@ -8,8 +8,7 @@ class EventPostTest(TestCase):
                 'clubs/tests/fixtures/other_users.json',
                 'clubs/tests/fixtures/default_club.json',
                 'clubs/tests/fixtures/default_book.json',
-                'clubs/tests/fixtures/default_event.json',
-]
+                'clubs/tests/fixtures/default_event.json',]
 
     def setUp(self):
         super(TestCase, self).setUp()
