@@ -1052,7 +1052,7 @@ class CalendarView(LoginRequiredMixin,generic.ListView):
 def get_date(req_day):
     if req_day:
         year, month = (int(x) for x in req_day.split('-'))
-        return date(year, month, day=1)
+        return datetime.date(year, month, day=1)
     return datetime.today()
 
 def join_event(request,event_id,club_id):
