@@ -554,9 +554,9 @@ def remove_member(request, club_id, member_id):
 """This function allows the member of the club to
     leave the club, which means the role has been
     deleted"""
+@login_required
 def leave_club(request, club_id):
     if request.method == 'POST':
-        if request.user.is_authenticated:
             user = request.user
             current_club = Club.objects.get(id=club_id)
             userrole = Role.objects.filter(club=current_club).get(user=user)
@@ -571,8 +571,6 @@ def leave_club(request, club_id):
                 post.save()
                 messages.add_message(request, messages.SUCCESS, f'You have successfully left {current_club.name}!')
             return redirect('feed')
-        else:
-            return redirect('login')
     else:
         return HttpResponseForbidden()
 
