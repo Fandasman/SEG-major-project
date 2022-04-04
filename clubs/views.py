@@ -1542,9 +1542,6 @@ class EventList(View):
 
     def post(self,request,club_id):
         self.render()
-        
-    
-
 
     def render(self,*args, **kwargs):
         club_id = self.kwargs['club_id']
@@ -1651,13 +1648,6 @@ def add_comment_to_post(request, club_id, post_id):
 #     def form_invalid(self, form,*args, **kwargs):
 #         club_id = self.kwargs['club_id']
 #         return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
-
-
-
-
-
-
-
 
 class Calendar(HTMLCalendar):
     def __init__(self, year=None, month=None):
@@ -1807,6 +1797,25 @@ def send_user_message(request):
         return HttpResponseForbidden()
 
 
+class SendUserMessageView(View):
+
+    def get(self,*args, **kwargs):
+        return HttpResponseForbidden()
+
+
+    def post(self,*args, **kwargs):
+        user = self.request.user
+        text = self.request.POST.get('text')
+        user_id = user.id
+        receiver_id = self.request.POST.get('receiver_id')
+        user = User.objects.get(id=user_id)
+        receiver = User.objects.get(id=receiver_id)
+        new_message = Message.objects.create(text=text, user=user, receiver=receiver)
+        new_message.save()
+        return render(self.request, 'user_templates/user_chat.html')
+    
+
+
 def get_user_messages(request, receiver_id):
     user = request.user
     receiver = User.objects.get(id=receiver_id)
@@ -1851,6 +1860,32 @@ def send_club_message(request):
             return HttpResponseForbidden()
     else:
         return HttpResponseForbidden()
+
+
+class SendClubMessage(LoginRequiredMixin,View):
+
+    def get(self,*args, **kwargs):
+       return HttpResponseForbidden()
+
+    def post(self,request,*args, **kwargs):
+        club_id = self.request.POST.get('club_id')
+        user_id = self.request.POST.get('user_id')
+        user = User.objects.get(id=user_id)
+        club = Club.objects.get(id=club_id)
+        text = self.request.POST.get('text')
+        try:
+            role = Role.objects.get(user=user, club=club)
+            if role.role == "O" or role.role == "CO" or role.role == "M":
+                new_message = Message.objects.create(text=text, user=user, club=club)
+                new_message.save()
+                return render(self.request, 'club_templates/club_chat.html')
+            else:
+                return redirect('club_list')
+        except ObjectDoesNotExist:
+            return HttpResponseForbidden()
+        
+
+       
 
 
 def get_club_messages(request, club_id):
