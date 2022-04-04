@@ -489,22 +489,40 @@ def create_club(request):
 
 
 
-# class CreateClubView(LoginRequiredMixin,CreateView):
-#     model = Club
-#     form_class = ClubForm
-#     template_name = 'create_club.html'
-#     success_url = reverse('club_list')
+class CreateClubView(LoginRequiredMixin,FormView):
+    model = Club
+    form_class = ClubForm
+    template_name = 'club_templates/create_club.html'
 
-#     def form_valid(self, form):
-#         current_user = self.request.user
-#         current_owned_clubs = Role.objects.filter(user = current_user, role = 'CO')
-#         if len(current_owned_clubs) > 3:
-#             self.render
 
-#     def render(self,request):
-#         form = ClubForm()
-#         messages.add_message(request, messages.ERROR, "You already own too many clubs!")
-#         return render(request, 'club_templates/create_club.html' , {'form': form})
+    def form_invalid(self, form):
+        return self.render()
+
+    def form_valid(self, form):
+        current_user = self.request.user
+        current_owned_clubs = Role.objects.filter(user = current_user, role = 'CO')
+        if len(current_owned_clubs) < 3:
+                newClub = form.save()
+                MembershipPost.objects.create(club = newClub, user = current_user)
+                role = Role.objects.create(user = current_user, club = newClub, role = 'CO')
+                return redirect('club_list')
+                
+        else:
+                messages.add_message(self.request, messages.ERROR, "You already own too many clubs!")
+                form = ClubForm()
+
+
+        return self.render()
+
+    def render(self):
+        form = ClubForm()
+        return render(self.request, 'club_templates/create_club.html' , {'form': form})
+    
+
+
+
+
+        
 
 
 
