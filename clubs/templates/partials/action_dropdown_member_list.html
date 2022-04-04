@@ -7,11 +7,12 @@
                 {%if userrole.role == "CO"%}
                   {% include 'partials/club_owner_operation.html' with members=members userrole=userrole%}
                {%endif%}
-                  {%if userrole.role == 'O'%}
+                  {%if userrole.role == "O"%}
                      {% include 'partials/officer_operation.html' with members=members userrole=userrole%}
               {%endif%}
              </ul>
                {%else%}
+               {% if userrole.role != "CO" %}
                   <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                      <form action="{% url 'leave_club' club.id%}" method="post">
                            {% csrf_token %}
@@ -20,5 +21,12 @@
                            </li>
                         </form>
                      </ul>
+
+               {%else%}
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                     <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
+                     </ul>
+
                  {%endif%}
+               {%endif%}
               </div>
