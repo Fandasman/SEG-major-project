@@ -53,7 +53,7 @@ class SetClubBookViewTestCase(TestCase):
         self.assertEqual(str(messages[0]), "you don't own this club")
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
 
-    def test_unsuccessful_invite_user_with_invalid_username(self):
+    def test_unsuccessful_set_book_with_invalid_username(self):
         self.form_input = {
             'book_title': 'x',
         }
