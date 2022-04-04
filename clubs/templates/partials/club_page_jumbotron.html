@@ -67,6 +67,9 @@
             <button type = "submit" class="jumbotron_button">Invite</button>
         </form>
 
+        {%endif%}
+
+        {% if userrole.role == 'CO' %}
         <form action="{% url 'delete_club' club.id %}">
           {% csrf_token %}
           <button type = "submit" class="jumbotron_button">Delete club</button>
