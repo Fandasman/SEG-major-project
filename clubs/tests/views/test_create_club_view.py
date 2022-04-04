@@ -32,7 +32,7 @@ class CreateClubViewTestCase(TestCase):
         self.client.login(username = self.user.username, password = "Password123")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'navbar_templates/create_club.html')
+        self.assertTemplateUsed(response, 'club_templates/create_club.html')
 
     def test_create_club_with_too_many_created_clubs(self):
         self.client.login(username = self.user.username, password = "Password123")

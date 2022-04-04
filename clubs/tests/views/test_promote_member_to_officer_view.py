@@ -13,6 +13,7 @@ class PromoteMemberTestCase(TestCase):
                 'clubs/tests/fixtures/other_users.json',
                 'clubs/tests/fixtures/other_applicants.json',
                 'clubs/tests/fixtures/other_clubs.json']
+
     def setUp(self):
         self.club = Club.objects.get(name='Booker')
         self.user = User.objects.get(email='alicesmith@example.org')

@@ -10,7 +10,7 @@ class InvitationTestCase(TestCase):
         "clubs/tests/fixtures/other_users.json",
         "clubs/tests/fixtures/default_club.json",
         "clubs/tests/fixtures/other_clubs.json",
-        "clubs/tests/fixtures/default_invitation.json"
+        "clubs/tests/fixtures/default_invitation.json",
     ]
 
     def setUp(self):

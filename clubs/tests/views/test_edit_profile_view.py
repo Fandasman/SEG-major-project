@@ -110,7 +110,7 @@ class TestEditProfileView(TestCase):
         self.assertEqual(after_count, before_count)
         response_url = reverse('feed')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
-        self.assertTemplateUsed(response, 'navbar_templates/feed.html')
+        self.assertTemplateUsed(response, 'feed.html')
         #messages_list = list(response.context['messages'])
         #self.assertEqual(len(messages_list), 2)
         #self.assertEqual(messages_list[0].level, messages.SUCCESS)

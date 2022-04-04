@@ -42,8 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'clubs',
     'widget_tweaks',
-    'bootstrap5',
-    'location_field.apps.DefaultConfig'
+    'bootstrap_pagination',
+    'django.contrib.humanize',
+    'location_field.apps.DefaultConfig',
+    'django_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -72,6 +74,7 @@ TEMPLATES = [
 
                 # Custom context processors
                 'clubs.context_processors.get_current_user',
+                'clubs.context_processors.inject_form',
             ],
         },
     },
@@ -136,8 +139,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Login URL to redirect logged out users
 LOGIN_URL = 'login'
 
-# Login URL to redirect logged in users
-REDIRECT_URL_WHEN_LOGGED_IN = 'feed'
+#URL where @login_prohibited redirects to
+REDIRECT_URL_WHEN_LOGGED_IN= 'feed'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -152,3 +156,8 @@ MESSAGE_TAGS = {
     message_constants.DEBUG: 'dark',
     message_constants.ERROR: 'danger',
 }
+
+# page lengths
+USERS_PER_PAGE= 25
+CLUBS_PER_PAGE= 15
+BOOKS_PER_PAGE= 30

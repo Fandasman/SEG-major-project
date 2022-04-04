@@ -12,7 +12,7 @@ class RoleModelTestCase(TestCase):
         "clubs/tests/fixtures/other_clubs.json",
         "clubs/tests/fixtures/default_book.json",
         "clubs/tests/fixtures/default_applicant.json",
-        "clubs/tests/fixtures/other_applicants.json"
+        "clubs/tests/fixtures/other_applicants.json",
     ]
 
     def setUp(self):

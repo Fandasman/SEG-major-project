@@ -1,30 +1,31 @@
+import calendar
+import csv
 import sys
+from collections import Counter
+from calendar import HTMLCalendar
+from datetime import datetime, timedelta
 from distutils.bcppcompiler import BCPPCompiler
 from django import template
 from django.conf import settings
 from django.contrib import messages
-from django.urls import reverse, resolve
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.http.response import HttpResponse, HttpResponseForbidden, JsonResponse
-from django.shortcuts import redirect, render
-from django.views import View
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
-from django.core.exceptions import ImproperlyConfigured
+from django.http import Http404, StreamingHttpResponse
+from django.http.response import HttpResponse, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
+from django.shortcuts import redirect, render, get_object_or_404
+from django.urls import reverse, reverse_lazy, resolve
+from django.utils.safestring import mark_safe
+from django.views import View, generic
 from django.views.generic import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import FormView
-from .forms import GenreForm, RatingForm, SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm, EventForm
-from .models import Book, Club, Role, User, Invitation, BooksRatings, Message,Event
-from collections import Counter
-from surprise import dump
-from scipy import spatial
+from django.views.generic.edit import CreateView, FormView
 from itertools import chain
-
+from scipy import spatial
+from surprise import dump
+from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm, UserPostForm, CommentForm, SearchForm, GenreForm
+from .models import Book, Club, Role, User, Invitation, Event, EventPost, UserPost, MembershipPost, Comment, Message, BooksRatings
 
 if "runserver" in sys.argv:
     print("Loading the model!")
@@ -37,7 +38,6 @@ THRESHOLD = 25
 @login_required
 def feed(request):
     current_user = request.user
-
     user_books = Book.objects.filter(isbn__in = current_user.users.values('isbn')).values_list('isbn', flat=True)
     user_genres = list(current_user.genres_preferences)
     filtered_user_books = Book.objects.exclude(isbn__in = user_books)
@@ -77,7 +77,7 @@ def feed(request):
             book = Book.objects.get(isbn = pair[0])
             recommended_books.append(book)
 
-    return render(request, 'navbar_templates/feed.html', {'user': current_user, 'recommended_books': recommended_books})
+    return render(request, 'feed.html', {'user': current_user, 'recommended_books': recommended_books})
 
 class LoginProhibitedMixin:
 
@@ -86,63 +86,13 @@ class LoginProhibitedMixin:
             return redirect('feed')
         return super().dispatch(*args, **kwargs)
 
-@login_required
-def show_book(request, book_id):
-    current_user = request.user
-    try:
-        book = Book.objects.get(id=book_id)
-        in_wishlist = current_user.wishlist.filter(isbn=book.isbn).exists()
-    except ObjectDoesNotExist:
-        return redirect('search_books')
-    else:
-        book_form = RatingForm(request.POST)
-        exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = current_user))) != 0
-        current_rating_value = 0
-        if exist_rating:
-            past_rating = BooksRatings.objects.get(isbn = book.isbn, user = current_user)
-
-        if request.method=='POST':
-            if book_form.is_valid() and book_form.cleaned_data.get('rating') != '':
-                if exist_rating == False:
-                    new_rating = BooksRatings.objects.create(
-                        isbn = book.isbn,
-                        rating = book_form.cleaned_data.get('rating'),
-                        user = current_user
-                    )
-                    new_rating.save()
-                    exist_rating = True
-                    current_rating_value = new_rating.rating
-                    if book.genre not in current_user.genres_preferences:
-                        current_user.genres_preferences.insert(len(current_user.genres_preferences), book.genre)
-                        current_user.save()
-                else:
-                    past_rating.rating = book_form.cleaned_data.get('rating')
-                    current_rating_value = past_rating.rating
-                    past_rating.save()
-
-        else:
-            if book not in request.user.wishlist.all() and exist_rating:
-                exist_rating = False
-                rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
-                rating.delete()
-
-            elif exist_rating:
-                current_rating_value = past_rating.rating
-
-        return render(request, 'book_templates/show_book.html',
-                     {'book': book,'form': book_form,
-                     'book_id': book_id,
-                     'exist_rating': exist_rating,
-                     'current_rating_value': current_rating_value,
-                     'in_wishlist': in_wishlist}
-    )
 
 @login_required
 def remove_rating(request, book_id):
     try:
         book = Book.objects.get(id = book_id)
     except ObjectDoesNotExist:
-        return redirect('search_books')
+        return redirect('book_list')
 
     exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) != 0
     if exist_rating:
@@ -158,15 +108,6 @@ def profile(request):
             {'user': current_user}
         )
 
-@login_required
-def search_books(request):
-    search_book = request.GET.get('book_searchbar')
-    if search_book:
-        books = Book.objects.filter(name__icontains=search_book)
-    else:
-        books = Book.objects.all()
-    return render(request, 'book_templates/search_books.html', {'books': books})
-
 class HomeView(LoginProhibitedMixin,View):
     template_name = 'home.html'
 
@@ -177,25 +118,40 @@ class HomeView(LoginProhibitedMixin,View):
         return self.render()
 
     def render(self):
-        return render(self.request, 'main_templates/home.html')
+        return render(self.request, 'home.html')
 
-# class MemberListView(LoginRequiredMixin, ListView):
-class MemberListView(ListView):
+
+class BookListView(LoginRequiredMixin, ListView):
+    model= Book
+    template_name= 'book_templates/book_list.html'
+    context_object_name= 'books'
+    paginate_by = settings.BOOKS_PER_PAGE
+    ordering = ['title']
+
+    def get_context_data(self, *args, **kwargs):
+        context= super().get_context_data(*args, **kwargs)
+        book= Book.objects.all()
+        return context
+
+class UserListView(LoginRequiredMixin, ListView):
     model= User
-    template_name= 'navbar_templates/member_list.html'
+    template_name= 'user_templates/user_list.html'
     context_object_name= 'users'
+    paginate_by = settings.USERS_PER_PAGE
+    ordering = ['username']
 
-    # def get_context_data(self, *args, **kwargs):
-    #     context= super().get_context_data(*args, **kwargs)
-    #     user= User.objects.all()
-    #     context['members']= Role.objects.all().filter(role= "M")
-    #     return context
+    def get_context_data(self, *args, **kwargs):
+        context= super().get_context_data(*args, **kwargs)
+        user= User.objects.all()
+        context['roles']= Role.objects.all().filter(role= "M")
+        return context
 
-# class ClubListView(LoginRequiredMixin, ListView):
-class ClubListView(ListView):
+class ClubListView(LoginRequiredMixin, ListView):
     model= Club
-    template_name= 'navbar_templates/club_list.html'
+    template_name= 'club_templates/club_list.html'
     context_object_name= 'clubs'
+    paginate_by = settings.CLUBS_PER_PAGE
+    ordering = ['name']
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -203,23 +159,31 @@ class ClubListView(ListView):
         context['roles'] = Role.objects.filter(role= "O")
         return context
 
-# class OwnerClubListView(LoginRequiredMixin, ListView):
-class OwnerClubListView(ListView):
+class OwnerClubListView(LoginRequiredMixin, ListView):
     model= Club
-    template_name= 'navbar_templates/owner_club_list.html'
-    context_object_name= 'user'
+    template_name= 'club_templates/owner_club_list.html'
+    context_object_name= 'clubs'
+    paginate_by = settings.CLUBS_PER_PAGE
+    ordering = ['name']
 
     def get_context_data(self, *args, **kwargs):
+<<<<<<< HEAD
         context = super().get_context_data(*args, **kwargs)
         current_user = self.request.user
         context['roles'] = Role.objects.filter(user = current_user, role= "CO")
+=======
+        context= super().get_context_data(*args, **kwargs)
+        current_user= self.request.user
+        context['roles']= Role.objects.all().filter(user= current_user, role= "CO")
+>>>>>>> ed476bf6f6dc9aeea4911d46f42f512f6d017b0c
         return context
 
-# class MemberClubListView(LoginRequiredMixin, ListView):
-class MemberClubListView(ListView):
-    model = Club
-    template_name= 'navbar_templates/member_club_list.html'
-    context_object_name = 'user'
+class MemberClubListView(LoginRequiredMixin, ListView):
+    model= Club
+    template_name= 'club_templates/member_club_list.html'
+    context_object_name= 'clubs'
+    paginate_by = settings.CLUBS_PER_PAGE
+    ordering = ['name']
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -231,7 +195,7 @@ class MemberClubListView(ListView):
 
 class RecommendedClubListView(ListView):
     model = Club
-    template_name = 'navbar_templates/recommended_club_list.html'
+    template_name = 'recommended_club_list.html'
     context_object_name = 'clubs'
 
     def get_club_recommendations(self):
@@ -279,33 +243,42 @@ class ShowUserView(DetailView):
 
 class ShowClubView(DetailView):
     model = Club
-    template_name = 'show_club.html'
+    template_name = 'club_templates/show_club.html'
     pk_url_kwarg = "club_id"
+
+class ShowBookView(DetailView):
+    model = Book
+    template_name = 'book_templates/show_book.html'
+    pk_url_kwarg = "book_id"
+
 
 class LogInView(View):
     """Log-in handling view"""
     def get(self,request):
-        self.next = request.GET.get('next') or 'officer'
         return self.render()
 
     def post(self,request):
         form = LogInForm(request.POST)
-        self.next = request.POST.get('next')
         user = form.get_user()
-        if user is not None and len(user.genres_preferences) != 0:
-            """Redirect to club selection page, with option to create new club"""
-            login(request, user)
-            return redirect('feed')
-        elif user is not None and len(user.genres_preferences) == 0:
+        if user is not None and len(user.genres_preferences) == 0:
             login(request, user)
             return redirect('select_genres')
 
-        messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
-        return self.render()
+        if user is not None:
+                """Redirect to club selection page, with option to create new club"""
+                login(request, user)
+                return redirect('feed')
+
+
+        else:
+            messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
+            return self.render()
 
     def render(self):
         form = LogInForm()
-        return render(self.request, 'main_templates/login.html', {'form': form, 'next' : self.next})
+        return render(self.request, 'login.html', {'form': form
+        # , 'next' : self.next
+        })
 
 """View used for logging out."""
 @login_required
@@ -321,7 +294,7 @@ class SignUpView(LoginProhibitedMixin,FormView):
     """View that signs up user."""
 
     form_class = SignUpForm
-    template_name = "main_templates/sign_up.html"
+    template_name = "sign_up.html"
     redirect_when_logged_in_url = settings.REDIRECT_URL_WHEN_LOGGED_IN
 
     def form_valid(self, form):
@@ -369,16 +342,17 @@ def create_club(request):
             form = ClubForm(request.POST)
             if form.is_valid():
                 newClub = form.save()
+                MembershipPost.objects.create(club = newClub, user = current_user)
                 role = Role.objects.create(user = current_user, club = newClub, role = 'CO')
                 return redirect('club_list')
         else:
             messages.add_message(request, messages.ERROR, "You already own too many clubs!")
             form = ClubForm()
-        return render(request, 'navbar_templates/create_club.html' , {'form': form})
+        return render(request, 'club_templates/create_club.html' , {'form': form})
 
     else:
         form = ClubForm()
-        return render(request, 'navbar_templates/create_club.html' , {'form': form})
+        return render(request, 'club_templates/create_club.html' , {'form': form})
 
 """This function allows owners of a club to delete the club"""
 @login_required
@@ -429,15 +403,17 @@ class EditProfileView(LoginRequiredMixin, View):
         form = EditProfileForm(instance=current_user)
         return render(self.request,'user_templates/edit_profile.html', {'form': form})
 
+
 """Includes the view for a user's wishlist."""
 class WishlistView(LoginRequiredMixin, ListView):
+
     def get(self, request, user_id):
         return self.render(user_id)
 
     def render(self, user_id):
         try:
             user = User.objects.get(id = user_id)
-            return render(self.request, 'wishlist.html', {'user': user})
+            return render(self.request, 'user_templates/wishlist.html', {'user': user})
 
         except ObjectDoesNotExist:
             return redirect('feed')
@@ -546,7 +522,10 @@ def leave_club(request, club_id):
             redirect_url = reverse('club_members', kwargs={'club_id':club_id})
             members = Role.objects.filter(club=current_club)
             userrole.delete()
-            return redirect('user_details')
+            post = MembershipPost.objects.create(user = user, club = current_club)
+            post.join = False
+            post.save()
+            return redirect('feed')
         else:
             return redirect('login')
     else:
@@ -566,6 +545,7 @@ def accept_applicant_to_club_as_Owner(request,club_id,member_id):
             newMember = Role.objects.get(club = club, user = member)
             newMember.role = 'M'
             newMember.save()
+            MembershipPost.objects.create(user = member, club = club)
             members = Role.objects.filter(club=club)
             return redirect(redirect_url,members = members,
                                                 userrole = userrole,
@@ -589,6 +569,7 @@ def accept_applicant_to_club_as_officer(request,club_id,member_id):
             newMember = Role.objects.get(club = club, user = member)
             newMember.role = 'M'
             newMember.save()
+            MembershipPost.objects.create(user = member, club = club)
             members = Role.objects.filter(club=club)
             return redirect(redirect_url,members = members,
                                                 userrole = userrole,
@@ -703,7 +684,7 @@ def wish(request, book_id):
         return redirect('show_book', book.id)
 
     except ObjectDoesNotExist:
-        return redirect('search_books')
+        return redirect('book_list')
 
 @login_required
 def unwish(request, book_id):
@@ -718,7 +699,7 @@ def unwish(request, book_id):
         return redirect('show_book', book.id)
 
     except ObjectDoesNotExist:
-        return redirect('search_books')
+        return redirect('book_list')
 
 """This function is for club owner/officer to set the book for
     club to read"""
@@ -797,11 +778,14 @@ def accept_invitation(request, inv_id):
         invitation = Invitation.objects.get(id=inv_id)
         club = invitation.club
         new_role = Role.objects.create(user=user, club=club, role="M")
+        MembershipPost.objects.create(user = user, club = club)
         old_invitation = Invitation.objects.filter(id=inv_id).delete()
         messages.add_message(request, messages.INFO, "join successful")
         return redirect('invitation_list', user.id)
     else:
         return HttpResponseForbidden()
+
+
 
 
 """This function allows users to reject the invitation from the club"""
@@ -827,27 +811,43 @@ class InvitationlistView(LoginRequiredMixin, ListView):
         try:
             user = User.objects.get(id = user_id)
             invitations = Invitation.objects.filter(user=user, status="P")
-            return render(self.request, 'navbar_templates/invitation_list.html', {'invitations': invitations})
+            return render(self.request, 'invitation_list.html', {'invitations': invitations})
 
         except ObjectDoesNotExist:
             return redirect('feed')
 
 def club_feed(request,club_id):
+    user=request.user
+    form = UserPostForm()
+    comment_form = CommentForm
     club = Club.objects.get(id=club_id)
     members = Role.objects.filter(club=club)
     try:
         userrole = Role.objects.get(club = club, user=request.user)
     except ObjectDoesNotExist:
-        messages.add_message(request,messages.ERROR,"It seem you don't belong to this club!")
+        messages.add_message(request, messages.ERROR, "It seems you don't belong to this club!")
         return redirect('club_list')
     else:
         if userrole.role == "A":
-            messages.add_message(request,messages.ERROR,"You are the applicant in this club, so you don't have authority to view the member list!")
+            messages.add_message(request, messages.ERROR, "You are an applicant in this club, you don't have authority to view the member list!")
             return redirect('club_list')
         else:
-             return render(request, 'club_templates/club_feed.html', {'members': members,
+            event_posts = EventPost.objects.filter(event__club=club)
+            comments = Comment.objects.filter(club=club)
+            membership_posts = MembershipPost.objects.filter(club=club)
+            user_posts = UserPost.objects.filter(club=club)
+            posts = sorted( chain(event_posts, membership_posts, user_posts),
+                    key=lambda instance: instance.created_at,reverse=True)
+            return render(request, 'club_templates/club_feed.html', {'members': members,
                                                        'userrole': userrole,
-                                                       'club' : club})
+                                                       'posts':posts,
+                                                       'club' : club,
+                                                       'form' : form,
+                                                       'comment_form' : comment_form,
+                                                       'comments' : comments,
+                                                       'user':user})
+
+
 
 def create_event(request, club_id):
     club = Club.objects.get(id=club_id)
@@ -859,6 +859,7 @@ def create_event(request, club_id):
         current_user = request.user
         if form.is_valid():
             this_event = form.save(club_id,current_user)
+            EventPost.objects.create(event = this_event, user=request.user)
             return redirect('events_list',club_id)
         else:
             messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
@@ -872,7 +873,7 @@ def event_list(request,club_id):
     members = Role.objects.filter(club=club)
     userrole = Role.objects.get(club = club, user=request.user)
     try:
-        events = Event.objects.filter(club = club)
+        events = Event.objects.filter(club=club)
     except ObjectDoesNotExist:
         messages.add_message(request,messages.ERROR,"There are no events")
         return redirect('club_list')
@@ -881,6 +882,129 @@ def event_list(request,club_id):
                                                       'userrole': userrole,
                                                       'club' : club,
                                                       'events' : events})
+
+class NewPostView(LoginRequiredMixin, CreateView):
+    """Class-based generic view for new post handling."""
+
+    model = UserPost
+    template_name = 'club_feed.html'
+    form_class = UserPostForm
+    http_method_names = ['post']
+
+    def form_valid(self, form):
+        """Process a valid form."""
+        form.instance.author = self.request.user
+        form.instance.club = Club.objects.get(id=(self.kwargs['club_id']))
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Return URL to redirect the user too after valid form handling."""
+
+        return reverse('club_feed',kwargs={'club_id':self.kwargs['club_id']})
+
+    def handle_no_permission(self):
+        return redirect('log_in')
+
+def like_post(request, club_id, post_id):
+    post = UserPost.objects.get(id=post_id)
+    if post.likes.filter(id=request.user.id).exists():
+        post.likes.remove(request.user)
+    else:
+
+        post.likes.add(request.user)
+
+    return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
+
+
+def add_comment_to_post(request, club_id, post_id):
+    post = UserPost.objects.get(id=post_id)
+    club = Club.objects.get(id=club_id)
+    if request.method == "POST":
+        comment = Comment.objects.create(club=club,post=post,user=request.user)
+        form = CommentForm(request.POST, instance = comment)
+        if form.is_valid():
+            comment = form.save()
+    return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
+
+
+# class Calendar(HTMLCalendar):
+#     def __init__(self, year=None, month=None):
+#         self.year = year
+#         self.month = month
+#         super(Calendar, self).__init__()
+#
+#     def formatday(self, day, user, month, year):
+#         roles = Role.objects.filter(user=user)
+#         events_per_day = []
+#         for role in roles:
+#             events_per_day+=(Event.objects.filter(deadline__day=day,club=role.club, deadline__month=month, deadline__year = year))
+#
+#         d = ''
+#         for event in events_per_day:
+#             d += f'<li> {event.name} </li>'
+#
+#         if day != 0:
+#             if not events_per_day :
+#                 return f"<td><span class='date'>{day}</span></td>"
+#             else:
+#                 return f"<td><mark style='background-color:#ced4da'>{day}</mark></td>"
+#
+#         return '<td></td>'
+#
+#     def formatweek(self, theweek, user, month, year):
+#         week = ''
+#         for d, weekday in theweek:
+#             week += self.formatday(d, user, month, year)
+#         return f'<tr> {week} </tr>'
+#
+#     def formatmonth(self, user, withyear=True):
+#         user=user
+#         month=self.month
+#         year=self.year
+#
+#         cal = f'<table>\n'
+#         cal += f'{self.formatmonthname(self.year, self.month, withyear=withyear)}\n'
+#         cal += f'{self.formatweekheader()}\n'
+#         for week in self.monthdays2calendar(self.year, self.month):
+#             cal += f'{self.formatweek(week, user, month, year)}\n'
+#         cal += f'</table>\n'
+#         return cal
+
+
+# class CalendarView(generic.ListView):
+#     model = Event
+#     template_name = 'calendar.html'
+#
+#
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#
+#         # use today's date for the calendar
+#         d = get_date(self.request.GET.get('day', None))
+#
+#         # Instantiate our calendar class with today's year and date
+#         cal = Calendar(d.year, d.month)
+#
+#
+#         user=self.request.user
+#
+#         roles = Role.objects.filter(user=user)
+#         events= []
+#         for role in roles:
+#             events+=(Event.objects.filter(club=role.club, deadline__month=d.month, deadline__year =d.year))
+#
+#         # Call the formatmonth method, which returns our calendar as a table
+#         html_cal = cal.formatmonth(withyear=True, user=user)
+#         context['calendar'] = mark_safe(html_cal)
+#         context['events'] = events
+#
+#         return context
+
+def get_date(req_day):
+    if req_day:
+        year, month = (int(x) for x in req_day.split('-'))
+        return date(year, month, day=1)
+    return datetime.today()
 
 def join_event(request,event_id,club_id):
      club = Club.objects.get(id=club_id)
@@ -1012,3 +1136,51 @@ def get_club_messages(request, club_id):
             })
 
     return JsonResponse({"messages":message_list})
+
+
+class SearchView(ListView):
+    template_name = 'search_view.html'
+    count = 0
+    query = ' '
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['count'] = self.count or 0
+        context['search_form'] = SearchForm(initial={
+            'search' : self.request.GET.get('search',''),
+            'filter_field' : self.request.GET.get('filter_field', ''),
+        })
+        context['query'] = self.query
+        return context
+
+    def get_queryset(self):
+        request = self.request
+        query = request.GET.get('search')
+        filter_field = self.request.GET.get('filter_field')
+
+        if query is not None:
+            queryset = []
+            book_results= Book.objects.search(query)
+            club_results= Club.objects.search(query)
+            user_results= User.objects.search(query)
+
+            if filter_field == 'books':
+                queryset = book_results
+            elif filter_field == 'clubs':
+                queryset =  club_results
+            elif filter_field == 'users':
+                queryset = user_results
+            elif filter_field == 'all':
+                queryset = chain(
+                    book_results,
+                    club_results,
+                    user_results
+                    )
+
+            qs_sorted = sorted(queryset,
+                        key=lambda instance: instance.pk,
+                        reverse=True)
+            self.count = len(qs_sorted)
+            self.query = query
+            return qs_sorted
+        return query
