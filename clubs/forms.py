@@ -116,7 +116,7 @@ class SetClubBookForm(forms.Form):
 
 
 
-    
+
 
 class InviteForm(forms.Form):
     model = User
