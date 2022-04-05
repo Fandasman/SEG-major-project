@@ -1,83 +1,81 @@
 {% extends 'base_content.html' %}
-
 {% block title %}
-Member List
+| MemberList
 {% endblock %}
-
 {% block content %}
-{% include 'partials/club_page_jumbotron.html' with members=members club=club %}
 
+{% include 'partials/club_page_jumbotron.html' with members=members club=club %}
 <style>
 
-  .card {
+.card {
 
-  box-shadow: 0 0 10px 0 rgba(100, 100, 100, 0.26);
+box-shadow: 0 0 10px 0 rgba(100, 100, 100, 0.26);
 
-  }
+}
 
-  body{
-    background-color: #f1f2f5;
-  }
+body{
+  background-color: #f1f2f5;
+}
 
-  .event_list_button{
-  background-color: #e4e6eb;
-  transition-duration: 0.4s;
-  font-size: 16px;
-  padding: 3px 6px;
-  margin: 4px 2px;
-  border-radius: 4px;
-  border:none;
-  }
+.event_list_button{
+background-color: #e4e6eb;
+transition-duration: 0.4s;
+font-size: 16px;
+padding: 3px 6px;
+margin: 4px 2px;
+border-radius: 4px;
+border:none;
+}
 
-  .event_list_button:hover{
-     background-color: #d8dadf;
-  }
+.event_list_button:hover{
+   background-color: #d8dadf;
+}
 
-  .dropdown_actions
-  {
-  background-color: #e4e6eb;
-  transition-duration: 0.4s;
-  font-size: 16px;
-  padding: 3px 6px;
-  margin: 4px 2px;
-  border-radius: 4px;
-  border:none;
-  min-width: 50px;
-  min-height: 20px;
+.dropdown_actions
+{
+background-color: #e4e6eb;
+transition-duration: 0.4s;
+font-size: 16px;
+padding: 3px 6px;
+margin: 4px 2px;
+border-radius: 4px;
+border:none;
+min-width: 50px;
+min-height: 20px;
 
-  }
+}
 
-  .dropdown_actions:hover{
-     background-color: #d8dadf;
-  }
+.dropdown_actions:hover{
+   background-color: #d8dadf;
+}
 
 
 </style>
 
 <div class="col d-flex justify-content-center">
-  <div class="card" style="width: 30rem;">
-    <div class="card-body">
-      <h5 class="card-title">Members <span style="color:#676A6D;"> · {{members | length}} </span> </h5>
-      <h6 style="color:#676A6D;">New people that join this group will appear here. </h6>
-        <hr class="my-2">
-        {% include 'partials/member_listing.html' with members=user.get_current_user_role userrole=userrole%}
-        <hr class="my-2">
-      {%if userrole.role == "CO" or userrole.role == 'O'%}
-        {% if club.get_all_aplicants.count > 0 %}
-          <h6>Aplicants · <span style="color:#FF0000;"> {{club.get_all_aplicants | length}} </span></h6>
-            {% include 'partials/member_listing.html' with members=club.get_all_aplicants userrole=userrole%}
-            <hr class="my-2">
-        {%endif%}
-      {%endif%}
-      <h6>Admins & moderators <span style="color:#676A6D;"> · {{club.get_all_administrators}} </span></h6>
-        {% include 'partials/member_listing.html' with members=club.get_club_owner userrole=userrole%}
-        {% include 'partials/member_listing.html' with members=club.get_club_officers userrole=userrole%}
-        <hr class="my-2">
-      <h6> Other Members <span style="color:#676A6D;"> · {{club.get_club_members| length}} </span></h6>
-        {% include 'partials/member_listing.html' with members=club.get_club_members userrole=userrole%}
-    </div>
-  </div>
-</div>
-<div>{% include 'club_templates/club_chat.html' with club=club %}</div>
+    <div class="card" style="width: 30rem;">
+       <div class="card-body">
+          <h5 class="card-title">Members <span style="color:#676A6D;"> · {{members | length}} </span> </h5>
+             <h6 style="color:#676A6D;">New people that join this group will appear here. </h6>
+                <hr class="my-2">
+                   {% include 'partials/member_listing.html' with members=user.get_current_user_role userrole=userrole%}
+                    <hr class="my-2">
+                       {%if userrole.role == "CO" or userrole.role == 'O'%}
+                          {%if club.get_all_aplicants.count > 0 %}
+                          <h6>Aplicants · <span style="color:#FF0000;"> {{club.get_all_aplicants | length}} </span></h6>
+                             {% include 'partials/member_listing.html' with members=club.get_all_aplicants userrole=userrole%}
+                            <hr class="my-2">
+                                {%endif%}
+                              {%endif%}
+                             <h6>Admins & moderators <span style="color:#676A6D;"> · {{club.get_all_administrators}} </span></h6>
+                               {% include 'partials/member_listing.html' with members=club.get_club_owner userrole=userrole%}
+                                 {% include 'partials/member_listing.html' with members=club.get_club_officers userrole=userrole%}
+                                   <hr class="my-2">
+                                     <h6> Other Members <span style="color:#676A6D;"> · {{club.get_club_members| length}} </span></h6>
+                                        {% include 'partials/member_listing.html' with members=club.get_club_members userrole=userrole%}
+                                     </div>
+                                  </div>
+                               </div>
+                               {% include 'club_templates/club_chat.html' with club=club %}
 
 {%endblock%}

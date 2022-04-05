@@ -57,3 +57,14 @@ class SendClubMessageViewTestCase(TestCase):
         self.client.login(username=self.user.username, password="Password123")
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
+
+    def test_object_dosent_exist_returns_HttpResponseForbidden(self):
+        form_input = {
+            'user_id': self.other_user.id,
+            'club_id': self.club.id,
+            'text': 'hello',
+        }
+        self.client.login(username=self.user.username, password="Password123")
+        Role.objects.all().delete()
+        response = self.client.post(self.url, form_input, follow=True)
+        self.assertEqual(response.status_code, 403)

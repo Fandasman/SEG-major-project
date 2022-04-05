@@ -36,10 +36,6 @@
 <div  class="jumbotron">
   <h1 class="display-4">{{club.name}}</h1>
   <p class="lead">  {{club.description}}</p>
-  <form action="{% url 'leave_club' club.id%}" method="post">
-      {% csrf_token %}
-      <button type="submit", class='btn btn-secondary'>Leave</button>
-  </form>
   <hr class="my-4">
   <p>Members : {{members | length }}</p>
 
@@ -53,7 +49,7 @@
          <button type="submit"class="jumbotron_button" >Members</button>
       </form>
 
-        <form action = "{% url 'events_list' club.id %}" method= "get">
+        <form action = "{% url 'events_list' club.id %}" method = "get">
             <button type="sumbit" class="jumbotron_button">Events</button>
         </form>
 
@@ -67,6 +63,9 @@
             <button type = "submit" class="jumbotron_button">Invite</button>
         </form>
 
+        {%endif%}
+
+        {% if userrole.role == 'CO' %}
         <form action="{% url 'delete_club' club.id %}">
           {% csrf_token %}
           <button type = "submit" class="jumbotron_button">Delete club</button>

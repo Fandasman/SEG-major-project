@@ -122,12 +122,8 @@ def show_book(request, book_id):
                     past_rating.save()
 
         else:
-            if book not in request.user.wishlist.all() and exist_rating:
-                exist_rating = False
-                rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
-                rating.delete()
 
-            elif exist_rating:
+            if exist_rating:
                 current_rating_value = past_rating.rating
 
         return render(request, 'book_templates/show_book.html',
@@ -456,12 +452,10 @@ class WishlistView(LoginRequiredMixin, ListView):
         return self.render(user_id)
 
     def render(self, user_id):
-        try:
-            user = User.objects.get(id = user_id)
-            return render(self.request, 'user_templates/wishlist.html', {'user': user})
+        user = User.objects.get(id = user_id)
+        return render(self.request, 'user_templates/wishlist.html', {'user': user})
 
-        except ObjectDoesNotExist:
-            return redirect('feed')
+
 
 
 """This function allows the club owner of the club to
@@ -558,22 +552,23 @@ def remove_member(request, club_id, member_id):
 """This function allows the member of the club to
     leave the club, which means the role has been
     deleted"""
+@login_required
 def leave_club(request, club_id):
     if request.method == 'POST':
-        if request.user.is_authenticated:
             user = request.user
             current_club = Club.objects.get(id=club_id)
             userrole = Role.objects.filter(club=current_club).get(user=user)
-            redirect_url = reverse('club_members', kwargs={'club_id':club_id})
-            members = Role.objects.filter(club=current_club)
-            userrole.delete()
-            post = MembershipPost.objects.create(user = user, club = current_club)
-            post.join = False
-            post.save()
-            messages.add_message(request, messages.SUCCESS, f'You have successfully left {current_club.name}!')
+            if userrole.role == "CO":
+                messages.add_message(request, messages.INFO, f'You cannot leave a club that you own!')
+            else:
+                redirect_url = reverse('club_members', kwargs={'club_id':club_id})
+                members = Role.objects.filter(club=current_club)
+                userrole.delete()
+                post = MembershipPost.objects.create(user = user, club = current_club)
+                post.join = False
+                post.save()
+                messages.add_message(request, messages.SUCCESS, f'You have successfully left {current_club.name}!')
             return redirect('feed')
-        else:
-            return redirect('login')
     else:
         return HttpResponseForbidden()
 
@@ -637,7 +632,6 @@ def reject_applicant_to_club_as_Owner(request,club_id,member_id):
             club = Club.objects.get(id = club_id)
             member = User.objects.get(id = member_id)
             newMember = Role.objects.get(club = club, user = member)
-            # print(Role.objects.filter(club=club).count())
             newMember.delete()
             members = Role.objects.filter(club=club)
             return redirect(redirect_url,members = members,
@@ -908,7 +902,10 @@ def create_event(request, club_id):
         if form.is_valid():
             this_event = form.save(club_id,current_user)
             EventPost.objects.create(event = this_event, user=request.user)
-            return redirect('events_list',club_id)
+            return render(request, 'club_templates/events_list.html', {'members': members,
+                                                        'userrole': userrole,
+                                                        'club' : club,
+                                                        'events' : events})
         else:
             messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
     form = EventForm()
@@ -920,16 +917,16 @@ def event_list(request,club_id):
     club = Club.objects.get(id=club_id)
     members = Role.objects.filter(club=club)
     userrole = Role.objects.get(club = club, user=request.user)
-    try:
-        events = Event.objects.filter(club=club)
-    except ObjectDoesNotExist:
+    if not Event.objects.filter(club= club):
         messages.add_message(request,messages.ERROR,"There are no events")
         return redirect('club_list')
     else:
-          return render(request, 'club_templates/events_list.html', {'members': members,
-                                                      'userrole': userrole,
-                                                      'club' : club,
-                                                      'events' : events})
+        events = Event.objects.filter(club=club)
+        return render(request, 'club_templates/events_list.html', {'members': members,
+                                                    'userrole': userrole,
+                                                    'club' : club,
+                                                    'events' : events})
+
 
 class NewPostView(LoginRequiredMixin, CreateView):
     """Class-based generic view for new post handling."""
@@ -1056,7 +1053,7 @@ class CalendarView(LoginRequiredMixin,generic.ListView):
 def get_date(req_day):
     if req_day:
         year, month = (int(x) for x in req_day.split('-'))
-        return date(year, month, day=1)
+        return datetime.date(year, month, day=1)
     return datetime.today()
 
 def join_event(request,event_id,club_id):
@@ -1101,11 +1098,6 @@ def add_user_to_interested_list_from_event_page(request,event_id,club_id):
     event.add_user_to_interested_field(request.user)
     return render(request, 'club_templates/event_page.html', {'event': event,
                                                               'club' : club})
-
-# def leave_club(request,club_id):
-#     club = Club.objects.get(id = club_id)
-#     role = Role.objects.filter(club= club).get(user = request.user).delete()
-#     return redirect('feed')
 
 
 def user_chat(request, receiver_id):
