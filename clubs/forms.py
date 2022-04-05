@@ -189,7 +189,7 @@ class EventForm(forms.ModelForm):
 
 
 
-    def get_book_titles():
+    def get_book_titles(self):
        for book in Book.objects.all():
            book_titles = book.title
        return book_titles
