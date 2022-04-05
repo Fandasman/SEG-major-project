@@ -1527,62 +1527,62 @@ class ClubFeedView(LoginRequiredMixin,View):
 
 
 
-# def create_event(request, club_id):
-#     club = Club.objects.get(id=club_id)
-#     members = Role.objects.filter(club=club)
-#     userrole = Role.objects.get(club = club, user=request.user)
-#     events = Event.objects.filter(club = club)
-#     if request.method == 'POST':
-#         form = EventForm(request.POST)
-#         current_user = request.user
-#         if form.is_valid():
-#             this_event = form.save(club_id,current_user)
-#             EventPost.objects.create(event = this_event, user=request.user)
-#             return redirect('events_list',club_id)
-#         else:
-#             messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
-#     form = EventForm()
-#     return render(request, 'club_templates/create_event.html', {'form': form,
-#                                                  'members': members,
-#                                                   'userrole': userrole,
-#                                                   'club': club})
+def create_event(request, club_id):
+    club = Club.objects.get(id=club_id)
+    members = Role.objects.filter(club=club)
+    userrole = Role.objects.get(club = club, user=request.user)
+    events = Event.objects.filter(club = club)
+    if request.method == 'POST':
+        form = EventForm(request.POST)
+        current_user = request.user
+        if form.is_valid():
+            this_event = form.save(club_id,current_user)
+            EventPost.objects.create(event = this_event, user=request.user)
+            return redirect('events_list',club_id)
+        else:
+            messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
+    form = EventForm()
+    return render(request, 'club_templates/create_event.html', {'form': form,
+                                                 'members': members,
+                                                  'userrole': userrole,
+                                                  'club': club})
 
     
-class CreateEventView(CreateView):
+# class CreateEventView(CreateView):
 
-    model = Event
-    form_class = EventForm
-    template_name = 'club_templates/create_event.html'
+#     model = Event
+#     form_class = EventForm
+#     template_name = 'club_templates/create_event.html'
 
-    def get(self,request,*args, **kwargs):
-        return self.render()
+#     def get(self,request,*args, **kwargs):
+#         return self.render()
 
-    def form_valid(self,form,*args, **kwargs):
-        form = EventForm
-        club_id = self.kwargs['club_id']
-        current_user = self.request.user
-        this_event = form.save(club_id,current_user)
-        EventPost.objects.create(event = this_event, user=self.request.user)
-        return redirect('events_list',club_id)
+#     def form_valid(self,form,*args, **kwargs):
+#         form = EventForm()
+#         club_id = self.kwargs['club_id']
+#         current_user = self.request.user
+#         this_event = form.save(club_id,current_user)
+#         EventPost.objects.create(event = this_event, user=self.request.user)
+#         return redirect('events_list',club_id)
 
-    def form_invalid(self,*args, **kwargs):
-        messages.add_message(self.request, messages.ERROR, "The credentials provided were invalid!")
-        return self.render()
+#     def form_invalid(self,*args, **kwargs):
+#         messages.add_message(self.request, messages.ERROR, "The credentials provided were invalid!")
+#         return self.render()
 
 
  
 
-    def render(self,*args, **kwargs):
-        club_id = self.kwargs['club_id']
-        club = Club.objects.get(id=club_id)
-        members = Role.objects.filter(club=club)
-        userrole = Role.objects.get(club = club, user=self.request.user)
-        events = Event.objects.filter(club = club)
-        form = EventForm()
-        return render(self.request, 'club_templates/create_event.html', {'form': form,
-                                                    'members': members,
-                                                    'userrole':userrole,
-                                                    'club': club})
+    # def render(self,*args, **kwargs):
+    #     club_id = self.kwargs['club_id']
+    #     club = Club.objects.get(id=club_id)
+    #     members = Role.objects.filter(club=club)
+    #     userrole = Role.objects.get(club = club, user=self.request.user)
+    #     events = Event.objects.filter(club = club)
+    #     form = EventForm()
+    #     return render(self.request, 'club_templates/create_event.html', {'form': form,
+    #                                                 'members': members,
+    #                                                 'userrole':userrole,
+    #                                                 'club': club})
 
 
 
