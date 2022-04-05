@@ -48,7 +48,8 @@ class WishlistViewTestCase(TestCase):
         second_role = self._get_second_role
         response = self.client.get(self.url)
         redirect_url = reverse('feed')
-        self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
+        self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)   
+     
 
     def test_get_delete_club_by_officer(self):
         second_user = User.objects.get(id = 2)
@@ -58,6 +59,10 @@ class WishlistViewTestCase(TestCase):
         response = self.client.get(self.url)
         redirect_url = reverse('feed')
         self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
+        
+
+   
+
 
 
     # Create second role

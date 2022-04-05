@@ -26,7 +26,7 @@ class PromoteMemberTestCase(TestCase):
         self.assertEqual(self.url,f'/promoted/{self.club.id}/{self.member_user.id}')
 
     def test_get_approve_application_as_CO_is_forbidden(self):
-        self.client.login(username = self.user.email, password='Password123')
+        self.client.login(username = self.user.username, password='Password123')
         role_count_before = Role.objects.count()
         response = self.client.get(self.url, follow = True)
         role_count_after = Role.objects.count()
@@ -49,7 +49,7 @@ class PromoteMemberTestCase(TestCase):
 
     def test_post_new_post_redirects_when_not_logged_in(self):
         user_count_before = Role.objects.count()
-        redirect_url = reverse('login')
+        redirect_url = reverse_with_next('login',self.url)
         response = self.client.post(self.url,follow=True)
         self.assertRedirects(response, redirect_url,
             status_code=302, target_status_code=200, fetch_redirect_response=True
