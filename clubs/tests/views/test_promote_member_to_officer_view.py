@@ -49,7 +49,7 @@ class PromoteMemberTestCase(TestCase):
 
     def test_post_new_post_redirects_when_not_logged_in(self):
         user_count_before = Role.objects.count()
-        redirect_url = reverse('login')
+        redirect_url = reverse_with_next('login',self.url)
         response = self.client.post(self.url,follow=True)
         self.assertRedirects(response, redirect_url,
             status_code=302, target_status_code=200, fetch_redirect_response=True

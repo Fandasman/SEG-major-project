@@ -57,3 +57,10 @@ class TestSendApplicationView(TestCase, LogInTester):
         response_url = reverse('feed')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'feed.html')
+
+    def test_apply_redirects_when_not_logged_in(self):
+        redirect_url = reverse_with_next('login', self.url)
+        response = self.client.post(self.url,follow=True)
+        self.assertRedirects(response, redirect_url,
+            status_code=302, target_status_code=200, fetch_redirect_response=True
+        )

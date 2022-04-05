@@ -46,3 +46,8 @@ class LeaveClubTestCase(TestCase):
         self.assertEqual(after_count, before_count)
         response_url = reverse('feed')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+
+    def test_get_request_is_forbbiden(self):
+        self.client.login(username = self.user.username, password='Password123')
+        response = self.client.get(self.url, follow = True)
+        self.assertEqual(response.status_code, 403)

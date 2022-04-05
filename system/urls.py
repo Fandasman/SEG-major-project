@@ -22,12 +22,13 @@ from django.conf.urls import url
 
 urlpatterns = [
 
+    # path('feed/', views.CalendarView.as_view(),name="feed"),
     path('add_comment/<int:club_id>/<int:post_id>', views.add_comment_to_post,name = "add_comment"),
     path('all_members/<int:club_id>/', views.ClubMembersView.as_view(), name = "club_members"),
     path('club_feed/<int:club_id>/', views.ClubFeedView.as_view(), name = "club_feed"),
     path('club_event_creation/<int:club_id>/', views.CreateEventView.as_view(),name = "create_event"),
     path('club_events_list/<int:club_id>/',views.EventList.as_view(),name = "events_list"),
-    path('join_event/<int:club_id>/<int:event_id>/',views.JoinEventView.as_view(),name="join_event"),
+    path('join_event/<int:club_id>/<int:event_id>/',views.join_event,name="join_event"),
     path('interested_in_event/<int:club_id>/<int:event_id>/',views.add_user_to_interested_list,name="interested_in_event"),
     path('join_event_event_page/<int:club_id>/<int:event_id>/',views.join_event_from_event_page,name="join_event_from_event_page"),
     path('interested_in_event_event_page/<int:club_id>/<int:event_id>/',views.add_user_to_interested_list_from_event_page,name="interested_in_event_from_event_page"),

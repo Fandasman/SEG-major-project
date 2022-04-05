@@ -22,7 +22,7 @@ class JoinEventTestCase(TestCase):
         self.url = reverse('join_event', kwargs ={'club_id': self.club.id, 'event_id': self.event.id})
 
 
-    def test_join_event_is_succesfull(self):
+    def test_join_event_is_succesful(self):
         self.client.login(username = self.user.username, password='Password123')
         before_count = self.event.participants.count()
         response = self.client.get(self.url, follow = True)

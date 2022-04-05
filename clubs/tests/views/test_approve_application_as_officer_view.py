@@ -33,9 +33,6 @@ class ApproveTheApplicationAsOTestCase(TestCase):
         self.assertEqual(role_count_after, role_count_before)
         self.assertEqual(response.status_code, 403)
 
-    # def test_unsuccessful_approve_the_application(self):
-    #     pass
-    #
     def test_successful_approve_the_application(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = Role.objects.count()
@@ -49,7 +46,7 @@ class ApproveTheApplicationAsOTestCase(TestCase):
 
     def test_post_new_post_redirects_when_not_logged_in(self):
         user_count_before = Role.objects.count()
-        redirect_url = reverse('login')
+        redirect_url = reverse_with_next('login',self.url)
         response = self.client.post(self.url,follow=True)
         self.assertRedirects(response, redirect_url,
             status_code=302, target_status_code=200, fetch_redirect_response=True

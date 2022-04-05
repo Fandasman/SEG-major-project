@@ -30,6 +30,7 @@ class InviteViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'club_templates/invite.html')
 
+
     def test_invite_view_redirects_when_logged_out(self):
         redirect_url = reverse_with_next('login', self.url)
         response = self.client.get(self.url)
@@ -59,6 +60,13 @@ class InviteViewTestCase(TestCase):
         new_role = Role.objects.get(club=self.club, user=self.other_user)
         self.assertEqual(new_role.role, 'M')
 
+    def test_forbidden_get_request_accept_invitation(self):
+        self.client.login(username=self.user.username, password="Password123")
+        invitation = Invitation.objects.create(club=self.club, user=self.other_user, status='P')
+        url = reverse('accept_invitation', kwargs={"inv_id":invitation.id})
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 403)
+
     def test_successful_reject_invitation(self):
         invitation = Invitation.objects.create(club=self.club, user=self.other_user, status='P')
         url = reverse('reject_invitation', kwargs={"inv_id": invitation.id})
@@ -69,6 +77,14 @@ class InviteViewTestCase(TestCase):
         after_count = Invitation.objects.count()
         self.assertEqual(after_count, before_count - 1)
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+
+    def test_forbidden_get_request_reject_invitation(self):
+        self.client.login(username=self.user.username, password="Password123")
+        invitation = Invitation.objects.create(club=self.club, user=self.other_user, status='P')
+        url = reverse('reject_invitation', kwargs={"inv_id":invitation.id})
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 403)
+
 
     def test_unsuccessful_repeat_invite_same_user(self):
         invitation = Invitation.objects.create(club=self.club, user=self.other_user, status='P')

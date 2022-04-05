@@ -626,12 +626,10 @@ class WishlistView(LoginRequiredMixin, ListView):
         return self.render(user_id)
 
     def render(self, user_id):
-        try:
-            user = User.objects.get(id = user_id)
-            return render(self.request, 'user_templates/wishlist.html', {'user': user})
+        user = User.objects.get(id = user_id)
+        return render(self.request, 'user_templates/wishlist.html', {'user': user})
 
-        except ObjectDoesNotExist:
-            return redirect('feed')
+
 
 
 """This function allows the club owner of the club to
@@ -1193,20 +1191,20 @@ class WishView(LoginRequiredMixin,View):
         except ObjectDoesNotExist:
             return redirect('book_list')     
 
-@login_required
-def unwish(request, book_id):
-    user = request.user
-    try:
-        book = Book.objects.get(pk = book_id)
-        previous_url = request.META.get('HTTP_REFERER')
-        if user.wishlist.filter(isbn=book.isbn).exists():
-            user.wishlist.remove(book)
-            if previous_url != None and 'wishlist' in previous_url:
-                return redirect('wishlist', user.id)
-        return redirect('show_book', book.id)
+# @login_required
+# def unwish(request, book_id):
+#     user = request.user
+#     try:
+#         book = Book.objects.get(pk = book_id)
+#         previous_url = request.META.get('HTTP_REFERER')
+#         if user.wishlist.filter(isbn=book.isbn).exists():
+#             user.wishlist.remove(book)
+#             if previous_url != None and 'wishlist' in previous_url:
+#                 return redirect('wishlist', user.id)
+#         return redirect('show_book', book.id)
 
-    except ObjectDoesNotExist:
-        return redirect('book_list')
+#     except ObjectDoesNotExist:
+#         return redirect('book_list')
 
 class UnwishView(LoginRequiredMixin,View):
 
@@ -1394,7 +1392,7 @@ def invite(request, club_id):
 
 class AcceptInvitationView(View):
 
-    def post(self,request,inv_id):
+    def post(self,request,inv_id,*args, **kwargs):
         user = self.request.user
         invitation = Invitation.objects.get(id=inv_id)
         club = invitation.club
@@ -1404,7 +1402,7 @@ class AcceptInvitationView(View):
         messages.add_message(request, messages.INFO, "join successful")
         return redirect('invitation_list', user.id)
 
-    def get(self,request):
+    def get(self,request,*args, **kwargs):
         return HttpResponseForbidden()
 
 
@@ -1430,7 +1428,7 @@ class RejectInvitationView(View):
         messages.add_message(request, messages.INFO, "you have rejected this invitation")
         return redirect('invitation_list', user.id)
 
-    def get(self):
+    def get(self,*args, **kwargs):
         return HttpResponseForbidden()
 
 
@@ -1550,6 +1548,10 @@ class ClubFeedView(LoginRequiredMixin,View):
     
 class CreateEventView(CreateView):
 
+    model = Event
+    form_class = EventForm
+    template_name = 'club_templates/create_event.html'
+
     def get(self,request,*args, **kwargs):
         return self.render()
 
@@ -1561,7 +1563,7 @@ class CreateEventView(CreateView):
         EventPost.objects.create(event = this_event, user=request.user)
         return redirect('events_list',club_id)
 
-    def form_invalid(self):
+    def form_invalid(self,*args, **kwargs):
         messages.add_message(self.request, messages.ERROR, "The credentials provided were invalid!")
         return self.render()
 
@@ -1697,21 +1699,21 @@ def add_comment_to_post(request, club_id, post_id):
             comment = form.save()
     return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
-class CommentOnPostView(LoginRequiredMixin,FormView):
+# class CommentOnPostView(LoginRequiredMixin,FormView):
     
-    form_class = CommentForm
+#     form_class = CommentForm
     
-    def form_valid(self, form,*args, **kwargs):
-        club_id = self.kwargs['club_id']
-        post_id = self.kwargs['post_id']
-        post = UserPost.objects.get(id=post_id)
-        club = Club.objects.get(id=club_id)
-        comment = Comment.objects.create(club=club,post=post,user=self.request.user)
-        comment = form.save()
+#     def form_valid(self, form,*args, **kwargs):
+#         club_id = self.kwargs['club_id']
+#         post_id = self.kwargs['post_id']
+#         post = UserPost.objects.get(id=post_id)
+#         club = Club.objects.get(id=club_id)
+#         comment = Comment.objects.create(club=club,post=post,user=self.request.user)
+#         comment = form.save()
     
-    def form_invalid(self, form,*args, **kwargs):
-        club_id = self.kwargs['club_id']
-        return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
+#     def form_invalid(self, form,*args, **kwargs):
+#         club_id = self.kwargs['club_id']
+#         return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
 class Calendar(HTMLCalendar):
     def __init__(self, year=None, month=None):
@@ -1806,26 +1808,27 @@ def join_event(request,event_id,club_id):
                                                    'club' : club,
                                                    'events' : events})
 
-class JoinEventView(View):
-    def get(self,*args, **kwargs):
-        return self.render()
+# class JoinEventView(View):
+#     def get(self,*args, **kwargs):
+#         return self.render()
 
-    def post(self,*args, **kwargs):
-        event_id = self.kwargs['event_id']
-        event = Event.objects.get(id=event_id)
-        event.save()
-        return self.render()
+#     def post(self,*args, **kwargs):
+#         event_id = self.kwargs['event_id']
+#         event = Event.objects.get(id=event_id)
+#         event.save()
+#         event.join_event(self.request.user)
+#         return self.render()
 
-    def render(self,*args, **kwargs):
-        club_id = self.kwargs['club_id']
-        club = Club.objects.get(id=club_id)
-        members = Role.objects.filter(club=club)
-        userrole = Role.objects.get(club = club, user=self.request.user)
-        events = Event.objects.filter(club = club)
-        return render(self.request, 'club_templates/events_list.html', {'members': members,
-                                                    'userrole': userrole,
-                                                    'club' : club,
-                                                    'events' : events})
+#     def render(self,*args, **kwargs):
+#         club_id = self.kwargs['club_id']
+#         club = Club.objects.get(id=club_id)
+#         members = Role.objects.filter(club=club)
+#         userrole = Role.objects.get(club = club, user=self.request.user)
+#         events = Event.objects.filter(club = club)
+#         return render(self.request, 'club_templates/events_list.html', {'members': members,
+#                                                     'userrole': userrole,
+#                                                     'club' : club,
+#                                                     'events' : events})
 
 
 def add_user_to_interested_list(request,event_id,club_id):

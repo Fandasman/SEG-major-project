@@ -49,3 +49,11 @@ class CreateEventViewTestCase(TestCase):
         self.form_input['deadline'] = date.today() - timedelta(days =1)
         response = self.client.post(self.form_input)
         self.assertEqual(response.status_code, 404)
+
+    def test_template_used_to_render_request(self):
+        self.client.login(username=self.user.username, password='Password123')
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'club_templates/create_event.html')
+
+    
