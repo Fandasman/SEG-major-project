@@ -1182,7 +1182,7 @@ def get_club_messages(request, club_id):
     return JsonResponse({"messages":message_list})
 
 
-class SearchView(ListView):
+class SearchView(LoginRequiredMixin, ListView):
     template_name = 'search_view.html'
     count = 0
     query = ' '
