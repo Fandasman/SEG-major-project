@@ -1,52 +1,25 @@
-from django import forms
 from django.test import TestCase
-from clubs.forms import EditProfileForm
-from clubs.models import User
+from clubs.models import User, UserPost, Club
+from clubs.forms import CommentForm
 
-class TestEditProfileForm(TestCase):
-    """Unit tests of the Edit Profile form."""
-    fixtures = [
-        'clubs/tests/fixtures/default_user.json',
-    ]
+class CommentPostFormTestCase(TestCase):
+
+    fixtures = ['clubs/tests/fixtures/default_user.json',
+                'clubs/tests/fixtures/default_club.json',
+                'clubs/tests/fixtures/default_post.json'
+                ]
 
     def setUp(self):
-        self.user = User.objects.get(username = 'johndoe')
-        self.form_input = {
-            'username': 'johndoe2',
-            'first_name': 'John2',
-            'last_name': 'Doe2',
-            'email': 'johndoe2@example.org',
-            'bio': 'New bio',
-            }
+        self.user = User.objects.get(username='johndoe')
+        self.post = UserPost.objects.get(id=1)
+        self.club = self.post.club
 
-    def test_form_has_necessary_fields(self):
-        form = EditProfileForm()
-        self.assertIn('username', form.fields)
-        self.assertIn('first_name', form.fields)
-        self.assertIn('last_name', form.fields)
-        self.assertIn('email', form.fields)
-        email_field = form.fields['email']
-        self.assertTrue(isinstance(email_field, forms.EmailField))
-        self.assertIn('bio', form.fields)
-
-
-    def test_valid_user_form(self):
-        form = EditProfileForm(data=self.form_input)
+    def test_valid_post_form(self):
+        input = {'body': 'x'*20, 'user':self.user, 'post':self.post, 'club':self.club}
+        form = CommentForm(data=input)
         self.assertTrue(form.is_valid())
 
-    def test_form_uses_model_validation(self):
-        self.form_input['email'] = 'bademailexample.org'
-        form = EditProfileForm(data=self.form_input)
+    def test_too_long_comment(self):
+        input = {'body': 'x'*101, 'user':self.user, 'post':self.post, 'club':self.club}
+        form = CommentForm(data=input)
         self.assertFalse(form.is_valid())
-
-    def test_form_must_save_correctly(self):
-        form = EditProfileForm(instance=self.user, data=self.form_input)
-        before_count = User.objects.count()
-        form.save()
-        after_count = User.objects.count()
-        self.assertEqual(after_count, before_count)
-        self.assertEqual(self.user.username, 'johndoe2')
-        self.assertEqual(self.user.first_name, 'John2')
-        self.assertEqual(self.user.last_name, 'Doe2')
-        self.assertEqual(self.user.email, 'johndoe2@example.org')
-        self.assertEqual(self.user.bio, 'New bio')
