@@ -169,7 +169,7 @@ class Club(models.Model):
 
     def _add_book(self, club):
         club.club_book.add(self)
-
+    
     def get_club_officers(self):
       return Role.objects.filter(club = self).filter(role = "O")
 

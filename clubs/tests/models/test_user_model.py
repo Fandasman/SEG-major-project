@@ -180,3 +180,25 @@ class UserModelTestCase(TestCase):
     def _assert_user_is_invalid(self):
         with self.assertRaises(ValidationError):
             self.user.full_clean()
+
+
+#Genre preferences test cases
+    def test_choices_are_selected(self):
+        """this ensures that any genres selected by the user are actually selected, and are equal to the ones selected by said user"""
+        self.user.genres_preferences = ['Crime','Fiction','Historical','Mystery','Politics']
+        self.assertEqual(self.user.genres_preferences, ['Crime','Fiction','Historical','Mystery','Politics'])
+        self._assert_user_is_valid
+
+    def test_maximum_of_5_choices(self):
+        self.user.genres_preferences = ['Crime','Fiction','Horror','Historical','Mystery','Politics']
+        self._assert_user_is_invalid
+
+    def test_no_duplicate_genres(self):
+         self.user.genres_preferences = ['Crime','Fiction','Horror','Horror','Mystery','Politics']
+         self._assert_user_is_invalid
+
+    def test_no_invalid_genres(self):
+        """this is to test if there are no genres selected outside the set genres within the genre_choices dictionary"""
+
+        self.user.genres_preferences = ['Crime','Fiction','Horror','Historical','Mystery','aaaaa']
+        self._assert_user_is_invalid

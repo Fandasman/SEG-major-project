@@ -33,8 +33,9 @@ class GenreFormTestCase(TestCase):
     def test_form_must_save_correctly(self):
         form = GenreForm(data=self.form_input)
         before_count = User.objects.count()
-        form.save()
         after_count = User.objects.count()
         self.assertEqual(after_count, before_count)
         self.assertTrue(form.is_valid())
-        #self.assertEqual(self.user.genres_preferences, [('Fiction'), ('Romance'), ('Horror'), ('Mystery'), ('Politics')])
+        self.user.genres_preferences = form.save()
+        self.user.save()
+        self.assertEqual(self.user.genres_preferences, [('Fiction'), ('Romance'), ('Horror'), ('Mystery'), ('Politics')])
