@@ -902,7 +902,10 @@ def create_event(request, club_id):
         if form.is_valid():
             this_event = form.save(club_id,current_user)
             EventPost.objects.create(event = this_event, user=request.user)
-            return redirect('events_list',club_id)
+            return render(request, 'club_templates/events_list.html', {'members': members,
+                                                        'userrole': userrole,
+                                                        'club' : club,
+                                                        'events' : events})
         else:
             messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
     form = EventForm()
@@ -924,18 +927,6 @@ def event_list(request,club_id):
                                                     'club' : club,
                                                     'events' : events})
 
-    # try:
-    #      Event.objects.get(name = "DefaultEvent")
-    # except ObjectDoesNotExist:
-    #     messages.add_message(request,messages.ERROR,"There are no events")
-    #     print("Here")
-    #     return redirect('club_list')
-    # else:
-    #       events = Event.objects.filter(club=club)
-    #       return render(request, 'club_templates/events_list.html', {'members': members,
-    #                                                   'userrole': userrole,
-    #                                                   'club' : club,
-    #                                                   'events' : events})
 
 class NewPostView(LoginRequiredMixin, CreateView):
     """Class-based generic view for new post handling."""

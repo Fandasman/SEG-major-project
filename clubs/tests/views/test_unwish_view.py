@@ -53,3 +53,5 @@ class WishViewTestCase(TestCase):
         self.assertRedirects(response, redirect_url, status_code = 302, target_status_code = 200)
         self.assertTemplateUsed(response, 'book_templates/book_list.html')
         self.assertEqual(self.user.wishlist.count(), 1)
+
+    
