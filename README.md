@@ -19,7 +19,7 @@ The application will be deployed by April 15th 2022, as per the specified deadli
 
 ## Installation instructions
 
-IN ORDER TO MAKE THE RECOMMENDER SYSTEM FUNCTION PROPERLY, MAKE SURE model.pk IS IN THE MAIN DIRECTORY OF THE PROJECT
+IN ORDER TO MAKE THE RECOMMENDER SYSTEM FUNCTION PROPERLY, MAKE SURE model.pkl IS IN THE MAIN DIRECTORY OF THE PROJECT
 
 To install the software and use it in your local development environment, you must first set up and activate a local development environment.  From the root of the project:
 
@@ -101,6 +101,9 @@ $ coverage report
 $ coverage html
 $ open htmlcov/index.html
 ```
+
+## Model and Datasets
+The pretrained model and all the datasets can be found here: [URL](https://drive.google.com/file/d/1AmuWPyvTZaOlMmha1ozlP_dchP0FJ6MX/view?usp=sharing)
 
 ## Sources
 The packages used by this application are specified in `requirements.txt`
