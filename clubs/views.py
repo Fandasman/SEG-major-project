@@ -142,7 +142,6 @@ def show_book(request, book_id):
 #     model = Book
 #     template_name = 'show_book.html'
 #     context_object_name = 'book'
-#     pk_url_kwarg = 'book_id'
 
 #     def get_context_data(self, **kwargs):
 #         context = super().get_context_data(**kwargs)
@@ -150,8 +149,12 @@ def show_book(request, book_id):
 #         context['past_rating'] = BooksRatings.objects.get(isbn = book.isbn, user = self.current_user)
 #         context
 
-#     def post(self,request):
+#     def post(self,request,*args, **kwargs):
+#         book_id = self.kwargs['book_idß']
+#         book = Book.objects.get(id=book_id)
+#         current_user = self.request.user
 #         book_form = RatingForm(request.POST)
+#         past_rating = BooksRatings.objects.get(isbn = book.isbn, user = current_user)
 #         if book_form.is_valid() and book_form.cleaned_data.get('rating') != '':
 #                 if exist_rating == False:
 #                     new_rating = BooksRatings.objects.create(
@@ -1694,21 +1697,21 @@ def add_comment_to_post(request, club_id, post_id):
             comment = form.save()
     return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
-# class CommentOnPostView(LoginRequiredMixin,FormView):
+class CommentOnPostView(LoginRequiredMixin,FormView):
     
-#     form_class = CommentForm
+    form_class = CommentForm
     
-#     def form_valid(self, form,*args, **kwargs):
-#         club_id = self.kwargs['club_id']
-#         post_id = self.kwargs['post_id']
-#         post = UserPost.objects.get(id=post_id)
-#         club = Club.objects.get(id=club_id)
-#         self.object = Comment.objects.create(club=club,post=post,user=self.request.user)
-#         self.object = form.save()
+    def form_valid(self, form,*args, **kwargs):
+        club_id = self.kwargs['club_id']
+        post_id = self.kwargs['post_id']
+        post = UserPost.objects.get(id=post_id)
+        club = Club.objects.get(id=club_id)
+        comment = Comment.objects.create(club=club,post=post,user=self.request.user)
+        comment = form.save()
     
-#     def form_invalid(self, form,*args, **kwargs):
-#         club_id = self.kwargs['club_id']
-#         return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
+    def form_invalid(self, form,*args, **kwargs):
+        club_id = self.kwargs['club_id']
+        return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
 class Calendar(HTMLCalendar):
     def __init__(self, year=None, month=None):
@@ -1837,26 +1840,26 @@ def add_user_to_interested_list(request,event_id,club_id):
                                                    'club' : club,
                                                    'events' : events})
 
-class AddUsertoInterestedView(View):
-    def get(self,*args, **kwargs):
-        return self.render()
+# class AddUsertoInterestedView(View):
+#     def get(self,*args, **kwargs):
+#         return self.render()
 
-    def post(self,*args, **kwargs):
-     event_id = self.kwargs['event_id']
-     event = Event.objects.get(id=event_id)
-     event.add_user_to_interested_field(self.request.user)
-     return self.render()
+#     def post(self,*args, **kwargs):
+#      event_id = self.kwargs['event_id']
+#      event = Event.objects.get(id=event_id)
+#      event.add_user_to_interested_field(self.request.user)
+#      return self.render()
 
-    def render(self,*args, **kwargs):
-        club_id = self.kwargs['club_id']
-        club = Club.objects.get(id=club_id)
-        members = Role.objects.filter(club=club)
-        userrole = Role.objects.get(club = club, user=self.request.user)
-        events = Event.objects.filter(club = club) 
-        return render(self.request, 'club_templates/events_list.html', {'members': members,
-                                                    'userrole': userrole,
-                                                    'club' : club,
-                                                    'events' : events})
+#     def render(self,*args, **kwargs):
+#         club_id = self.kwargs['club_id']
+#         club = Club.objects.get(id=club_id)
+#         members = Role.objects.filter(club=club)
+#         userrole = Role.objects.get(club = club, user=self.request.user)
+#         events = Event.objects.filter(club = club) 
+#         return render(self.request, 'club_templates/events_list.html', {'members': members,
+#                                                     'userrole': userrole,
+#                                                     'club' : club,
+#                                                     'events' : events})
 
 def event_page(request,event_id,club_id):
      club = Club.objects.get(id=club_id)
