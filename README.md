@@ -108,3 +108,8 @@ The packages used by this application are specified in `requirements.txt`
 Certain sections of the code, such as basic views and tests were taken from the Clucker application developed during the first semester of teaching of the Software Engineering Group Project module in the 2021/2022 class.
 
 Some sections were also inspired by the Chess Club group project developed as assessed coursework for the same module in the 2021/2022 class. That project itself uses code presented in Clucker as well. As such, similarities in the source code between those two specific applications can be expected.
+
+
+The code for the calendar used in the user profile view was inspired by the code provided at: https://www.huiwenteo.com/normal/2018/07/24/django-calendar.html.
+
+The code for the search engine functionality was also inspired by what was provided at: https://www.codingforentrepreneurs.com/blog/a-multiple-model-django-search-engine.

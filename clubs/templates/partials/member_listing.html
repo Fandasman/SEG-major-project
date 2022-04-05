@@ -1,4 +1,3 @@
-
 {% for member in members%}
     <div class="row">
       <div class="col-md-2">
@@ -19,9 +18,6 @@
     <div class="btn-group" role="group" aria-label="Basic example">
        {%if member.user != user%}
          <form action = "{% url 'show_user' member.user.id %}" method = "get">
-            {% csrf_token %}
-              <input type = "hidden" name = "next" value = "{{ next }}">
-                 {% include 'partials/bootstrap_form.html' with form=form %}
                    <input type = "submit" value = "See profile" class="event_list_button">
                  </form>
              {%else%}
