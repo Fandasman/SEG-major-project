@@ -184,6 +184,32 @@ def remove_rating(request, book_id):
 
     return redirect('show_book', book_id)
 
+
+# class RemoveRatingView(View):
+
+#     def get(self,*args, **kwargs):
+#         self.render()
+    
+#     def post(self,*args, **kwargs):
+#         self.render()
+
+    
+#     def render(self,*args, **kwargs):
+#         book_id = self.kwargs['book_id']
+#         try:
+#             book = Book.objects.get(id = book_id)
+#         except ObjectDoesNotExist:
+#             return redirect('book_list')
+
+#         exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = self.request.user))) != 0
+#         if exist_rating:
+#             rating = BooksRatings.objects.get(isbn = book.isbn, user = self.request.user)
+#             rating.delete()
+
+#         return redirect('show_book', book_id)
+
+
+
 # @login_required
 # def profile(request):
 #     current_user = request.user
@@ -1025,27 +1051,73 @@ class OfficerApplicantRejectView(LoginRequiredMixin,View):
     Otherwise, the user will see the list of the members of the club
     And the member can not see the details of the members
     only officers and club owners can do this"""
-@login_required
-def club_members(request, club_id):
-    club = Club.objects.get(id=club_id)
-    members = Role.objects.filter(club=club)
-    try:
-        userrole = Role.objects.get(club = club, user=request.user)
-    except ObjectDoesNotExist:
-        messages.add_message(request,messages.ERROR,"It seem you don't belong to this club!")
-        return redirect('club_list')
-    else:
-        if userrole.role == "A":
-            messages.add_message(request,messages.ERROR,"You are the applicant in this club, so you don't have authority to view the member list!")
+
+# class InvitationlistView(LoginRequiredMixin, ListView):
+
+#     def get(self, request, user_id):
+#         return self.render(user_id)
+
+#     def render(self, user_id):
+#         try:
+#             user = User.objects.get(id = user_id)
+#             invitations = Invitation.objects.filter(user=user, status="P")
+#             return render(self.request, 'invitation_list.html', {'invitations': invitations})
+
+#         except ObjectDoesNotExist:
+#             return redirect('feed')
+
+
+
+# @login_required
+# def club_members(request, club_id):
+#     club = Club.objects.get(id=club_id)
+#     members = Role.objects.filter(club=club)
+#     try:
+#         userrole = Role.objects.get(club = club, user=request.user)
+#     except ObjectDoesNotExist:
+#         messages.add_message(request,messages.ERROR,"It seem you don't belong to this club!")
+#         return redirect('club_list')
+#     else:
+#         if userrole.role == "A":
+#             messages.add_message(request,messages.ERROR,"You are the applicant in this club, so you don't have authority to view the member list!")
+#             return redirect('club_list')
+#         else:
+#             return render(request, 'club_templates/club_page.html', {'members': members,
+#                                                     'userrole': userrole,
+#                                                     'club' : club})
+
+class ClubMembersView(LoginRequiredMixin,ListView):
+    def get(self,request,*args, **kwargs):
+        return self.render()
+
+    
+    # def get_queryset(self):
+    #     club_id = self.kwargs['club_id']
+    #     QuerySet =  super().get_queryset()
+    #     club = Club.objects.get(id=club_id)
+    #     members = Role.objects.filter(club=club)
+    #     QuerySet = members
+    
+
+    def render(self,*args, **kwargs):
+        club_id = self.kwargs['club_id']
+        club = Club.objects.get(id=club_id)
+        members = Role.objects.filter(club=club)
+        try:
+            userrole = Role.objects.get(club = club, user=self.request.user)
+        except ObjectDoesNotExist:
+            messages.add_message(self.request,messages.ERROR,"It seem you don't belong to this club!")
             return redirect('club_list')
         else:
-            return render(request, 'club_templates/club_page.html', {'members': members,
-                                                    'userrole': userrole,
-                                                    'club' : club})
+            if userrole.role == "A":
+                messages.add_message(self.request,messages.ERROR,"You are the applicant in this club, so you don't have authority to view the member list!")
+                return redirect('club_list')
+            else:
+                return render(self.request, 'club_templates/club_page.html', {'members': members,
+                                                        'userrole': userrole,
+                                                        'club' : club})
 
-"""This function is for the user to apply for the club.
-    If the user already in the club, system will refuse
-    to create a role for the user with an error message."""
+
 # @login_required
 # def apply(request, club_id):
 #     current_club = Club.objects.get(id=club_id)
