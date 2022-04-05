@@ -680,6 +680,8 @@ class PromoteToOfficer(LoginRequiredMixin,View):
     def get(self,*args, **kwargs):
         return HttpResponseForbidden()
 
+    
+
 
 
 
@@ -1614,16 +1616,20 @@ class EventList(View):
         club = Club.objects.get(id=club_id)
         members = Role.objects.filter(club=club)
         userrole = Role.objects.get(club = club, user=self.request.user)
-        try:
-            events = Event.objects.filter(club=club)
-        except ObjectDoesNotExist:
-            messages.add_message(self.request,messages.ERROR,"There are no events")
-            return redirect('club_list')
-        else:
+        events = Event.objects.filter(club=club)
+        if len(events) != 0:
             return render(self.request, 'club_templates/events_list.html', {'members': members,
                                                         'userrole': userrole,
                                                         'club' : club,
                                                         'events' : events})
+        else:
+            messages.add_message(self.request,messages.ERROR,"There are no events")
+            return redirect('club_list')
+        # else:
+        #     return render(self.request, 'club_templates/events_list.html', {'members': members,
+        #                                                 'userrole': userrole,
+        #                                                 'club' : club,
+        #                                                 'events' : events})
 
 
 class NewPostView(LoginRequiredMixin, CreateView):
