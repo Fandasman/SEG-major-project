@@ -114,6 +114,10 @@ class SetClubBookForm(forms.Form):
         except ObjectDoesNotExist:
             return False
 
+
+
+    
+
 class InviteForm(forms.Form):
     model = User
     username = forms.CharField(max_length=50, required=True, label="username")
