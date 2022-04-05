@@ -21,5 +21,3 @@ class UserPostFormTestCase(TestCase):
         input = {'body': 'x'*281, 'user':self.user, 'club':self.club}
         form = UserPostForm(data=input)
         self.assertFalse(form.is_valid())
-
-    def test_form_has_necessary_fields(self):
