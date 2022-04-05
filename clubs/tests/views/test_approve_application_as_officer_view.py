@@ -33,9 +33,6 @@ class ApproveTheApplicationAsOTestCase(TestCase):
         self.assertEqual(role_count_after, role_count_before)
         self.assertEqual(response.status_code, 403)
 
-    # def test_unsuccessful_approve_the_application(self):
-    #     pass
-    #
     def test_successful_approve_the_application(self):
         self.client.login(username=self.user.username, password='Password123')
         before_count = Role.objects.count()

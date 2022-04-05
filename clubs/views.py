@@ -452,12 +452,10 @@ class WishlistView(LoginRequiredMixin, ListView):
         return self.render(user_id)
 
     def render(self, user_id):
-        try:
-            user = User.objects.get(id = user_id)
-            return render(self.request, 'user_templates/wishlist.html', {'user': user})
+        user = User.objects.get(id = user_id)
+        return render(self.request, 'user_templates/wishlist.html', {'user': user})
 
-        except ObjectDoesNotExist:
-            return redirect('feed')
+
 
 
 """This function allows the club owner of the club to
@@ -916,16 +914,28 @@ def event_list(request,club_id):
     club = Club.objects.get(id=club_id)
     members = Role.objects.filter(club=club)
     userrole = Role.objects.get(club = club, user=request.user)
-    try:
-        events = Event.objects.filter(club=club)
-    except ObjectDoesNotExist:
+    if not Event.objects.filter(club= club):
         messages.add_message(request,messages.ERROR,"There are no events")
         return redirect('club_list')
     else:
-          return render(request, 'club_templates/events_list.html', {'members': members,
-                                                      'userrole': userrole,
-                                                      'club' : club,
-                                                      'events' : events})
+        events = Event.objects.filter(club=club)
+        return render(request, 'club_templates/events_list.html', {'members': members,
+                                                    'userrole': userrole,
+                                                    'club' : club,
+                                                    'events' : events})
+
+    # try:
+    #      Event.objects.get(name = "DefaultEvent")
+    # except ObjectDoesNotExist:
+    #     messages.add_message(request,messages.ERROR,"There are no events")
+    #     print("Here")
+    #     return redirect('club_list')
+    # else:
+    #       events = Event.objects.filter(club=club)
+    #       return render(request, 'club_templates/events_list.html', {'members': members,
+    #                                                   'userrole': userrole,
+    #                                                   'club' : club,
+    #                                                   'events' : events})
 
 class NewPostView(LoginRequiredMixin, CreateView):
     """Class-based generic view for new post handling."""
