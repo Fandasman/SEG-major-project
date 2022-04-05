@@ -26,7 +26,7 @@ class ApproveTheApplicationAsOTestCase(TestCase):
         self.assertEqual(self.url,f'/accept_applicant_as_officer/{self.club.id}/{self.member_user.id}')
 
     def test_get_approve_application_as_O_is_forbidden(self):
-        self.client.login(username = self.user.email, password='Password123')
+        self.client.login(username = self.user.username, password='Password123')
         role_count_before = Role.objects.count()
         response = self.client.get(self.url, follow = True)
         role_count_after = Role.objects.count()

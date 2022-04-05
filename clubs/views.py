@@ -10,8 +10,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, PermissionDenied
 from django.http import Http404, StreamingHttpResponse
 from django.http.response import HttpResponse, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
@@ -26,6 +26,9 @@ from scipy import spatial
 from surprise import dump
 from .forms import SignUpForm, LogInForm, EditProfileForm, ClubForm, SetClubBookForm, InviteForm,EventForm, UserPostForm, CommentForm, SearchForm, GenreForm, RatingForm
 from .models import Book, Club, Role, User, Invitation, Event, EventPost, UserPost, MembershipPost, Comment, Message, BooksRatings
+
+
+
 
 if "runserver" in sys.argv:
     print("Loading the model!")
@@ -185,28 +188,28 @@ def remove_rating(request, book_id):
     return redirect('show_book', book_id)
 
 
-# class RemoveRatingView(View):
+class RemoveRatingView(LoginRequiredMixin,View):
 
-#     def get(self,*args, **kwargs):
-#         self.render()
+    def get(self,*args, **kwargs):
+        return self.render()
     
-#     def post(self,*args, **kwargs):
-#         self.render()
+    def post(self,*args, **kwargs):
+        return self.render()
 
     
-#     def render(self,*args, **kwargs):
-#         book_id = self.kwargs['book_id']
-#         try:
-#             book = Book.objects.get(id = book_id)
-#         except ObjectDoesNotExist:
-#             return redirect('book_list')
+    def render(self,*args, **kwargs):
+        book_id = self.kwargs['book_id']
+        try:
+            book = Book.objects.get(id = book_id)
+        except ObjectDoesNotExist:
+            return redirect('book_list')
 
-#         exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = self.request.user))) != 0
-#         if exist_rating:
-#             rating = BooksRatings.objects.get(isbn = book.isbn, user = self.request.user)
-#             rating.delete()
+        exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = self.request.user))) != 0
+        if exist_rating:
+            rating = BooksRatings.objects.get(isbn = book.isbn, user = self.request.user)
+            rating.delete()
 
-#         return redirect('show_book', book_id)
+        return redirect('show_book', book_id)
 
 
 
@@ -536,7 +539,7 @@ class DeleteClubView(LoginRequiredMixin,View):
         return self.render()
 
     def post(self,request,club_id):
-        self.render()
+        return self.render()
         
     
 
@@ -937,8 +940,9 @@ class OwnerAcceptApplicantView(LoginRequiredMixin,View):
 
 class OfficerApplicantAccept(LoginRequiredMixin,View):
 
+
     def get(self,*args, **kwargs):
-        return HttpResponseForbidden()
+           return HttpResponseForbidden()
 
     def post(self,*args, **kwargs):
             club_id = self.kwargs['club_id']
@@ -956,7 +960,7 @@ class OfficerApplicantAccept(LoginRequiredMixin,View):
             return redirect(redirect_url,members = members,
                                                 userrole = userrole,
                                                 club = club)
-    
+
 
 
 """This function allows the club owner of the club to
@@ -1051,21 +1055,6 @@ class OfficerApplicantRejectView(LoginRequiredMixin,View):
     Otherwise, the user will see the list of the members of the club
     And the member can not see the details of the members
     only officers and club owners can do this"""
-
-# class InvitationlistView(LoginRequiredMixin, ListView):
-
-#     def get(self, request, user_id):
-#         return self.render(user_id)
-
-#     def render(self, user_id):
-#         try:
-#             user = User.objects.get(id = user_id)
-#             invitations = Invitation.objects.filter(user=user, status="P")
-#             return render(self.request, 'invitation_list.html', {'invitations': invitations})
-
-#         except ObjectDoesNotExist:
-#             return redirect('feed')
-
 
 
 # @login_required
@@ -1496,7 +1485,7 @@ class ClubFeedView(LoginRequiredMixin,View):
         return self.render()
 
     def post(self,request,club_id):
-        self.render()
+        return self.render()
         
     
 
@@ -1613,7 +1602,7 @@ class EventList(View):
         return self.render()
 
     def post(self,request,club_id):
-        self.render()
+        return self.render()
 
     def render(self,*args, **kwargs):
         club_id = self.kwargs['club_id']
@@ -1675,7 +1664,7 @@ class LikePostView(LoginRequiredMixin,View):
         return self.render()
 
     def post(self,request,club_id):
-        self.render()
+        return self.render()
         
     def render(self,*args, **kwargs):
         post_id = self.kwargs['post_id']
@@ -1814,6 +1803,28 @@ def join_event(request,event_id,club_id):
                                                    'club' : club,
                                                    'events' : events})
 
+class JoinEventView(View):
+    def get(self,*args, **kwargs):
+        return self.render()
+
+    def post(self,*args, **kwargs):
+        event_id = self.kwargs['event_id']
+        event = Event.objects.get(id=event_id)
+        event.save()
+        return self.render()
+
+    def render(self,*args, **kwargs):
+        club_id = self.kwargs['club_id']
+        club = Club.objects.get(id=club_id)
+        members = Role.objects.filter(club=club)
+        userrole = Role.objects.get(club = club, user=self.request.user)
+        events = Event.objects.filter(club = club)
+        return render(self.request, 'club_templates/events_list.html', {'members': members,
+                                                    'userrole': userrole,
+                                                    'club' : club,
+                                                    'events' : events})
+
+
 def add_user_to_interested_list(request,event_id,club_id):
      club = Club.objects.get(id=club_id)
      members = Role.objects.filter(club=club)
@@ -1825,6 +1836,28 @@ def add_user_to_interested_list(request,event_id,club_id):
                                                    'userrole': userrole,
                                                    'club' : club,
                                                    'events' : events})
+
+class AddUsertoInterestedView(View):
+    def get(self,*args, **kwargs):
+        return self.render()
+
+    def post(self,*args, **kwargs):
+     event_id = self.kwargs['event_id']
+     event = Event.objects.get(id=event_id)
+     event.add_user_to_interested_field(self.request.user)
+     return self.render()
+
+    def render(self,*args, **kwargs):
+        club_id = self.kwargs['club_id']
+        club = Club.objects.get(id=club_id)
+        members = Role.objects.filter(club=club)
+        userrole = Role.objects.get(club = club, user=self.request.user)
+        events = Event.objects.filter(club = club) 
+        return render(self.request, 'club_templates/events_list.html', {'members': members,
+                                                    'userrole': userrole,
+                                                    'club' : club,
+                                                    'events' : events})
+
 def event_page(request,event_id,club_id):
      club = Club.objects.get(id=club_id)
      event = Event.objects.get(id=event_id)
@@ -1854,19 +1887,19 @@ def user_chat(request, receiver_id):
     })
 
 
-def send_user_message(request):
-    user = request.user
-    if request.method == "POST":
-        text = request.POST.get('text')
-        user_id = user.id
-        receiver_id = request.POST.get('receiver_id')
-        user = User.objects.get(id=user_id)
-        receiver = User.objects.get(id=receiver_id)
-        new_message = Message.objects.create(text=text, user=user, receiver=receiver)
-        new_message.save()
-        return render(request, 'user_templates/user_chat.html')
-    else:
-        return HttpResponseForbidden()
+# def send_user_message(request):
+#     user = request.user
+#     if request.method == "POST":
+#         text = request.POST.get('text')
+#         user_id = user.id
+#         receiver_id = request.POST.get('receiver_id')
+#         user = User.objects.get(id=user_id)
+#         receiver = User.objects.get(id=receiver_id)
+#         new_message = Message.objects.create(text=text, user=user, receiver=receiver)
+#         new_message.save()
+#         return render(request, 'user_templates/user_chat.html')
+#     else:
+#         return HttpResponseForbidden()
 
 
 class SendUserMessageView(View):
