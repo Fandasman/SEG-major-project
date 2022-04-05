@@ -138,19 +138,19 @@ def show_book(request, book_id):
     )
 
 
-@login_required
-def remove_rating(request, book_id):
-    try:
-        book = Book.objects.get(id = book_id)
-    except ObjectDoesNotExist:
-        return redirect('book_list')
+# @login_required
+# def remove_rating(request, book_id):
+#     try:
+#         book = Book.objects.get(id = book_id)
+#     except ObjectDoesNotExist:
+#         return redirect('book_list')
 
-    exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) != 0
-    if exist_rating:
-        rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
-        rating.delete()
+#     exist_rating = len(list(BooksRatings.objects.filter(isbn = book.isbn, user = request.user))) != 0
+#     if exist_rating:
+#         rating = BooksRatings.objects.get(isbn = book.isbn, user = request.user)
+#         rating.delete()
 
-    return redirect('show_book', book_id)
+#     return redirect('show_book', book_id)
 
 
 class RemoveRatingView(LoginRequiredMixin,View):
@@ -1010,13 +1010,13 @@ class CreateEventView(CreateView):
     def get(self,request,*args, **kwargs):
         return self.render()
 
-    def form_valid(self,request,club_id):
-        form = EventForm(request.POST)
-        current_user = request.user
-        
+    def form_valid(self,form,*args, **kwargs):
+        form = EventForm
+        club_id = self.kwargs['club_id']
+        current_user = self.request.user
         this_event = form.save(club_id,current_user)
-        EventPost.objects.create(event = this_event, user=request.user)
-        return redirect('events_list', kwargs={'club_id':club_id})
+        EventPost.objects.create(event = this_event, user=self.request.user)
+        return redirect('events_list',club_id)
 
     def form_invalid(self,*args, **kwargs):
         messages.add_message(self.request, messages.ERROR, "The credentials provided were invalid!")
