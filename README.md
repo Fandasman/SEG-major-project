@@ -103,7 +103,7 @@ $ open htmlcov/index.html
 ```
 
 ## Model and Datasets
-The pretrained model and all the datasets can be found here: [URL](https://drive.google.com/file/d/1AmuWPyvTZaOlMmha1ozlP_dchP0FJ6MX/view?usp=sharing)
+The pretrained model and all the datasets can be found [here](https://drive.google.com/file/d/1AmuWPyvTZaOlMmha1ozlP_dchP0FJ6MX/view?usp=sharing)
 
 ## Sources
 The packages used by this application are specified in `requirements.txt`
