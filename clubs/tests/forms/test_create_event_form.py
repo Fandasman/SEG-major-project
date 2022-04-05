@@ -81,3 +81,10 @@ class EventCreationForm(TestCase):
         self.assertEqual(this_event.book.isbn, self.book.isbn)
         self.assertEqual(this_event.maxNumberOfParticipants, 20)
         self.assertEqual(this_event.deadline, date.today())
+
+    def test_get_book_titles(self):
+        form = EventForm()
+        titles = form.get_book_titles()
+        for book in Book.objects.all():
+           book_titles = book.title
+        self.assertEqual(titles, book_titles)
