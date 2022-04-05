@@ -1558,9 +1558,10 @@ class CreateEventView(CreateView):
         return self.render()
 
     def form_valid(self,form,*args, **kwargs):
+        form = EventForm
         club_id = self.kwargs['club_id']
         current_user = self.request.user
-        this_event = self.form.save(club_id,current_user)
+        this_event = form.save(club_id,current_user)
         EventPost.objects.create(event = this_event, user=self.request.user)
         return redirect('events_list',club_id)
 
