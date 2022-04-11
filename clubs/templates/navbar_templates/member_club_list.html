@@ -1,0 +1,41 @@
+{%extends 'base_content.html'%}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Member Club List</h1>
+      <form action="{% url 'owner_club_list' %}" method="post">
+        {% csrf_token %}
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        {% if roles|length == 0 %}
+          <h3> You are not a member of any clubs yet :( </h3>
+          <p> Try applying to some, or checking your invites and come back! </p>
+        
+        {% else %}
+
+       <p>You're a member of <b>{{ roles|length }}</b> club(s)! Woohoo!</p>
+
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Role</th>
+              </tr>
+            </thead>
+            {% for role in roles %}
+              <tr>
+                <td>{{ role.club.name }}</td>
+                <td>{{ role.role }}</td>
+                <td>
+                  <a class="btn btn-primary"  href="{% url 'club_feed' role.club.id %}">View page</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </table>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,45 @@
+{% extends 'base_content.html' %}
+{% block title %}
+| Profile
+{% endblock %}
+{% block content %}
+
+
+<div class="container">
+  <div class="row">
+    <div class='profile' style="width: 70%; height:100%" >
+      <div class="row content">
+        <div class="col-xs-12 col-lg-6 col-xl-4">
+          {% include 'partials/user_profile.html' with form=form%}
+        </div>
+      </div>
+      <form action= "{% url 'edit_profile'%}" method = "get">
+      <button class="btn btn-primary" href="{% url 'edit_profile'  %}">Edit profile</button>
+    </form>
+    <br>
+    <a class="btn btn-secondary" href="{% url 'select_genres' %}">Update genre preferences</a>
+    </div>
+
+  <div class = 'calendar', style="width: 30%; height:100%" >
+    <h2> Calendar</h2>
+    <hr>
+      {{ calendar }}
+      <br>
+      <hr>
+      <h4>Monthly Events</h4>
+      {%if events%}
+      <ul class="list-group list-group-flush">
+        {%for event in events%}
+          <li class="list-group-item">{{event.deadline}} : <a href = '/event_page/{{event.club.id}}/{{event.id}}' event.club.id>{{event.name}}</a></li>
+        {%endfor%}
+      </ul>
+      {%else%}
+        Sorry..no events this month
+      {%endif%}
+    </div>
+  </div>
+  </div>
+
+
+
+{% endblock %}

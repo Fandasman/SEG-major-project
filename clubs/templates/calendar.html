@@ -1,0 +1,32 @@
+{%extends 'base_content.html'%}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class= "col">
+    </div>
+    <div class= "col">
+    </div>
+
+
+  <div class = 'col'>
+    <h2> Calendar</h2>
+    <hr>
+      {{ calendar }}
+      <br>
+      <hr>
+      <h4>Monthly Events</h4>
+      {%if events%}
+      <ul class="list-group list-group-flush">
+        {%for event in events%}
+          <li class="list-group-item">{{event.deadline}} : <a href = '/event_page/{{event.club.id}}/{{event.id}}' event.club.id>{{event.name}}</a></li>
+        {%endfor%}
+      </ul>
+      {%else%}
+        Sorry..no events this month
+      {%endif%}
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

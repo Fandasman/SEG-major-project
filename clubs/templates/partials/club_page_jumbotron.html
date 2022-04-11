@@ -1,0 +1,78 @@
+<style>
+
+.buttons_jumbotron
+{
+  text-align: center;
+}
+
+
+.jumbotron_button {
+     background-color: transparent;
+     transition-duration: 0.4s;
+     font-size: 16px;
+     padding: 10px;
+     border: none;
+     margin: 4px 2px;
+     color: #808080
+
+  }
+
+.jumbotron_button:hover {
+    background-color: #D3D3D3;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    border-radius: 12px;
+    color: white;
+  }
+</style>
+
+
+<div class="buttons_jumbotron">
+<div class="shadow p-3 mb-5 bg-body rounded">
+<div  class="jumbotron">
+  <h1 class="display-4">{{club.name}}</h1>
+  <p class="lead">  {{club.description}}</p>
+  <hr class="my-4">
+  <p>Members : {{members | length }}</p>
+
+  <div class="btn-group btn-group-toggle" data-toggle="buttons">
+
+        <form action = "{% url 'club_feed' club.id %}" method = "get">
+            <button type="sumbit" class="jumbotron_button">Feed</button>
+        </form>
+
+      <form action = "{% url 'club_members' club.id %}" method = "get">
+         <button type="submit"class="jumbotron_button" >Members</button>
+      </form>
+
+        <form action = "{% url 'events_list' club.id %}" method = "get">
+            <button type="sumbit" class="jumbotron_button">Events</button>
+        </form>
+
+    {% if userrole.role == 'CO' or userrole.role == 'O' %}
+        <form action = "{% url 'create_event' club.id %}" method = "get">
+            <button type="submit" class="jumbotron_button" >Schedule Event</button>
+        </form>
+
+        <form action="{% url 'invite' club.id %}">
+            {% csrf_token %}
+            <button type = "submit" class="jumbotron_button">Invite</button>
+        </form>
+
+        {%endif%}
+
+        {% if userrole.role == 'CO' %}
+        <form action="{% url 'delete_club' club.id %}" method= "post">
+          {% csrf_token %}
+          <button type = "submit" class="jumbotron_button">Delete club</button>
+        </form>
+
+        {%endif%}
+     </div>
+   </div>
+</div>
+</div>

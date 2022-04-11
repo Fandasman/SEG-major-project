@@ -1,0 +1,43 @@
+[
+    {
+        "model": "clubs.user",
+        "pk": 2,
+        "fields": {
+            "first_name": "Jane",
+            "last_name": "Doe",
+            "username": "janedoe",
+            "email": "jane@example.org",
+            "password": "pbkdf2_sha256$260000$iGkOGC00dvNVncr3rtGWdL$IkIyONd+R4mPoN4APRvVqk5tGVLa3xocSQ2qJur+VZo=",
+            "bio": "Hi, I'm Jane.",
+            "is_active": true
+        }
+    },
+
+    {
+        "model": "clubs.user",
+        "pk": 3,
+        "fields": {
+            "first_name": "Alice",
+            "last_name": "Smith",
+            "username": "alicesmith",
+            "email": "alicesmith@example.org",
+            "password": "pbkdf2_sha256$260000$iGkOGC00dvNVncr3rtGWdL$IkIyONd+R4mPoN4APRvVqk5tGVLa3xocSQ2qJur+VZo=",
+            "bio": "Hi, I'm Alice.",
+            "is_active": true
+        }
+    },
+
+    {
+        "model": "clubs.user",
+        "pk": 4,
+        "fields": {
+            "first_name": "Bob",
+            "last_name": "Smith",
+            "username": "bobsmith",
+            "email": "bobsmith@example.org",
+            "password": "pbkdf2_sha256$260000$iGkOGC00dvNVncr3rtGWdL$IkIyONd+R4mPoN4APRvVqk5tGVLa3xocSQ2qJur+VZo=",
+            "bio": "Hi, I'm Bob.",
+            "is_active": true
+        }
+    }
+]

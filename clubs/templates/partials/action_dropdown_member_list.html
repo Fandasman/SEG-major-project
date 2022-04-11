@@ -1,0 +1,24 @@
+<div class="dropdown">
+     <button class="dropdown_actions" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+       ...
+         </button>
+           {%if member.user != user %}
+             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                {%if userrole.role == "CO"%}
+                  {% include 'partials/club_owner_operation.html' with members=members userrole=userrole%}
+               {%endif%}
+                  {%if userrole.role == 'O'%}
+                     {% include 'partials/officer_operation.html' with members=members userrole=userrole%}
+              {%endif%}
+             </ul>
+               {%else%}
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                     <form action="{% url 'leave_club' club.id%}" method="post">
+                           {% csrf_token %}
+                             <li>
+                             <button type="submit" class="dropdown-item" type="button">Leave club</button>
+                           </li>
+                        </form>
+                     </ul>
+                 {%endif%}
+              </div>

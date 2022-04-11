@@ -1,0 +1,39 @@
+{% extends 'base_content.html'%}
+{% load bootstrap_pagination %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Clubs</h1>
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+          </tr>
+        </thead>
+        {% for club in clubs %}
+          <tr>
+            <td>{{ club.name }}</td>
+            <td>
+              <p>
+              <form action = "{% url 'club_feed' club.id %}" method = "get">
+                {% csrf_token %}
+                <input type = "hidden" name = "next" value = "{{ next }}">
+                {% include 'partials/bootstrap_form.html' with form=form %}
+                <input type = "submit" value = "View page" class="btn btn-primary">
+              </form>
+              <br>
+              <form action="{% url 'apply' club.id%}" method="post">
+                {% csrf_token %}
+                <button type="submit", class='btn btn-success'>Apply</button>
+              </form>
+              </p>
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+      {% bootstrap_paginate page_obj range=6 previous_label="Previous" next_label="Next" show_first_last="true" %}
+    </div>
+  </div>
+</div>
+{% endblock %}

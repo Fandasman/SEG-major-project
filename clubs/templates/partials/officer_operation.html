@@ -1,0 +1,13 @@
+{% if userrole.role == "O" and member.role == "A" %}
+  <form action="{% url 'rejectasofficer' club.id member.user.id %}" method="post">
+      {% csrf_token %}
+  <input type="submit" value="Reject the applicant" class="event_list_button">
+  </form>
+{% endif %}
+
+{%if userrole.role == "O" and member.role == "A"%}
+ <form action="{% url 'accept_applicant' club.id member.user.id %}" method="post">
+     {% csrf_token %}
+ <input type="submit" value="Accept" class="event_list_button">
+ </form>
+{%endif%}
