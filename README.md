@@ -70,6 +70,7 @@ $ python3 manage.py migrate
 Seed the development database with:
 
 ```
+
 $ python3 manage.py seed --main_dataset ./main-data.csv --books_dataset ./new-books-data.csv
 ```
 
