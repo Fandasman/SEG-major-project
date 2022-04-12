@@ -20,8 +20,8 @@ class Command(BaseCommand):
         parser.add_argument("--books_dataset", type=str, required=True)
 
     def handle(self, *args, **options):
-        main_dataset = pd.read_csv(options['main_dataset']).drop(columns='Unnamed: 0')
-        books_dataset = pd.read_csv(options['books_dataset']).drop(columns='Unnamed: 0')
+        main_dataset = pd.read_csv(options['main_dataset'])
+        books_dataset = pd.read_csv(options['books_dataset'])
 
         print("Starting seed...")
 
