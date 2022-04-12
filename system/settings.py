@@ -161,3 +161,9 @@ MESSAGE_TAGS = {
 USERS_PER_PAGE= 25
 CLUBS_PER_PAGE= 15
 BOOKS_PER_PAGE= 30
+
+
+# Activate django_heroku
+if '/app' in os.environ['HOME']:
+    import django_heroku
+    django_heroku.settings(locals())

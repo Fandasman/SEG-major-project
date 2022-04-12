@@ -7,6 +7,7 @@ The members of the team are:
 - Guneek Deol
 - Mugur-Cristian Iacob
 - Lubna Taraki
+- Frantisek Hermanek
 - Xiaojun Liang
 
 ## Project structure
