@@ -14,7 +14,7 @@ The members of the team are:
 The project is called `system`.  It consists of a single app `clubs` and a `system` folder containing framework specific files.
 
 ## Deployed version of the application
-The deployed version of the application can be found at [URL](URL).
+The deployed version of the application can be found at this [URL](https://agile-gorge-39941.herokuapp.com/).
 
 The application will be deployed by April 15th 2022, as per the specified deadline.
 
