@@ -56,7 +56,6 @@ min-height: 20px;
     <div class="card" style="width: 30rem;">
        <div class="card-body">
           <h5 class="card-title">Members <span style="color:#676A6D;"> · {{members | length}} </span> </h5>
-             <h6 style="color:#676A6D;">New people that join this group will appear here. </h6>
                     <hr class="my-2">
                        {%if userrole.role == "CO" or userrole.role == 'O'%}
                           {%if club.get_all_aplicants.count > 0 %}
