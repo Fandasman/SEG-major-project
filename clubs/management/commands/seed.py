@@ -21,7 +21,7 @@ class Command(BaseCommand):
         main_dataset_url = "https://media.githubusercontent.com/media/Fandasman/SEG-major-project/main/main-data.csv?token=AK35BWXFUD2DKQOKH3ULGJ3CK352O"
         books_dataset_url = "https://media.githubusercontent.com/media/Fandasman/SEG-major-project/main/new-books-data.csv?token=AK35BWTJYRPE3NWWOPLDRMLCK353S"
         
-        main_dataset = pd.read_csv(main_dataset_url, sep = ',', nrows=100000)
+        main_dataset = pd.read_csv(main_dataset_url, sep = ',', nrows=2000)
         books_dataset = pd.read_csv(books_dataset_url, sep = ',')
 
         print("Starting seed...")
@@ -42,7 +42,7 @@ class Command(BaseCommand):
     # Generate fake users
     def generate_users(self, main_dataset):
         print("Generating club owner profile...")
-        num_user_ids = 1000
+        num_user_ids = 500
         User.objects.create(
             id = 1,
             username = 'charlie',
