@@ -16,10 +16,12 @@ class Command(BaseCommand):
         self.faker = Faker('en_GB')
 
     def handle(self, *args, **options):
-        main_dataset_url = "https://media.githubusercontent.com/media/Fandasman/SEG-major-project/main/main-data.csv?token=AK35BWTOIACUKWMRTER7GMTCK3WC4"
-        books_dataset_url = "https://media.githubusercontent.com/media/Fandasman/SEG-major-project/main/new-books-data.csv?token=AK35BWTFRKOAGZS73GB3GS3CK3WLI"
+
+        # Paste the most up to date url links to the datasets here
+        main_dataset_url = "https://media.githubusercontent.com/media/Fandasman/SEG-major-project/main/main-data.csv?token=AK35BWXFUD2DKQOKH3ULGJ3CK352O"
+        books_dataset_url = "https://media.githubusercontent.com/media/Fandasman/SEG-major-project/main/new-books-data.csv?token=AK35BWTJYRPE3NWWOPLDRMLCK353S"
         
-        main_dataset = pd.read_csv(main_dataset_url, sep = ',')
+        main_dataset = pd.read_csv(main_dataset_url, sep = ',', nrows=100000)
         books_dataset = pd.read_csv(books_dataset_url, sep = ',')
 
         print("Starting seed...")
@@ -40,7 +42,7 @@ class Command(BaseCommand):
     # Generate fake users
     def generate_users(self, main_dataset):
         print("Generating club owner profile...")
-        num_user_ids = len(set(main_dataset['User-ID'].tolist()))
+        num_user_ids = 1000
         User.objects.create(
             id = 1,
             username = 'charlie',
@@ -79,11 +81,13 @@ class Command(BaseCommand):
         print("Reading ratings from the main dataset...")
 
         for index, row in tqdm(main_dataset.iterrows(), total=main_dataset.shape[0]):
-            BooksRatings.objects.create(
-                isbn = row['ISBN'],
-                rating = row['Book-Rating'],
-                user = User.objects.get(id=row['User-ID'])
-            )
+            user_id = row['User-ID']
+            if user_id in User.objects.values_list('id', flat=True):
+                BooksRatings.objects.create(
+                    isbn = row['ISBN'],
+                    rating = row['Book-Rating'],
+                    user = User.objects.get(id=row['User-ID'])
+                )
 
         print("Done!")
 
