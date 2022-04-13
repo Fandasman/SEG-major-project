@@ -15,13 +15,12 @@ class Command(BaseCommand):
         super().__init__()
         self.faker = Faker('en_GB')
 
-    def add_arguments(self, parser):
-        parser.add_argument("--main_dataset", type=str, required=True)
-        parser.add_argument("--books_dataset", type=str, required=True)
-
     def handle(self, *args, **options):
-        main_dataset = pd.read_csv(options['main_dataset'])
-        books_dataset = pd.read_csv(options['books_dataset'])
+        main_dataset_url = "https://media.githubusercontent.com/media/Fandasman/SEG-major-project/main/main-data.csv?token=AK35BWTOIACUKWMRTER7GMTCK3WC4"
+        books_dataset_url = "https://media.githubusercontent.com/media/Fandasman/SEG-major-project/main/new-books-data.csv?token=AK35BWTFRKOAGZS73GB3GS3CK3WLI"
+        
+        main_dataset = pd.read_csv(main_dataset_url, sep = ',')
+        books_dataset = pd.read_csv(books_dataset_url, sep = ',')
 
         print("Starting seed...")
 
