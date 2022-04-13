@@ -68,16 +68,21 @@ Migrate the database:
 $ python3 manage.py migrate
 ```
 
-Seed the development database with:
+Seed the development database locally with:
 
 ```
-
 $ python3 manage.py seed --main_dataset ./main-data.csv --books_dataset ./new-books-data.csv
 ```
-
+In case you would like to store the aforementioned files in another directory, specify the path.
 Make sure the main_data.csv and new_books_data.csv are in the main directory of the project in order for the command to function properly.
 
-In case you would like to store the aforementioned files in another directory, specify the path.
+Or if you wish to seed the data set from a url source, use:
+
+```
+$ python3 manage.py seed
+```
+The default option is seeding from url, but this can be updated if url does not function in seed.py. See the documentation there for reference!
+
 
 Unseed the development database with:
 
