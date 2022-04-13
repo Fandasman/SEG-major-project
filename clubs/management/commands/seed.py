@@ -128,13 +128,13 @@ class Command(BaseCommand):
             fakeName = self.faker.company()
             fakeLocation = self.faker.address()
             fakeDescription = self.faker.text(max_nb_chars = 500)
-            club_book = Book.objects.get(id=random.randint(1, len(Book.objects.all())))
+            #club_book = Book.objects.get(id=random.randint(1, len(Book.objects.all())))
 
             club = Club.objects.create(
                 name = fakeName,
                 location = fakeLocation,
                 description = fakeDescription,
-                club_book = club_book
+                #club_book = club_book
             )
 
             # Role.objects.create(
