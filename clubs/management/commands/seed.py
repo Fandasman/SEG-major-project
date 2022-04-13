@@ -129,7 +129,7 @@ class Command(BaseCommand):
         print("Generating fake book clubs...")
         for i in tqdm(range(20)):
             fakeName = self.faker.company()
-            fakeLocation = self.faker.address()
+            fakeLocation = self.faker.address(max_nb_chars = 100)
             fakeDescription = self.faker.text(max_nb_chars = 500)
             club_book = Book.objects.get(id=random.randint(1, len(Book.objects.all())))
 
