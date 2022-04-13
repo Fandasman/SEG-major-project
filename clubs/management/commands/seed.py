@@ -27,11 +27,11 @@ class Command(BaseCommand):
 
         Command.generate_users(self, main_dataset)
 
-        # Command.get_ratings(self, main_dataset)
+        Command.get_ratings(self, main_dataset)
 
-        # Command.get_books(self, books_dataset)
+        Command.get_books(self, books_dataset)
 
-        # Command.update_genres_preferences(self)
+        Command.update_genres_preferences(self)
 
         Command.generate_clubs(self)
 
@@ -41,7 +41,7 @@ class Command(BaseCommand):
     # Generate fake users
     def generate_users(self, main_dataset):
         print("Generating club owner profile...")
-        #num_user_ids = len(set(main_dataset['User-ID'].tolist()))
+        num_user_ids = len(set(main_dataset['User-ID'].tolist()))
         User.objects.create(
             id = 1,
             username = 'charlie',
@@ -54,25 +54,25 @@ class Command(BaseCommand):
 
         print("Done!")
 
-        # print("Generating fake users...")
-        # for i in tqdm(range(num_user_ids - 1)):
-        #     fakeUsername = self.faker.user_name() + str(i)
-        #     fakeFirstName = self.faker.first_name()
-        #     fakeLastName = self.faker.last_name()
-        #     fakeEmail = fakeUsername + "@example.org"
-        #     fakeBio = self.faker.text(max_nb_chars = 500)
+        print("Generating fake users...")
+        for i in tqdm(range(num_user_ids - 1)):
+            fakeUsername = self.faker.user_name() + str(i)
+            fakeFirstName = self.faker.first_name()
+            fakeLastName = self.faker.last_name()
+            fakeEmail = fakeUsername + "@example.org"
+            fakeBio = self.faker.text(max_nb_chars = 500)
 
-        #     User.objects.create(
-        #         id = i + 2,
-        #         username = fakeUsername,
-        #         first_name = fakeFirstName,
-        #         last_name = fakeLastName,
-        #         email = fakeEmail,
-        #         password = Command.PASSWORD,
-        #         bio = fakeBio
-        #     )
+            User.objects.create(
+                id = i + 2,
+                username = fakeUsername,
+                first_name = fakeFirstName,
+                last_name = fakeLastName,
+                email = fakeEmail,
+                password = Command.PASSWORD,
+                bio = fakeBio
+            )
 
-        # print("Done!")
+        print("Done!")
 
 
     # Read ratings from the main dataset
@@ -128,43 +128,43 @@ class Command(BaseCommand):
             fakeName = self.faker.company()
             fakeLocation = self.faker.address()
             fakeDescription = self.faker.text(max_nb_chars = 500)
-            #club_book = Book.objects.get(id=random.randint(1, len(Book.objects.all())))
+            club_book = Book.objects.get(id=random.randint(1, len(Book.objects.all())))
 
             club = Club.objects.create(
                 name = fakeName,
                 location = fakeLocation,
                 description = fakeDescription,
-                #club_book = club_book
+                club_book = club_book
             )
 
-            # Role.objects.create(
-            #     user = User.objects.get(username = "charlie"),
-            #     club = club,
-            #     role = 'CO'
-            # )
+            Role.objects.create(
+                user = User.objects.get(username = "charlie"),
+                club = club,
+                role = 'CO'
+            )
 
-            # for i in range(random.randint(2, 3)):
-            #     user = User.objects.get(id=random.randint(2, len(User.objects.all())))
-            #     club_roles = Role.objects.filter(club = club)
-            #     club_user_ids = [i['user_id'] for i in club_roles.values('user_id')]
+            for i in range(random.randint(2, 3)):
+                user = User.objects.get(id=random.randint(2, len(User.objects.all())))
+                club_roles = Role.objects.filter(club = club)
+                club_user_ids = [i['user_id'] for i in club_roles.values('user_id')]
 
-            #     if user.id not in club_user_ids:
-            #         Role.objects.create(
-            #             user = user,
-            #             club = club,
-            #             role = 'O'
-            #         )
+                if user.id not in club_user_ids:
+                    Role.objects.create(
+                        user = user,
+                        club = club,
+                        role = 'O'
+                    )
 
-            # for i in range(random.randint(5, 10)):
-            #     user = User.objects.get(id=random.randint(2, len(User.objects.all())))
-            #     club_roles = Role.objects.filter(club = club)
-            #     club_user_ids = [i['user_id'] for i in club_roles.values('user_id')]
+            for i in range(random.randint(5, 10)):
+                user = User.objects.get(id=random.randint(2, len(User.objects.all())))
+                club_roles = Role.objects.filter(club = club)
+                club_user_ids = [i['user_id'] for i in club_roles.values('user_id')]
 
-            #     if user.id not in club_user_ids:
-            #         Role.objects.create(
-            #             user = user,
-            #             club = club,
-            #             role = 'M'
-            #         )
+                if user.id not in club_user_ids:
+                    Role.objects.create(
+                        user = user,
+                        club = club,
+                        role = 'M'
+                    )
 
         print("Done!")
