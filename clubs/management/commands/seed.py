@@ -16,21 +16,24 @@ class Command(BaseCommand):
         self.faker = Faker('en_GB')
 
     # UNCOMMENT IF YOU WISH TO LOAD DATASETS LOCALLY
+
     # def add_arguments(self, parser):
     #     parser.add_argument("--main_dataset", type=str, required=True)
     #     parser.add_argument("--books_dataset", type=str, required=True)
 
     def handle(self, *args, **options):
         # UNCOMMENT IF YOU WISH TO LOAD DATASETS LOCALLY
+
         # main_dataset = pd.read_csv(options['main_dataset']).drop(columns='Unnamed: 0')
         # books_dataset = pd.read_csv(options['books_dataset']).drop(columns='Unnamed: 0')
 
         # UNCOMMENT IF YOU WISH TO LOAD DATASETS FROM URL
         # Paste the most up to date url links to the datasets here
-        # main_dataset_url = "https://media.githubusercontent.com/media/Fandasman/SEG-major-project/main/main-data.csv?token=AK35BWRBTE7O6ILWA4P3KG3CK5SBE"
-        # books_dataset_url = "https://media.githubusercontent.com/media/Fandasman/SEG-major-project/main/new-books-data.csv?token=AK35BWXBLPSQMDKDEV3SUI3CK5SA2"
-        # main_dataset = pd.read_csv(main_dataset_url, sep = ',', nrows=2000)
-        # books_dataset = pd.read_csv(books_dataset_url, sep = ',')
+
+        main_dataset_url = "https://media.githubusercontent.com/media/Fandasman/SEG-major-project/main/main-data.csv?token=AK35BWRBTE7O6ILWA4P3KG3CK5SBE"
+        books_dataset_url = "https://media.githubusercontent.com/media/Fandasman/SEG-major-project/main/new-books-data.csv?token=AK35BWXBLPSQMDKDEV3SUI3CK5SA2"
+        main_dataset = pd.read_csv(main_dataset_url, sep = ',', nrows=2000)
+        books_dataset = pd.read_csv(books_dataset_url, sep = ',')
 
         print("Starting seed...")
 
