@@ -41,7 +41,7 @@ class Command(BaseCommand):
     # Generate fake users
     def generate_users(self, main_dataset):
         print("Generating club owner profile...")
-        num_user_ids = len(set(main_dataset['User-ID'].tolist()))
+        #num_user_ids = len(set(main_dataset['User-ID'].tolist()))
         User.objects.create(
             id = 1,
             username = 'charlie',
