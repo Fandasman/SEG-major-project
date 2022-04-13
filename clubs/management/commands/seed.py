@@ -25,11 +25,11 @@ class Command(BaseCommand):
 
         print("Starting seed...")
 
+        Command.get_books(self, books_dataset)
+
         Command.generate_users(self, main_dataset)
 
         Command.get_ratings(self, main_dataset)
-
-        Command.get_books(self, books_dataset)
 
         Command.update_genres_preferences(self)
 
