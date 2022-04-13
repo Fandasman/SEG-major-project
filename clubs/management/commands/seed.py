@@ -138,11 +138,12 @@ class Command(BaseCommand):
     # Generate fake clubs and set charlie as their owner
     def generate_clubs(self):
         print("Generating fake book clubs...")
+        books = Book.objects.all()
         for i in tqdm(range(20)):
             fakeName = self.faker.company()
-            fakeLocation = self.faker.address(max_nb_chars = 100)
+            fakeLocation = self.faker.address()
             fakeDescription = self.faker.text(max_nb_chars = 500)
-            club_book = Book.objects.get(id=random.randint(1, len(Book.objects.all())))
+            club_book = random.choice(books)
 
             club = Club.objects.create(
                 name = fakeName,
