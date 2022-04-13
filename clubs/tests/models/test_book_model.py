@@ -42,12 +42,12 @@ class BookModelTestCase(TestCase):
         self.book.title=second_book.title
         self._assert_book_is_valid()
 
-    def test_title_can_have_less_than_100_characters(self):
-        self.book.title='x' * 100
+    def test_title_can_have_less_than_500_characters(self):
+        self.book.title='x' * 500
         self._assert_book_is_valid()
 
-    def test_title_cannot_have_more_than_100_characters(self):
-        self.book.title='x' * 101
+    def test_title_cannot_have_more_than_500_characters(self):
+        self.book.title='x' * 501
         self._assert_book_is_invalid()
 
 # Author tests
@@ -60,12 +60,12 @@ class BookModelTestCase(TestCase):
         self.book.author=second_book.author
         self._assert_book_is_valid()
 
-    def test_author_can_have_less_than_100_characters(self):
-        self.book.author='x' * 100
+    def test_author_can_have_less_than_500_characters(self):
+        self.book.author='x' * 500
         self._assert_book_is_valid()
 
-    def test_author_cannot_have_more_than_100_characters(self):
-        self.book.author='x' * 101
+    def test_author_cannot_have_more_than_500_characters(self):
+        self.book.author='x' * 501
         self._assert_book_is_invalid()
 
 # Publisher tests
@@ -78,12 +78,12 @@ class BookModelTestCase(TestCase):
         self.book.publisher=second_book.publisher
         self._assert_book_is_valid()
 
-    def test_publisher_can_have_less_than_100_characters(self):
-        self.book.publisher='x' * 100
+    def test_publisher_can_have_less_than_500_characters(self):
+        self.book.publisher='x' * 500
         self._assert_book_is_valid()
 
-    def test_publisher_cannot_have_more_than_100_characters(self):
-        self.book.publisher='x' * 101
+    def test_publisher_cannot_have_more_than_500_characters(self):
+        self.book.publisher='x' * 501
         self._assert_book_is_invalid()
 
 # Published tests

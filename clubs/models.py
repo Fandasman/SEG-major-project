@@ -48,9 +48,9 @@ class UserManager(AbstractUserManager):
 # Create the Book model
 class Book(models.Model):
     isbn = models.CharField(max_length = 13, unique = True, blank = False)
-    title = models.CharField(max_length = 100, blank = False)
-    author = models.CharField(max_length = 100, blank = False)
-    publisher = models.CharField(max_length = 100, blank = False)
+    title = models.CharField(max_length = 500, blank = False)
+    author = models.CharField(max_length = 500, blank = False)
+    publisher = models.CharField(max_length = 500, blank = False)
     published = models.IntegerField(
         default = datetime.datetime.now().year,
         validators = [MaxValueValidator(datetime.datetime.now().year), MinValueValidator(0)]
