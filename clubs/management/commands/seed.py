@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 from clubs.models import User, Book, BooksRatings, Club, Role
 from django.contrib.auth.hashers import make_password
 from faker import Faker
+from django.core.exceptions import ObjectDoesNotExist
 
 class Command(BaseCommand):
     """The database seeder."""
@@ -74,15 +75,18 @@ class Command(BaseCommand):
             fakeEmail = fakeUsername + "@example.org"
             fakeBio = self.faker.text(max_nb_chars = 500)
 
-            User.objects.create(
-                id = i + 2,
-                username = fakeUsername,
-                first_name = fakeFirstName,
-                last_name = fakeLastName,
-                email = fakeEmail,
-                password = Command.PASSWORD,
-                bio = fakeBio
-            )
+            try:
+                User.objects.get(id = i + 2)
+            except ObjectDoesNotExist:
+                User.objects.create(
+                    id = i + 2,
+                    username = fakeUsername,
+                    first_name = fakeFirstName,
+                    last_name = fakeLastName,
+                    email = fakeEmail,
+                    password = Command.PASSWORD,
+                    bio = fakeBio
+                )
 
         print("Done!")
 
