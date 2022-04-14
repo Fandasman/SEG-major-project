@@ -420,8 +420,8 @@ class CreateClubView(LoginRequiredMixin,FormView):
 
         return self.render()
 
-    def form_invalid(self):
-        return self.render()
+    # def form_invalid(self):
+    #     return self.render()
 
     def render(self):
         form = ClubForm()
