@@ -96,13 +96,11 @@ class Command(BaseCommand):
         print("Reading ratings from the main dataset...")
 
         for index, row in tqdm(main_dataset.iterrows(), total=main_dataset.shape[0]):
-            user_id = row['User-ID']
-            if user_id in User.objects.values_list('id', flat=True):
-                BooksRatings.objects.create(
-                    isbn = row['ISBN'],
-                    rating = row['Book-Rating'],
-                    user = User.objects.get(id=row['User-ID'])
-                )
+            BooksRatings.objects.create(
+                isbn = row['ISBN'],
+                rating = row['Book-Rating'],
+                user = User.objects.get(id=row['User-ID'])
+            )
 
         print("Done!")
 
