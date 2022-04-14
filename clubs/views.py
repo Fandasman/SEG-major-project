@@ -420,9 +420,6 @@ class CreateClubView(LoginRequiredMixin,FormView):
 
         return self.render()
 
-    def form_invalid(self):
-        return self.render()
-
     def render(self):
         form = ClubForm()
         return render(self.request, 'club_templates/create_club.html' , {'form': form})
@@ -437,9 +434,6 @@ class DeleteClubView(LoginRequiredMixin,View):
 
     def post(self,request,club_id):
         return self.render()
-
-
-
 
     def render(self,*args, **kwargs):
         club_id = self.kwargs['club_id']
