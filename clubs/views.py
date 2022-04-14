@@ -37,7 +37,7 @@ if "runserver" in sys.argv:
 THRESHOLD = 25
 
 
-# Create your views here.
+
 @login_required
 def feed(request):
     current_user = request.user
@@ -137,44 +137,6 @@ def show_book(request, book_id):
                      'in_wishlist': in_wishlist}
     )
 
-# class ShowBookView(DetailView):
-
-#     model = Book
-#     template_name = 'show_book.html'
-#     context_object_name = 'book'
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         book = self.get_object()
-#         context['past_rating'] = BooksRatings.objects.get(isbn = book.isbn, user = self.current_user)
-#         context
-
-#     def post(self,request,*args, **kwargs):
-#         book_id = self.kwargs['book_idß']
-#         book = Book.objects.get(id=book_id)
-#         current_user = self.request.user
-#         book_form = RatingForm(request.POST)
-#         past_rating = BooksRatings.objects.get(isbn = book.isbn, user = current_user)
-#         if book_form.is_valid() and book_form.cleaned_data.get('rating') != '':
-#                 if exist_rating == False:
-#                     new_rating = BooksRatings.objects.create(
-#                         isbn = book.isbn,
-#                         rating = book_form.cleaned_data.get('rating'),
-#                         user = current_user
-#                     )
-#                     new_rating.save()
-#                     exist_rating = True
-#                     current_rating_value = new_rating.rating
-#                     if book.genre not in current_user.genres_preferences:
-#                         current_user.genres_preferences.insert(len(current_user.genres_preferences), book.genre)
-#                         current_user.save()
-#                 else:
-#                     past_rating.rating = book_form.cleaned_data.get('rating')
-#                     current_rating_value = past_rating.rating
-#                     past_rating.save()
-
-
-
 
 # @login_required
 # def remove_rating(request, book_id):
@@ -195,11 +157,11 @@ class RemoveRatingView(LoginRequiredMixin,View):
 
     def get(self,*args, **kwargs):
         return self.render()
-    
+
     def post(self,*args, **kwargs):
         return self.render()
 
-    
+
     def render(self,*args, **kwargs):
         book_id = self.kwargs['book_id']
         try:
@@ -214,14 +176,6 @@ class RemoveRatingView(LoginRequiredMixin,View):
 
         return redirect('show_book', book_id)
 
-
-
-# @login_required
-# def profile(request):
-#     current_user = request.user
-#     return render(request, 'user_templates/profile.html',
-#             {'user': current_user}
-#         )
 
 
 class HomeView(LoginProhibitedMixin,View):
@@ -416,33 +370,14 @@ class SignUpView(LoginProhibitedMixin,FormView):
     def get_success_url(self):
         pass
 
-"""This function allows the user to select prefered genres upon sign up."""
-# @login_required
-# def select_genres(request):
-
-#     genres = Book.objects.values_list('genre',flat=True).distinct()
-#     current_user = request.user
-
-#     if request.method=='POST':
-#             form = GenreForm(request.POST)
-#             if form.is_valid():
-#                     current_user.genres_preferences = form.save()
-#                     current_user.save()
-#                     messages.add_message(request, messages.SUCCESS, "Preferences updated!")
-#                     return redirect('feed')
-#             else:
-#                 messages.add_message(request, messages.ERROR, "You must select a maximum of 5 choices!")
-#     else:
-#         form = GenreForm(instance = current_user)
-#     return render(request, "select_genres.html", {'genres': genres, 'form': form})
 
 
 """This class allows the user to select prefered genres upon sign up."""
 class SelectGenresView(LoginRequiredMixin,FormView):
-    
+
     form_class = GenreForm
     template_name = "select_genres.html"
-    
+
 
     def form_valid(self,form):
                     current_user = self.request.user
@@ -450,41 +385,15 @@ class SelectGenresView(LoginRequiredMixin,FormView):
                     current_user.save()
                     messages.add_message(self.request, messages.SUCCESS, "Preferences updated!")
                     return redirect('feed')
-           
+
     def form_invalid(self,form):
                     genres = Book.objects.values_list('genre',flat=True).distinct()
                     messages.add_message(self.request, messages.ERROR, "You must select a maximum of 5 choices!")
                     return render(self.request, "select_genres.html", {'genres': genres, 'form': form})
 
-    
 
 
 
-"""This function standardize the requirements for
-    creating clubs, if club is successfully created,
-    it will be store in the database and client will
-    be redirected to the feed page"""
-# @login_required
-# def create_club(request):
-#     current_user = request.user
-#     if request.method == 'POST':
-#         current_user = request.user
-#         current_owned_clubs = Role.objects.filter(user = current_user, role = 'CO')
-#         if len(current_owned_clubs) < 3:
-#             form = ClubForm(request.POST)
-#             if form.is_valid():
-#                 newClub = form.save()
-#                 MembershipPost.objects.create(club = newClub, user = current_user)
-#                 role = Role.objects.create(user = current_user, club = newClub, role = 'CO')
-#                 return redirect('club_list')
-#         else:
-#             messages.add_message(request, messages.ERROR, "You already own too many clubs!")
-#             form = ClubForm()
-#         return render(request, 'club_templates/create_club.html' , {'form': form})
-
-#     else:
-#         form = ClubForm()
-#         return render(request, 'club_templates/create_club.html' , {'form': form})
 
 
 class CreateClubView(LoginRequiredMixin,FormView):
@@ -493,9 +402,9 @@ class CreateClubView(LoginRequiredMixin,FormView):
     template_name = 'club_templates/create_club.html'
 
 
- 
 
-    def form_valid(self, form):
+
+    def form_valid(self,form):
         current_user = self.request.user
         current_owned_clubs = Role.objects.filter(user = current_user, role = 'CO')
         if len(current_owned_clubs) < 3:
@@ -503,37 +412,22 @@ class CreateClubView(LoginRequiredMixin,FormView):
                 MembershipPost.objects.create(club = newClub, user = current_user)
                 role = Role.objects.create(user = current_user, club = newClub, role = 'CO')
                 return redirect('club_list')
-                
+
         else:
                 messages.add_message(self.request, messages.ERROR, "You already own too many clubs!")
                 form = ClubForm()
 
 
         return self.render()
-    
+
     def form_invalid(self):
         return self.render()
 
     def render(self):
         form = ClubForm()
         return render(self.request, 'club_templates/create_club.html' , {'form': form})
-    
 
 
-
-"""This function allows owners of a club to delete the club"""
-# @login_required
-# def delete_club(request, club_id):
-#     current_user = request.user
-#     club = Club.objects.get(id = club_id)
-#     try:
-#         role = Role.objects.get(user = current_user, club = club,role = 'CO') 
-#     except ObjectDoesNotExist:
-#         return redirect('feed')
-#     else:
-#         if role.role == 'CO':
-#             return render(request, 'club_templates/delete_club.html', {'club': club})
-        # return redirect("feed")
 
 
 class DeleteClubView(LoginRequiredMixin,View):
@@ -543,15 +437,15 @@ class DeleteClubView(LoginRequiredMixin,View):
 
     def post(self,request,club_id):
         return self.render()
-        
-    
+
+
 
 
     def render(self,*args, **kwargs):
         club_id = self.kwargs['club_id']
         club = Club.objects.get(id = club_id)
         try:
-            role = Role.objects.get(user = self.request.user, club = club,role = 'CO') 
+            role = Role.objects.get(user = self.request.user, club = club,role = 'CO')
         except ObjectDoesNotExist:
             return redirect('feed')
         else:
@@ -559,20 +453,7 @@ class DeleteClubView(LoginRequiredMixin,View):
                 return render(self.request, 'club_templates/delete_club.html', {'club': club})
 
 
-# @login_required
-# def delete_club_action(request, club_id):
-#     current_user = request.user
-#     club = Club.objects.get(id = club_id)
-#     try:
-#         role = Role.objects.get(user = current_user, club = club)
-#     except ObjectDoesNotExist:
-#         return redirect('feed')
-#     else:
-#         if role.role == 'CO':
-#             Club.objects.get(id = club_id).delete()
-#             messages.add_message(request, messages.SUCCESS, "Club deleted! Time to make another one?")
 
-#         return redirect('feed')
 
 
 class DeleteClubActionView(LoginRequiredMixin,View):
@@ -591,12 +472,12 @@ class DeleteClubActionView(LoginRequiredMixin,View):
                     messages.add_message(self.request, messages.SUCCESS, "Club deleted! Time to make another one?")
 
             return redirect('feed')
-    
+
 
 
     def post(self,request,*args, **kwargs):
        pass
-        
+
 
 
 class EditProfileView(LoginRequiredMixin, View):
@@ -630,36 +511,11 @@ class WishlistView(LoginRequiredMixin, ListView):
         return render(self.request, 'user_templates/wishlist.html', {'user': user})
 
 
-
-
-"""This function allows the club owner of the club to
-    promote the member to the officer"""
-# def promote_member_to_officer(request, club_id, member_id):
-#     if request.method == 'POST':
-#         if request.user.is_authenticated:
-#             user = request.user
-#             club = Club.objects.get(id = club_id)
-#             userrole = Role.objects.filter(user=user,club=club)
-#             redirect_url = reverse('club_members', kwargs={'club_id':club_id})
-#             member = User.objects.get(id = member_id)
-#             newOfficer = Role.objects.get(club = club, user = member)
-#             newOfficer.role = 'O'
-#             newOfficer.save()
-#             members = [member for member in Role.objects.filter(club=club)]
-#             return redirect(redirect_url,members = members,
-#                                                 userrole = userrole,
-#                                                 club = club)
-#         else:
-#             return redirect('login')
-#     else:
-#         return HttpResponseForbidden()
-
-
 """This function allows the club owner of the club to
     promote the member to the officer"""
 
 class PromoteToOfficer(LoginRequiredMixin,View):
-     
+
     def post(self,*args, **kwargs):
         club_id = self.kwargs['club_id']
         member_id = self.kwargs['member_id']
@@ -675,43 +531,15 @@ class PromoteToOfficer(LoginRequiredMixin,View):
         return redirect(redirect_url,members = members,
                                                 userrole = userrole,
                                                 club = club)
-        
+
 
     def get(self,*args, **kwargs):
         return HttpResponseForbidden()
 
-    
 
-
-
-
-"""This function allows the club owner of the club to
-    promote the officer to the club owner, and the club
-    owner will be the officer of the club"""
-# def promote_officer_to_ClubOwner(request, club_id, member_id):
-#     if request.method == 'POST':
-#         if request.user.is_authenticated:
-#             user = request.user
-#             club = Club.objects.get(id = club_id)
-#             userrole = Role.objects.get(club=club,user=user)
-#             redirect_url = reverse('club_members', kwargs={'club_id':club_id})
-#             member = User.objects.get(id = member_id)
-#             newClubOwner = Role.objects.get(club = club, user = member)
-#             userrole.role = 'O'
-#             userrole.save()
-#             newClubOwner.role = 'CO'
-#             newClubOwner.save()
-#             members = [member for member in Role.objects.filter(club=club)]
-#             return redirect(redirect_url,members = members,
-#                                                 userrole = userrole,
-#                                                 club = club)
-#         else:
-#             return redirect('login')
-#     else:
-#         return HttpResponseForbidden()
 
 class PromoteToOwner(LoginRequiredMixin,View):
-     
+
     def post(self,*args, **kwargs):
         club_id = self.kwargs['club_id']
         member_id = self.kwargs['member_id']
@@ -730,37 +558,16 @@ class PromoteToOwner(LoginRequiredMixin,View):
         return redirect(redirect_url,members = members,
                                                 userrole = userrole,
                                                 club = club)
-        
+
 
     def get(self,*args, **kwargs):
         return HttpResponseForbidden()
 
-"""This function allows the club owner of the club to
-    demote the officer to the member"""
-# def demote_officer_to_member(request, club_id, member_id):
-#     if request.method == 'POST':
-#         if request.user.is_authenticated:
-#             user = request.user
-#             userrole = Role.objects.filter(user=user)
-#             redirect_url = reverse('club_members', kwargs={'club_id':club_id})
-#             club = Club.objects.get(id = club_id)
-#             member = User.objects.get(id = member_id)
-#             newMember = Role.objects.get(club = club, user = member)
-#             isOwner = Role.objects.get(club=club,user=request.user,role = 'CO')
-#             newMember.role = 'M'
-#             newMember.save()
-#             members = [member for member in Role.objects.filter(club=club)]
-#             return redirect(redirect_url,members = members,
-#                                                 userrole = userrole,
-#                                                 club = club)
-#         else:
-#             return redirect('login')
-#     else:
-#         return HttpResponseForbidden()
+
 
 
 class DemoteOfficerView(LoginRequiredMixin,View):
-     
+
     def post(self,*args, **kwargs):
         club_id = self.kwargs['club_id']
         member_id = self.kwargs['member_id']
@@ -777,34 +584,14 @@ class DemoteOfficerView(LoginRequiredMixin,View):
         return redirect(redirect_url,members = members,
                                                 userrole = userrole,
                                                 club = club)
-        
+
 
     def get(self,*args, **kwargs):
         return HttpResponseForbidden()
 
-"""This function allows the club owner of the club to
-    remove the member of the club"""
-# def remove_member(request, club_id, member_id):
-#     if request.method == 'POST':
-#         if request.user.is_authenticated:
-#             user = request.user
-#             userrole = Role.objects.filter(user=user)
-#             redirect_url = reverse('club_members', kwargs={'club_id':club_id})
-#             club = Club.objects.get(id = club_id)
-#             member = User.objects.get(id = member_id)
-#             newMember = Role.objects.get(club = club, user = member)
-#             newMember.delete()
-#             members = Role.objects.filter(club=club)
-#             return redirect(redirect_url,members = members,
-#                                                 userrole = userrole,
-#                                                 club = club)
-#         else:
-#             return redirect('login')
-#     else:
-#         return HttpResponseForbidden()
 
 class RemoveMemberView(LoginRequiredMixin,View):
-     
+
     def post(self,*args, **kwargs):
         club_id = self.kwargs['club_id']
         member_id = self.kwargs['member_id']
@@ -819,7 +606,7 @@ class RemoveMemberView(LoginRequiredMixin,View):
         return redirect(redirect_url,members = members,
                                                 userrole = userrole,
                                                 club = club)
-        
+
 
     def get(self,*args, **kwargs):
         return HttpResponseForbidden()
@@ -828,26 +615,6 @@ class RemoveMemberView(LoginRequiredMixin,View):
 """This function allows the member of the club to
     leave the club, which means the role has been
     deleted"""
-# @login_required
-# def leave_club(request, club_id):
-#     if request.method == 'POST':
-#             user = request.user
-#             current_club = Club.objects.get(id=club_id)
-#             userrole = Role.objects.filter(club=current_club).get(user=user)
-#             if userrole.role == "CO":
-#                 messages.add_message(request, messages.INFO, f'You cannot leave a club that you own!')
-#             else:
-#                 redirect_url = reverse('club_members', kwargs={'club_id':club_id})
-#                 members = Role.objects.filter(club=current_club)
-#                 userrole.delete()
-#                 post = MembershipPost.objects.create(user = user, club = current_club)
-#                 post.join = False
-#                 post.save()
-#                 messages.add_message(request, messages.SUCCESS, f'You have successfully left {current_club.name}!')
-#             return redirect('feed')
-#     else:
-#         return HttpResponseForbidden()
-
 
 class LeaveClubView(LoginRequiredMixin,View):
     def post(self,request,*args, **kwargs):
@@ -870,32 +637,7 @@ class LeaveClubView(LoginRequiredMixin,View):
 
     def get(self,request,*args, **kwargs):
         return HttpResponseForbidden()
-        
 
-
-# """This function allows the club owner of the club to
-#     accept the application the applicant, it means
-#     the applicant will be the member of the club"""
-# def accept_applicant_to_club_as_Owner(request,club_id,member_id):
-#     if request.method == 'POST':
-#         if request.user.is_authenticated:
-#             user = request.user
-#             userrole = Role.objects.filter(user=user)
-#             redirect_url = reverse('club_members', kwargs={'club_id':club_id})
-#             club = Club.objects.get(id = club_id)
-#             member = User.objects.get(id = member_id)
-#             newMember = Role.objects.get(club = club, user = member)
-#             newMember.role = 'M'
-#             newMember.save()
-#             MembershipPost.objects.create(user = member, club = club)
-#             members = Role.objects.filter(club=club)
-#             return redirect(redirect_url,members = members,
-#                                                 userrole = userrole,
-#                                                 club = club)
-#         else:
-#             return redirect('login')
-#     else:
-#         return HttpResponseForbidden()
 
 class OwnerAcceptApplicantView(LoginRequiredMixin,View):
     def post(self,request,*args, **kwargs):
@@ -913,33 +655,10 @@ class OwnerAcceptApplicantView(LoginRequiredMixin,View):
         members = Role.objects.filter(club=club)
         return redirect(redirect_url,members = members,
                                                 userrole = userrole,
-                                                club = club)        
+                                                club = club)
 
     def get(self,request,*args, **kwargs):
         return HttpResponseForbidden()
-
-"""This function allows the officer of the club to
-    accept the application the applicant, it means
-    the applicant will be the member of the club"""
-# def accept_applicant_to_club_as_officer(request,club_id,member_id):
-#     if request.method == 'POST':
-#         if request.user.is_authenticated:
-#             user = request.user
-#             userrole = Role.objects.filter(user=user)
-#             redirect_url = reverse('club_members', kwargs={'club_id':club_id})
-#             club = Club.objects.get(id = club_id)
-#             member = User.objects.get(id = member_id)
-#             newMember = Role.objects.get(club = club, user = member)
-#             newMember.role = 'M'
-#             newMember.save()
-#             MembershipPost.objects.create(user = member, club = club)
-#             members = Role.objects.filter(club=club)
-#             return redirect(redirect_url,members = members,
-#                                                 userrole = userrole,
-#                                                 club = club)
-#         return redirect('login')
-#     else:
-#         return HttpResponseForbidden()
 
 class OfficerApplicantAccept(LoginRequiredMixin,View):
 
@@ -966,28 +685,6 @@ class OfficerApplicantAccept(LoginRequiredMixin,View):
 
 
 
-"""This function allows the club owner of the club to
-    reject the application the applicant, it means
-    the applicant will be removed from the club"""
-# def reject_applicant_to_club_as_Owner(request,club_id,member_id):
-#     if request.method == 'POST':
-#         if request.user.is_authenticated:
-#             user = request.user
-#             userrole = Role.objects.filter(user=user)
-#             redirect_url = reverse('club_members', kwargs={'club_id':club_id})
-#             club = Club.objects.get(id = club_id)
-#             member = User.objects.get(id = member_id)
-#             newMember = Role.objects.get(club = club, user = member)
-#             newMember.delete()
-#             members = Role.objects.filter(club=club)
-#             return redirect(redirect_url,members = members,
-#                                                 userrole = userrole,
-#                                                 club = club)
-#         else:
-#             return redirect('login')
-#     else:
-#         return HttpResponseForbidden()
-
 class OwnerApplicantRejectView(LoginRequiredMixin,View):
 
     def get(self,*args, **kwargs):
@@ -1007,29 +704,7 @@ class OwnerApplicantRejectView(LoginRequiredMixin,View):
             return redirect(redirect_url,members = members,
                                                 userrole = userrole,
                                                 club = club)
-    
 
-"""This function allows the officer of the club to
-    reject the application the applicant, it means
-    the applicant will be removed from the club"""
-# def reject_applicant_to_club_as_Officer(request,club_id,member_id):
-#     if request.method == 'POST':
-#         if request.user.is_authenticated:
-#             user = request.user
-#             userrole = Role.objects.filter(user=user)
-#             redirect_url = reverse('club_members', kwargs={'club_id':club_id})
-#             club = Club.objects.get(id = club_id)
-#             member = User.objects.get(id = member_id)
-#             newMember = Role.objects.get(club = club, user = member)
-#             newMember.delete()
-#             members = Role.objects.filter(club=club)
-#             return redirect(redirect_url,members = members,
-#                                                 userrole = userrole,
-#                                                 club = club)
-#         else:
-#             return redirect('login')
-#     else:
-#         return HttpResponseForbidden()
 
 class OfficerApplicantRejectView(LoginRequiredMixin,View):
 
@@ -1060,36 +735,10 @@ class OfficerApplicantRejectView(LoginRequiredMixin,View):
     only officers and club owners can do this"""
 
 
-# @login_required
-# def club_members(request, club_id):
-#     club = Club.objects.get(id=club_id)
-#     members = Role.objects.filter(club=club)
-#     try:
-#         userrole = Role.objects.get(club = club, user=request.user)
-#     except ObjectDoesNotExist:
-#         messages.add_message(request,messages.ERROR,"It seem you don't belong to this club!")
-#         return redirect('club_list')
-#     else:
-#         if userrole.role == "A":
-#             messages.add_message(request,messages.ERROR,"You are the applicant in this club, so you don't have authority to view the member list!")
-#             return redirect('club_list')
-#         else:
-#             return render(request, 'club_templates/club_page.html', {'members': members,
-#                                                     'userrole': userrole,
-#                                                     'club' : club})
 
 class ClubMembersView(LoginRequiredMixin,ListView):
     def get(self,request,*args, **kwargs):
         return self.render()
-
-    
-    # def get_queryset(self):
-    #     club_id = self.kwargs['club_id']
-    #     QuerySet =  super().get_queryset()
-    #     club = Club.objects.get(id=club_id)
-    #     members = Role.objects.filter(club=club)
-    #     QuerySet = members
-    
 
     def render(self,*args, **kwargs):
         club_id = self.kwargs['club_id']
@@ -1110,25 +759,6 @@ class ClubMembersView(LoginRequiredMixin,ListView):
                                                         'club' : club})
 
 
-# @login_required
-# def apply(request, club_id):
-#     current_club = Club.objects.get(id=club_id)
-#     if request.method == "POST":
-#         if request.user.is_authenticated:
-#             current_user = request.user
-#             try:
-#                 role = Role.objects.filter(club=current_club).get(user=current_user)
-#             except ObjectDoesNotExist:
-#                 messages.add_message(request,messages.SUCCESS,"You applied to this club successfully")
-#                 role = Role.objects.create(user=current_user, club=current_club, role='A')
-#                 return redirect('club_list')
-#             else:
-#                 messages.add_message(request,messages.ERROR,"You've already applied for this club!")
-#                 return redirect('feed')
-#         else:
-#             return redirect('login')
-#     else:
-#         return HttpResponseForbidden()
 
 class ApplyView(LoginRequiredMixin,View):
 
@@ -1137,8 +767,8 @@ class ApplyView(LoginRequiredMixin,View):
 
     def post(self,request,club_id):
         return self.render()
-        
-    
+
+
 
 
     def render(self,*args, **kwargs):
@@ -1155,21 +785,6 @@ class ApplyView(LoginRequiredMixin,View):
             return redirect('feed')
 
 
-"""These functions are for adding/removing
-     books from a user's wishlist."""
-# @login_required
-# def wish(request, book_id):
-#     user = request.user
-#     try:
-#         book = Book.objects.get(pk = book_id)
-#         if user.wishlist.filter(isbn=book.isbn).exists() == False:
-#             user.wishlist.add(book)
-#         return redirect('show_book', book.id)
-
-#     except ObjectDoesNotExist:
-#         return redirect('book_list')
-
-
 class WishView(LoginRequiredMixin,View):
 
 
@@ -1178,7 +793,7 @@ class WishView(LoginRequiredMixin,View):
 
     def post(self,*args, **kwargs):
         return self.render()
-    
+
 
 
     def render(self,*args, **kwargs):
@@ -1191,22 +806,8 @@ class WishView(LoginRequiredMixin,View):
             return redirect('show_book', book.id)
 
         except ObjectDoesNotExist:
-            return redirect('book_list')     
+            return redirect('book_list')
 
-# @login_required
-# def unwish(request, book_id):
-#     user = request.user
-#     try:
-#         book = Book.objects.get(pk = book_id)
-#         previous_url = request.META.get('HTTP_REFERER')
-#         if user.wishlist.filter(isbn=book.isbn).exists():
-#             user.wishlist.remove(book)
-#             if previous_url != None and 'wishlist' in previous_url:
-#                 return redirect('wishlist', user.id)
-#         return redirect('show_book', book.id)
-
-#     except ObjectDoesNotExist:
-#         return redirect('book_list')
 
 class UnwishView(LoginRequiredMixin,View):
 
@@ -1216,7 +817,7 @@ class UnwishView(LoginRequiredMixin,View):
 
     def post(self,*args, **kwargs):
         return self.render()
-    
+
 
 
     def render(self,*args, **kwargs):
@@ -1268,38 +869,6 @@ def set_club_book(request, club_id):
     return render(request, 'club_templates/set_club_book.html', {'form': form, 'club': club})
 
 
-# class SetClubBookView(FormView):
-
-#     form_class = SetClubBookForm
-#     template_name = 'club_templates/set_club_book.html'
-
-#     def form_valid(self,*args, **kwargs):
-#             current_user = self.request.user
-#             club_id = self.kwargs['club_id']
-#             club = Club.objects.get(id=club_id)
-#             book = form.get_book()
-#             current_owned_club = Role.objects.filter(user=current_user, role='O', club=club) | \
-#                                  Role.objects.filter(user=current_user, role='CO', club=club)
-#             club_book = Club.objects.filter(club_book= book, id= club_id)
-#             if current_owned_club.count() == 1:
-#                 if club_book.count() == 0:
-#                     club._add_book(book)
-#                     return redirect('club_feed', club.id)
-#                 else:
-#                     messages.add_message(self.request, messages.ERROR, "this book has already added")
-#                     return redirect('set_club_book', club.id)
-#             else:
-#                 messages.add_message(self.request, messages.ERROR, "you don't own this club")
-#                 return redirect('club_list')
-
-#     def form_invalid(self,*args, **kwargs):
-#         club_id = self.kwargs['club_id']
-#         club = Club.objects.get(id=club_id)
-#         messages.add_message(self.request, messages.ERROR, "Invalid club name or book name")
-#         return redirect('set_club_book', club.id)
-
-
-
 
 """This function allows club office/owner to
     invite other users to join the club"""
@@ -1338,60 +907,6 @@ def invite(request, club_id):
 
 
 
-# class InviteView(FormView):
-
-#     form_class = InviteForm
-#     template_name = 'club_templates/invite.html'
-
-
-#     def form_valid(self,form,*args, **kwargs):
-#             club_id = self.kwargs['club_id']
-#             current_user = self.request.user
-#             club = club = Club.objects.get(id=club_id)
-#             user = form.get_user()
-#             owned_club = Role.objects.filter(user=current_user, role='O', club=club) |\
-#                                  Role.objects.filter(user=current_user, role='CO', club=club)
-#             invited = Invitation.objects.filter(user=user, club=club, status='P')
-#             isMember = Role.objects.filter(club=club, user=user)
-#             if owned_club.count() == 1:
-#                 if invited.count() == 0 and isMember.count() == 0:
-#                     invitations = Invitation.objects.create(user=user, club=club, status='P')
-#                     return redirect('club_members', club.id)
-#                 else:
-#                     messages.add_message(self.request, messages.ERROR, "you have already invited this user "
-#                                                                   "or this user already in the club")
-#                     form = InviteForm()
-#                     return redirect('invite', club.id)
-#             else:
-#                 messages.add_message(self.request, messages.ERROR, "you don't have the permission to invite others")
-#                 form = InviteForm()
-#                 return redirect('club_list')
-
-        
-
-#     def form_invalid(self,*args, **kwargs):
-#         club_id = self.kwargs['club_id']
-#         club = Club.objects.get(id=club_id)
-#         messages.add_message(self.request, messages.ERROR, "Invalid username")
-#         form = InviteForm()
-#         return redirect('invite', club.id)
-
-
-
-"""This function allows users to accept the invitation from the club"""
-# def accept_invitation(request, inv_id):
-#     if request.method == "POST":
-#         user = request.user
-#         invitation = Invitation.objects.get(id=inv_id)
-#         club = invitation.club
-#         new_role = Role.objects.create(user=user, club=club, role="M")
-#         MembershipPost.objects.create(user = user, club = club)
-#         old_invitation = Invitation.objects.filter(id=inv_id).delete()
-#         messages.add_message(request, messages.INFO, "join successful")
-#         return redirect('invitation_list', user.id)
-#     else:
-#         return HttpResponseForbidden()
-
 class AcceptInvitationView(View):
 
     def post(self,request,inv_id,*args, **kwargs):
@@ -1408,17 +923,6 @@ class AcceptInvitationView(View):
         return HttpResponseForbidden()
 
 
-"""This function allows users to reject the invitation from the club"""
-# def reject_invitation(request, inv_id):
-#     if request.method == "POST":
-#         user = request.user
-#         invitation = Invitation.objects.get(id=inv_id)
-#         club = invitation.club
-#         old_invitation = Invitation.objects.filter(id=inv_id).delete()
-#         messages.add_message(request, messages.INFO, "you have rejected this invitation")
-#         return redirect('invitation_list', user.id)
-#     else:
-#         return HttpResponseForbidden()
 
 class RejectInvitationView(View):
 
@@ -1449,37 +953,7 @@ class InvitationlistView(LoginRequiredMixin, ListView):
         except ObjectDoesNotExist:
             return redirect('feed')
 
-# @login_required
-# def club_feed(request,club_id):
-#     user=request.user
-#     form = UserPostForm()
-#     comment_form = CommentForm
-#     club = Club.objects.get(id=club_id)
-#     members = Role.objects.filter(club=club)
-#     try:
-#         userrole = Role.objects.get(club = club, user=request.user)
-#     except ObjectDoesNotExist:
-#         messages.add_message(request, messages.ERROR, "It seems you don't belong to this club!")
-#         return redirect('club_list')
-#     else:
-#         if userrole.role == "A":
-#             messages.add_message(request, messages.ERROR, "You are an applicant in this club, you don't have authority to view the member list!")
-#             return redirect('club_list')
-#         else:
-#             event_posts = EventPost.objects.filter(event__club=club)
-#             comments = Comment.objects.filter(club=club)
-#             membership_posts = MembershipPost.objects.filter(club=club)
-#             user_posts = UserPost.objects.filter(club=club)
-#             posts = sorted( chain(event_posts, membership_posts, user_posts),
-#                     key=lambda instance: instance.created_at,reverse=True)
-#             return render(request, 'club_templates/club_feed.html', {'members': members,
-#                                                        'userrole': userrole,
-#                                                        'posts':posts,
-#                                                        'club' : club,
-#                                                        'form' : form,
-#                                                        'comment_form' : comment_form,
-#                                                        'comments' : comments,
-#                                                        'user':user})
+
 
 
 class ClubFeedView(LoginRequiredMixin,View):
@@ -1489,8 +963,8 @@ class ClubFeedView(LoginRequiredMixin,View):
 
     def post(self,request,club_id):
         return self.render()
-        
-    
+
+
 
 
     def render(self,*args, **kwargs):
@@ -1538,7 +1012,14 @@ def create_event(request, club_id):
         if form.is_valid():
             this_event = form.save(club_id,current_user)
             EventPost.objects.create(event = this_event, user=request.user)
+<<<<<<< HEAD
             return redirect('events_list',club_id)
+=======
+            return render(request, 'club_templates/events_list.html', {'members': members,
+                                                        'userrole': userrole,
+                                                        'club' : club,
+                                                        'events' : events})
+>>>>>>> 027ff686060921434445992564a8616b6959c4ee
         else:
             messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
     form = EventForm()
@@ -1546,6 +1027,7 @@ def create_event(request, club_id):
                                                  'members': members,
                                                   'userrole': userrole,
                                                   'club': club})
+<<<<<<< HEAD
 
     
 # class CreateEventView(CreateView):
@@ -1587,21 +1069,9 @@ def create_event(request, club_id):
 
 
 
+=======
+>>>>>>> 027ff686060921434445992564a8616b6959c4ee
 
-# def event_list(request,club_id):
-#     club = Club.objects.get(id=club_id)
-#     members = Role.objects.filter(club=club)
-#     userrole = Role.objects.get(club = club, user=request.user)
-#     try:
-#         events = Event.objects.filter(club=club)
-#     except ObjectDoesNotExist:
-#         messages.add_message(request,messages.ERROR,"There are no events")
-#         return redirect('club_list')
-#     else:
-#           return render(request, 'club_templates/events_list.html', {'members': members,
-#                                                       'userrole': userrole,
-#                                                       'club' : club,
-#                                                       'events' : events})
 
 class EventList(View):
 
@@ -1654,19 +1124,7 @@ class NewPostView(LoginRequiredMixin, CreateView):
     def handle_no_permission(self):
         return redirect('login')
 
-# @login_required
-# def like_post(request, club_id, post_id):
-#     try:
-#         post = UserPost.objects.get(id=post_id)
-#         if post.likes.filter(id=request.user.id).exists():
-#             post.likes.remove(request.user)
-#         else:
 
-#             post.likes.add(request.user)
-#     except ObjectDoesNotExist:
-#         return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
-#     else:
-#         return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
 
 class LikePostView(LoginRequiredMixin,View):
@@ -1676,7 +1134,7 @@ class LikePostView(LoginRequiredMixin,View):
 
     def post(self,request,club_id):
         return self.render()
-        
+
     def render(self,*args, **kwargs):
         post_id = self.kwargs['post_id']
         club_id = self.kwargs['club_id']
@@ -1705,21 +1163,7 @@ def add_comment_to_post(request, club_id, post_id):
             comment = form.save()
     return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
 
-# class CommentOnPostView(LoginRequiredMixin,FormView):
-    
-#     form_class = CommentForm
-    
-#     def form_valid(self, form,*args, **kwargs):
-#         club_id = self.kwargs['club_id']
-#         post_id = self.kwargs['post_id']
-#         post = UserPost.objects.get(id=post_id)
-#         club = Club.objects.get(id=club_id)
-#         comment = Comment.objects.create(club=club,post=post,user=self.request.user)
-#         comment = form.save()
-    
-#     def form_invalid(self, form,*args, **kwargs):
-#         club_id = self.kwargs['club_id']
-#         return HttpResponseRedirect(reverse('club_feed',kwargs={'club_id':club_id}))
+
 
 class Calendar(HTMLCalendar):
     def __init__(self, year=None, month=None):
@@ -1814,27 +1258,7 @@ def join_event(request,event_id,club_id):
                                                    'club' : club,
                                                    'events' : events})
 
-# class JoinEventView(View):
-#     def get(self,*args, **kwargs):
-#         return self.render()
 
-#     def post(self,*args, **kwargs):
-#         event_id = self.kwargs['event_id']
-#         event = Event.objects.get(id=event_id)
-#         event.save()
-#         event.join_event(self.request.user)
-#         return self.render()
-
-#     def render(self,*args, **kwargs):
-#         club_id = self.kwargs['club_id']
-#         club = Club.objects.get(id=club_id)
-#         members = Role.objects.filter(club=club)
-#         userrole = Role.objects.get(club = club, user=self.request.user)
-#         events = Event.objects.filter(club = club)
-#         return render(self.request, 'club_templates/events_list.html', {'members': members,
-#                                                     'userrole': userrole,
-#                                                     'club' : club,
-#                                                     'events' : events})
 
 
 def add_user_to_interested_list(request,event_id,club_id):
@@ -1849,26 +1273,6 @@ def add_user_to_interested_list(request,event_id,club_id):
                                                    'club' : club,
                                                    'events' : events})
 
-# class AddUsertoInterestedView(View):
-#     def get(self,*args, **kwargs):
-#         return self.render()
-
-#     def post(self,*args, **kwargs):
-#      event_id = self.kwargs['event_id']
-#      event = Event.objects.get(id=event_id)
-#      event.add_user_to_interested_field(self.request.user)
-#      return self.render()
-
-#     def render(self,*args, **kwargs):
-#         club_id = self.kwargs['club_id']
-#         club = Club.objects.get(id=club_id)
-#         members = Role.objects.filter(club=club)
-#         userrole = Role.objects.get(club = club, user=self.request.user)
-#         events = Event.objects.filter(club = club) 
-#         return render(self.request, 'club_templates/events_list.html', {'members': members,
-#                                                     'userrole': userrole,
-#                                                     'club' : club,
-#                                                     'events' : events})
 
 def event_page(request,event_id,club_id):
      club = Club.objects.get(id=club_id)
@@ -1899,21 +1303,6 @@ def user_chat(request, receiver_id):
     })
 
 
-# def send_user_message(request):
-#     user = request.user
-#     if request.method == "POST":
-#         text = request.POST.get('text')
-#         user_id = user.id
-#         receiver_id = request.POST.get('receiver_id')
-#         user = User.objects.get(id=user_id)
-#         receiver = User.objects.get(id=receiver_id)
-#         new_message = Message.objects.create(text=text, user=user, receiver=receiver)
-#         new_message.save()
-#         return render(request, 'user_templates/user_chat.html')
-#     else:
-#         return HttpResponseForbidden()
-
-
 class SendUserMessageView(View):
 
     def get(self,*args, **kwargs):
@@ -1930,7 +1319,7 @@ class SendUserMessageView(View):
         new_message = Message.objects.create(text=text, user=user, receiver=receiver)
         new_message.save()
         return render(self.request, 'user_templates/user_chat.html')
-    
+
 
 
 def get_user_messages(request, receiver_id):
@@ -1958,27 +1347,6 @@ def club_chat(request, club_id):
     })
 
 
-# def send_club_message(request):
-#     if request.method == "POST":
-#         text = request.POST.get('text')
-#         user_id = request.POST.get('user_id')
-#         club_id = request.POST.get('club_id')
-#         user = User.objects.get(id=user_id)
-#         club = Club.objects.get(id=club_id)
-#         try:
-#             role = Role.objects.get(user=user, club=club)
-#             if role.role == "O" or role.role == "CO" or role.role == "M":
-#                 new_message = Message.objects.create(text=text, user=user, club=club)
-#                 new_message.save()
-#                 return render(request, 'club_templates/club_chat.html')
-#             else:
-#                 return redirect('club_list')
-#         except ObjectDoesNotExist:
-#             return HttpResponseForbidden()
-#     else:
-#         return HttpResponseForbidden()
-
-
 class SendClubMessage(LoginRequiredMixin,View):
 
     def get(self,*args, **kwargs):
@@ -2000,9 +1368,9 @@ class SendClubMessage(LoginRequiredMixin,View):
                 return redirect('club_list')
         except ObjectDoesNotExist:
             return HttpResponseForbidden()
-        
 
-       
+
+
 
 
 def get_club_messages(request, club_id):
